@@ -1,0 +1,20 @@
+﻿import { defineConfig } from "vite";
+import { cloudflare } from "@cloudflare/vite-plugin";
+import react from "@vitejs/plugin-react";
+
+export default defineConfig({
+  plugins: [cloudflare(), react()],
+  build: {
+    outDir: "dist",
+    rollupOptions: {
+      input: {
+        worker: "src/index.ts",
+      },
+    },
+  },
+  resolve: {
+    alias: {
+      "@": "/src",
+    },
+  },
+});

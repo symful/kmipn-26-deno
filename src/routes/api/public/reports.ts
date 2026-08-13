@@ -1,0 +1,291 @@
+import { Hono } from "hono";
+import type { Env } from "@/types/bindings";
+import { PublicReportCreateSchema } from "@/lib/schemas";
+import { safeHandler } from "@/lib/safeHandler";
+import { withClient, type PgClient } from "@/lib/db";
+import { checkRateLimit } from "@/lib/ratelimit";
+import { logger } from "@/lib/logger";
+import { runAssessment } from "@/lib/agent/orchestrator";
+
+const PUBLIC_RATE_LIMIT = { limit: 60, windowMs: 60 * 1000 };
+
+export const publicReportsRoute = new Hono<{ Bindings: Env }>();
+
+/**
+ * GET /api/public/reports - List public reports with privacy redaction
+ *
+ * Returns only: id, category_id, general_wilayah (kabupaten level), status,
+ * last_updated, public_progress, moderated_photo_url, share_token
+ *
+ * NO: reporter_id (device_id), exact location, internal assessments, audit
+ */
+publicReportsRoute.get(
+  "/",
+  safeHandler(async (c) => {
+    const statusParam = c.req.query("status");
+    const categoryId = c.req.query("category_id");
+    const page = Math.max(1, parseInt(c.req.query("page") ?? "1", 10));
+    const limit = Math.min(100, Math.max(1, parseInt(c.req.query("limit") ?? "20", 10)));
+    const offset = (page - 1) * limit;
+
+    const result = await withClient(c.env, async (client: PgClient) => {
+      // Build filters - only return non-rejected reports by default
+      const filters: string[] = [];
+      const params: unknown[] = [];
+      let i = 1;
+
+      if (statusParam) {
+        const statuses = statusParam.split(",").map((s) => s.trim());
+        filters.push(`r.status = ANY($${i++})`);
+        params.push(statuses);
+      } else {
+        // Default: exclude rejected reports from public view
+        filters.push(`r.status != 'rejected'`);
+      }
+
+      if (categoryId) {
+        filters.push(`r.category_id = $${i++}`);
+        params.push(categoryId);
+      }
+
+      const where = filters.length ? `WHERE ${filters.join(" AND ")}` : "";
+
+      const listSql = `
+        SELECT
+          r.id,
+          r.category_id,
+          r.status,
+          r.created_at as last_updated,
+          r.photo_urls,
+          COALESCE(kab.name, 'Unknown') AS general_wilayah,
+          COALESCE(ST_X(ST_Centroid(kab.geom)), r.lng) AS kabupaten_lng,
+          COALESCE(ST_Y(ST_Centroid(kab.geom)), r.lat) AS kabupaten_lat
+        FROM reports r
+        LEFT JOIN wilayah kab ON kab.level = 'KABUPATEN'
+          AND kab.geom IS NOT NULL
+          AND ST_Contains(kab.geom, r.geom::geometry)
+        ${where}
+        ORDER BY r.created_at DESC
+        LIMIT $${i++} OFFSET $${i++}
+      `;
+
+      const countSql = `SELECT COUNT(*)::int AS total FROM reports r ${where}`;
+
+      const listParams = [...params, limit, offset];
+      const countParams = [...params];
+
+      const [listResult, countResult] = await Promise.all([
+        client.query(listSql, listParams),
+        client.query(countSql, countParams),
+      ]);
+
+      const total = countResult.rows[0]?.total ?? 0;
+
+      // Get share tokens for these reports
+      const reportIds = listResult.rows.map((row) => row.id);
+      let shareTokens: Record<string, string> = {};
+      if (reportIds.length > 0) {
+        const tokensResult = await client.query(
+          `SELECT report_id, share_token FROM report_shares
+           WHERE report_id = ANY($1) AND expires_at > NOW()`,
+          [reportIds]
+        );
+        for (const row of tokensResult.rows) {
+          shareTokens[row.report_id] = row.share_token;
+        }
+      }
+
+      // Transform rows with redaction
+      const reports = listResult.rows.map((row) => {
+        // Calculate public_progress from status (0-100)
+        const publicProgress = getPublicProgress(row.status);
+
+        // Get first photo as moderated_photo_url (in production, this would be a reviewed/moderated URL)
+        const moderatedPhotoUrl = row.photo_urls?.[0] ?? null;
+
+        // Generate generalized location: kabupaten centroid + random offset ≤ 5km
+        const generalizedLocation = generalizeLocation(
+          Number(row.kabupaten_lat),
+          Number(row.kabupaten_lng)
+        );
+
+        return {
+          id: row.id,
+          category_id: row.category_id,
+          general_wilayah: row.general_wilayah,
+          status: row.status,
+          last_updated: row.last_updated,
+          public_progress: publicProgress,
+          moderated_photo_url: moderatedPhotoUrl,
+          share_token: shareTokens[row.id] ?? null,
+          generalized_location: generalizedLocation,
+        };
+      });
+
+      return { reports, total, page, limit };
+    });
+
+    return c.json(result);
+  }),
+);
+
+/**
+ * GET /api/public/reports/:id - Get single public report detail with redaction
+ */
+publicReportsRoute.get(
+  "/:id",
+  safeHandler(async (c) => {
+    const ip = c.req.header("x-forwarded-for") ?? c.req.header("cf-connecting-ip") ?? "anonymous";
+    if (!checkRateLimit(`public-reports:${ip}`, PUBLIC_RATE_LIMIT.limit, PUBLIC_RATE_LIMIT.windowMs)) {
+      return c.json({ error: { code: "RATE_LIMITED", message: "Too many requests" } }, 429);
+    }
+    const id = c.req.param("id");
+    const result = await withClient(c.env, async (client: PgClient) => {
+      const r = await client.query(
+        `SELECT r.id, r.category_id, r.status, r.created_at, r.updated_at,
+                r.photo_urls, r.title, r.description,
+                COALESCE(kab.name, 'Unknown') AS general_wilayah,
+                COALESCE(ST_X(ST_Centroid(kab.geom)), r.lng) AS kabupaten_lng,
+                COALESCE(ST_Y(ST_Centroid(kab.geom)), r.lat) AS kabupaten_lat
+         FROM reports r
+         LEFT JOIN wilayah kab ON kab.level = 'KABUPATEN'
+           AND kab.geom IS NOT NULL
+           AND ST_Contains(kab.geom, r.geom::geometry)
+         WHERE r.id = $1`,
+        [id]
+      );
+      return r.rows[0];
+    });
+
+    if (!result) {
+      return c.json({ error: { code: "NOT_FOUND", message: "Report not found" } }, 404);
+    }
+
+    // Get share token
+    const shareToken = await withClient(c.env, async (client: PgClient) => {
+      const tokenResult = await client.query(
+        `SELECT share_token FROM report_shares
+         WHERE report_id = $1 AND expires_at > NOW()
+         ORDER BY created_at DESC LIMIT 1`,
+        [id]
+      );
+      return tokenResult.rows[0]?.share_token ?? null;
+    });
+
+    // Build response with redaction
+    const publicProgress = getPublicProgress(result.status);
+    const moderatedPhotoUrl = result.photo_urls?.[0] ?? null;
+    const generalizedLocation = generalizeLocation(
+      Number(result.kabupaten_lat),
+      Number(result.kabupaten_lng)
+    );
+
+    return c.json({
+      id: result.id,
+      category_id: result.category_id,
+      general_wilayah: result.general_wilayah,
+      status: result.status,
+      last_updated: result.updated_at ?? result.created_at,
+      public_progress: publicProgress,
+      moderated_photo_url: moderatedPhotoUrl,
+      share_token: shareToken,
+      generalized_location: generalizedLocation,
+      title: result.title,
+      // Description is truncated to prevent PII leakage
+      description: String(result.description ?? "").slice(0, 200),
+    });
+  }),
+);
+
+publicReportsRoute.post(
+  "/",
+  safeHandler(async (c) => {
+    const body = await c.req.json();
+    const parsed = PublicReportCreateSchema.safeParse(body);
+    if (!parsed.success) {
+      return c.json({ error: { code: "VALIDATION_ERROR", message: "Invalid request data" }, details: parsed.error.flatten() }, 400);
+    }
+
+    const rateLimitKey = `deviceId:reportCreate:${parsed.data.device_id}`;
+    if (!checkRateLimit(rateLimitKey, 10, 60 * 60 * 1000)) {
+      return c.json({ error: { code: "RATE_LIMITED", message: "Too many requests" } }, 429);
+    }
+
+    const result = await withClient(c.env, async (client: PgClient) => {
+      const existing = await client.query(
+        "SELECT id FROM reports WHERE idempotency_key = $1",
+        [parsed.data.idempotency_key]
+      );
+      if (existing.rows[0]) {
+        return { id: existing.rows[0].id as string, duplicate: true };
+      }
+      const inserted = await client.query<{ id: string }>(
+        `INSERT INTO reports (idempotency_key, category_id, description, geom, photo_urls, status, created_at, updated_at)
+         VALUES ($1, $2, $3, ST_MakePoint($4, $5)::geography, $6, 'submitted', NOW(), NOW()) RETURNING id`,
+        [
+          parsed.data.idempotency_key,
+          parsed.data.category_id,
+          parsed.data.description,
+          parsed.data.lng,
+          parsed.data.lat,
+          parsed.data.photo_urls ?? [],
+        ]
+      );
+      return { id: inserted.rows[0]!.id, duplicate: false };
+    });
+
+    if (!result.duplicate) {
+      try {
+        await withClient(c.env, async (client) => {
+          await client.query(
+            `INSERT INTO outbox (event_type, target_system, payload, related_report_id, next_retry_at)
+             VALUES ($1, 'internal', $2, $3, NOW())`,
+            ["report_created", JSON.stringify({ report_id: result.id, action: "report_created" }), result.id]
+          );
+        });
+      } catch (e) {
+        logger.error({ route: c.req.path, method: c.req.method, error: e as Error, context: "outbox_insert_failed" });
+      }
+      c.executionCtx.waitUntil(
+        runAssessment(c.env, result.id).catch((e) =>
+          logger.error({ route: c.req.path, method: c.req.method, error: e, context: "ai_assessment_failed" })
+        )
+      );
+    }
+
+    return c.json(result, 200);
+  }),
+);
+
+function getPublicProgress(status: string): number {
+  const progressMap: Record<string, number> = {
+    draft: 0,
+    submitted: 10,
+    under_review: 30,
+    verified: 50,
+    assigned: 60,
+    in_progress: 75,
+    resolved: 100,
+    closed: 100,
+    rejected: 0,
+    duplicate_merged: 100,
+    needs_survey: 40,
+  };
+  return progressMap[status] ?? 0;
+}
+
+function generalizeLocation(
+  lat: number,
+  lng: number
+): { lat: number; lng: number } {
+  if (!lat || !lng || isNaN(lat) || isNaN(lng)) {
+    return { lat: 0, lng: 0 };
+  }
+  const maxOffsetKm = 5;
+  const latOffset = (Math.random() - 0.5) * 2 * (maxOffsetKm / 111);
+  const lngOffset = (Math.random() - 0.5) * 2 * (maxOffsetKm / (111 * Math.cos((lat * Math.PI) / 180)));
+  return {
+    lat: Math.round((lat + latOffset) * 1000000) / 1000000,
+    lng: Math.round((lng + lngOffset) * 1000000) / 1000000,
+  };
+}

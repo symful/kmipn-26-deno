@@ -1,0 +1,720 @@
+openapi: 3.1.0
+info:
+  title: SIGAP API
+  version: 1.0.0
+  description: Geospatial infrastructure reporting platform API
+
+servers:
+  - url: https://sigap.live/api
+    description: Production
+
+paths:
+  /auth/login:
+    post:
+      operationId: login
+      tags: [auth]
+      security: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/LoginRequest"
+      responses:
+        "200":
+          description: Login successful
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/LoginResponse"
+        "401":
+          description: Invalid credentials
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+
+  /auth/refresh:
+    post:
+      operationId: refreshToken
+      tags: [auth]
+      security: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [refresh_token]
+              properties:
+                refresh_token:
+                  type: string
+      responses:
+        "200":
+          description: Token refreshed
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/LoginResponse"
+        "401":
+          description: Invalid or expired refresh token
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+
+  /categories:
+    get:
+      operationId: listCategories
+      tags: [categories]
+      security: []
+      responses:
+        "200":
+          description: List of categories
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  categories:
+                    type: array
+                    items:
+                      $ref: "#/components/schemas/Category"
+
+  /reports:
+    get:
+      operationId: listReports
+      tags: [reports]
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: status
+          in: query
+          schema:
+            $ref: "#/components/schemas/ReportStatus"
+        - name: category_id
+          in: query
+          schema:
+            type: string
+            format: uuid
+        - name: page
+          in: query
+          schema:
+            type: integer
+            default: 1
+        - name: limit
+          in: query
+          schema:
+            type: integer
+            default: 20
+            maximum: 100
+      responses:
+        "200":
+          description: Paginated reports
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  reports:
+                    type: array
+                    items:
+                      $ref: "#/components/schemas/Report"
+                  total:
+                    type: integer
+                  page:
+                    type: integer
+        "401":
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+
+    post:
+      operationId: createReport
+      tags: [reports]
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CreateReportRequest"
+      responses:
+        "201":
+          description: Report created
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Report"
+        "400":
+          description: Validation error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "401":
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+
+  /reports/{id}:
+    get:
+      operationId: getReport
+      tags: [reports]
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        "200":
+          description: Report detail
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Report"
+        "404":
+          description: Not found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+
+    patch:
+      operationId: updateReport
+      tags: [reports]
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/UpdateReportRequest"
+      responses:
+        "200":
+          description: Report updated
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Report"
+        "404":
+          description: Not found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+
+    delete:
+      operationId: deleteReport
+      tags: [reports]
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        "204":
+          description: Report deleted
+        "404":
+          description: Not found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+
+  /reports/sync:
+    post:
+      operationId: syncReports
+      tags: [reports]
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [reports]
+              properties:
+                reports:
+                  type: array
+                  items:
+                    $ref: "#/components/schemas/CreateReportRequest"
+                  maxItems: 50
+      responses:
+        "200":
+          description: Sync results
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  results:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        idempotency_key:
+                          type: string
+                          format: uuid
+                        report:
+                          $ref: "#/components/schemas/Report"
+                        action:
+                          type: string
+                          enum: [created, updated, conflict]
+                        conflict_reason:
+                          type: string
+                notices:
+                  type: array
+                  items:
+                    type: string
+
+  /agent/assess:
+    post:
+      operationId: assessReport
+      tags: [agent]
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [report_id]
+              properties:
+                report_id:
+                  type: string
+                  format: uuid
+                assessment_kind:
+                  type: string
+                  default: initial
+      responses:
+        "200":
+          description: Assessment complete
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AgentAssessment"
+        "404":
+          description: Report not found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+
+  /geojson/reports:
+    get:
+      operationId: exportReportsGeoJSON
+      tags: [geojson]
+      security: []
+      parameters:
+        - name: status
+          in: query
+          schema:
+            $ref: "#/components/schemas/ReportStatus"
+        - name: category_id
+          in: query
+          schema:
+            type: string
+            format: uuid
+        - name: bbox
+          in: query
+          description: Bounding box as minLng,minLat,maxLng,maxLat
+          schema:
+            type: string
+      responses:
+        "200":
+          description: GeoJSON FeatureCollection
+          content:
+            application/geo+json:
+              schema:
+                $ref: "#/components/schemas/GeoJSONFeatureCollection"
+
+components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+
+  schemas:
+    Role:
+      type: string
+      enum: [WARGA, SURVEYOR, VERIFIKATOR, OPERATOR, PETUGAS, PENGAMBIL_KEPUTUSAN, ADMIN_DAERAH, AUDITOR, RT_RW, ADMIN]
+
+    ReportStatus:
+      type: string
+      enum:
+        - submitted
+        - under_review
+        - verified
+        - in_progress
+        - resolved
+        - rejected
+        - duplicate_merged
+        - needs_survey
+
+    AssessmentStatus:
+      type: string
+      enum:
+        - completed
+        - timeout
+        - parse_failed
+        - vlm_error
+
+    User:
+      type: object
+      required: [id, email, role, name, created_at, updated_at]
+      properties:
+        id:
+          type: string
+          format: uuid
+        email:
+          type: string
+          format: email
+        role:
+          $ref: "#/components/schemas/Role"
+        name:
+          type: string
+        created_at:
+          type: string
+          format: date-time
+        updated_at:
+          type: string
+          format: date-time
+        deleted_at:
+          type: string
+          format: date-time
+          nullable: true
+
+    Category:
+      type: object
+      required: [id, slug, name, created_at]
+      properties:
+        id:
+          type: string
+          format: uuid
+        slug:
+          type: string
+        name:
+          type: string
+        icon:
+          type: string
+          nullable: true
+        created_at:
+          type: string
+          format: date-time
+
+    Wilayah:
+      type: object
+      required: [id, name, level, created_at]
+      properties:
+        id:
+          type: string
+          format: uuid
+        parent_id:
+          type: string
+          format: uuid
+          nullable: true
+        name:
+          type: string
+        level:
+          type: string
+          enum: [PROVINSI, KABUPATEN, KECAMATAN, DESA]
+        geom:
+          type: object
+          nullable: true
+        created_at:
+          type: string
+          format: date-time
+
+    Report:
+      type: object
+      required:
+        [
+          id,
+          idempotency_key,
+          category_id,
+          description,
+          lat,
+          lng,
+          status,
+          created_at,
+          updated_at,
+        ]
+      properties:
+        id:
+          type: string
+          format: uuid
+        idempotency_key:
+          type: string
+          format: uuid
+        category_id:
+          type: string
+          format: uuid
+        category:
+          $ref: "#/components/schemas/Category"
+        description:
+          type: string
+        geom:
+          type: object
+        lat:
+          type: number
+          format: double
+        lng:
+          type: number
+          format: double
+        photo_urls:
+          type: array
+          items:
+            type: string
+        exif_data:
+          type: object
+          nullable: true
+        device_id:
+          type: string
+          nullable: true
+        status:
+          $ref: "#/components/schemas/ReportStatus"
+        severity:
+          type: integer
+          minimum: 1
+          maximum: 5
+          nullable: true
+        assigned_to:
+          type: string
+          format: uuid
+          nullable: true
+        assignee:
+          $ref: "#/components/schemas/User"
+          nullable: true
+        created_at:
+          type: string
+          format: date-time
+        updated_at:
+          type: string
+          format: date-time
+
+    CreateReportRequest:
+      type: object
+      required: [idempotency_key, category_id, description, lat, lng]
+      properties:
+        idempotency_key:
+          type: string
+          format: uuid
+        category_id:
+          type: string
+          format: uuid
+        description:
+          type: string
+        lat:
+          type: number
+          format: double
+        lng:
+          type: number
+          format: double
+        photo_urls:
+          type: array
+          items:
+            type: string
+          default: []
+        exif_data:
+          type: object
+        device_id:
+          type: string
+
+    UpdateReportRequest:
+      type: object
+      properties:
+        status:
+          $ref: "#/components/schemas/ReportStatus"
+        severity:
+          type: integer
+          minimum: 1
+          maximum: 5
+        assigned_to:
+          type: string
+          format: uuid
+
+    AgentAssessment:
+      type: object
+      required: [id, report_id, assessment_kind, assessment_status, created_at]
+      properties:
+        id:
+          type: string
+          format: uuid
+        report_id:
+          type: string
+          format: uuid
+        assessment_kind:
+          type: string
+        assessment_status:
+          $ref: "#/components/schemas/AssessmentStatus"
+        vision_description:
+          type: string
+          nullable: true
+        damage_severity:
+          type: integer
+          minimum: 1
+          maximum: 5
+          nullable: true
+        exif_summary:
+          type: object
+          nullable: true
+        duplicate_candidates:
+          type: array
+          items:
+            type: object
+          nullable: true
+        confidence:
+          type: number
+          format: float
+          minimum: 0
+          maximum: 1
+          nullable: true
+        recommended_status:
+          $ref: "#/components/schemas/ReportStatus"
+          nullable: true
+        tool_calls_made:
+          type: integer
+          nullable: true
+        latency_ms:
+          type: integer
+          nullable: true
+        model_version:
+          type: string
+          nullable: true
+        created_at:
+          type: string
+          format: date-time
+
+    LoginRequest:
+      type: object
+      required: [email, password]
+      properties:
+        email:
+          type: string
+          format: email
+        password:
+          type: string
+
+    LoginResponse:
+      type: object
+      required: [access_token, refresh_token, expires_in]
+      properties:
+        access_token:
+          type: string
+        refresh_token:
+          type: string
+        expires_in:
+          type: integer
+        user:
+          $ref: "#/components/schemas/User"
+
+    ErrorResponse:
+      type: object
+      required: [error]
+      properties:
+        error:
+          type: string
+        detail:
+          type: string
+          nullable: true
+
+    GeoJSONFeatureCollection:
+      type: object
+      required: [type, features]
+      properties:
+        type:
+          type: string
+          const: FeatureCollection
+        features:
+          type: array
+          items:
+            $ref: "#/components/schemas/GeoJSONFeature"
+
+    GeoJSONFeature:
+      type: object
+      required: [type, geometry, properties]
+      properties:
+        type:
+          type: string
+          const: Feature
+        geometry:
+          type: object
+          oneOf:
+            - $ref: "#/components/schemas/GeoJSONPoint"
+            - $ref: "#/components/schemas/GeoJSONPolygon"
+        properties:
+          type: object
+          required: [id, status, category_id, description, created_at]
+          properties:
+            id:
+              type: string
+              format: uuid
+            status:
+              $ref: "#/components/schemas/ReportStatus"
+            category_id:
+              type: string
+              format: uuid
+            description:
+              type: string
+            severity:
+              type: integer
+              nullable: true
+            created_at:
+              type: string
+              format: date-time
+
+    GeoJSONPoint:
+      type: object
+      required: [type, coordinates]
+      properties:
+        type:
+          type: string
+          const: Point
+        coordinates:
+          type: array
+          items:
+            type: number
+          minItems: 2
+          maxItems: 2
+
+    GeoJSONPolygon:
+      type: object
+      required: [type, coordinates]
+      properties:
+        type:
+          type: string
+          const: Polygon
+        coordinates:
+          type: array
+          items:
+            type: array
+            items:
+              type: array
+              items:
+                type: number
+              minItems: 2

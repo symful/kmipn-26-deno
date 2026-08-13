@@ -1,0 +1,2818 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <script src="./support.js"></script>
+  </head>
+  <body>
+    <x-dc>
+      <helmet data-dc-atomics>
+        <meta name="design_doc_mode" content="canvas">
+        <link rel="preconnect" href="https://fonts.googleapis.com">
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link
+          href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:ital,wght@0,400;0,500;0,600;0,700;1,400&family=IBM+Plex+Mono:wght@400;500;600&display=swap"
+          rel="stylesheet"
+        >
+        <style>
+          * {
+            box-sizing: border-box;
+          }
+          body {
+            margin: 0;
+            background: #e6e8e3;
+            font-family: "IBM Plex Sans", system-ui, sans-serif;
+            color: #17191c;
+            -webkit-font-smoothing: antialiased;
+          }
+          a {
+            color: #0f7a6b;
+            text-decoration: none;
+          }
+          a:hover {
+            color: #0a5c50;
+          }
+          .tnum {
+            font-variant-numeric: tabular-nums;
+          }
+        </style>
+      </helmet>
+      <div
+        style="padding: 56px 60px 90px; display: flex; flex-direction: column; gap: 12px; min-width: 1480px"
+      >
+        <div
+          style="display: flex; flex-direction: column; gap: 10px; max-width: 820px"
+        >
+          <div style="display: flex; align-items: center; gap: 12px">
+            <div
+              style="width: 34px; height: 34px; border-radius: 8px; background: #0f7a6b; display: flex; align-items: center; justify-content: center; color: #fff; font-weight: 700; font-size: 17px"
+            >
+              P
+            </div>
+            <div
+              style="font-size: 24px; font-weight: 700; letter-spacing: -0.01em"
+            >
+              PantauDesa
+            </div>
+            <span
+              style="font-family: 'IBM Plex Mono', monospace; font-size: 11px; font-weight: 500; color: #616770; border: 1px solid #cfd3cc; border-radius: 5px; padding: 3px 8px"
+            >Hi-Fi · v1.0</span>
+          </div>
+          <div
+            style="font-size: 15px; line-height: 1.55; color: #4a5058; text-wrap: pretty"
+          >
+            Platform pemetaan &amp; monitoring pembangunan desa. Sembilan layar
+            inti mengikuti spesifikasi UI/UX — nada utilitarian layanan
+            publik, aksi teal, status berbahasa tindakan, dan mode offline yang
+            selalu terlihat.
+          </div>
+        </div>
+
+        <!-- ============================ SECTION 1: WARGA ============================ -->
+        <div
+          style="display: flex; align-items: baseline; gap: 14px; margin-top: 34px; padding-bottom: 10px; border-bottom: 2px solid #cfd3cc"
+        >
+          <div
+            style="font-family: 'IBM Plex Mono', monospace; font-size: 13px; font-weight: 600; color: #0f7a6b"
+          >
+            01
+          </div>
+          <div
+            style="font-size: 19px; font-weight: 700; letter-spacing: -0.01em"
+          >
+            Aplikasi Mobile Warga
+          </div>
+          <div style="font-size: 14px; color: #616770">
+            Membuat &amp; memantau laporan · persona Sari, warga pelapor
+          </div>
+        </div>
+
+        <div
+          style="display: flex; gap: 40px; flex-wrap: wrap; padding-top: 8px"
+        >
+          <!-- 1a Beranda Warga M-05 -->
+          <div
+            style="display: flex; flex-direction: column; align-items: center; gap: 14px"
+          >
+            <div style="display: flex; align-items: center; gap: 9px">
+              <span
+                style="font-family: 'IBM Plex Mono', monospace; font-size: 11px; font-weight: 600; padding: 3px 7px; border-radius: 5px; background: #1f2226; color: #fff"
+              >M-05</span>
+              <span style="font-size: 13px; font-weight: 600; color: #3a3f45"
+              >Beranda Warga</span>
+            </div>
+            <div
+              style="width: 392px; height: 812px; background: #1f2226; border-radius: 44px; padding: 11px; box-shadow: 0 28px 60px -22px rgba(0, 0, 0, 0.5)"
+            >
+              <div
+                style="position: relative; width: 100%; height: 100%; background: #f4f5f3; border-radius: 34px; overflow: hidden; display: flex; flex-direction: column"
+              >
+                <!-- status bar -->
+                <div
+                  style="height: 44px; display: flex; align-items: center; justify-content: space-between; padding: 0 24px; flex: none"
+                >
+                  <span class="tnum" style="font-size: 13px; font-weight: 600"
+                  >09:41</span>
+                  <div style="display: flex; gap: 5px; align-items: center">
+                    <span
+                      style="width: 16px; height: 9px; border: 1.4px solid #17191c; border-radius: 2px; display: inline-block"
+                    ></span><span
+                      style="width: 6px; height: 9px; background: #17191c; border-radius: 1px"
+                    ></span>
+                  </div>
+                </div>
+                <!-- app bar -->
+                <div style="padding: 6px 18px 12px; flex: none">
+                  <div
+                    style="display: flex; align-items: center; justify-content: space-between"
+                  >
+                    <div>
+                      <div
+                        style="font-size: 11px; color: #616770; font-weight: 500"
+                      >
+                        Wilayah aktif
+                      </div>
+                      <div
+                        style="display: flex; align-items: center; gap: 5px; font-size: 17px; font-weight: 700"
+                      >
+                        Desa Ciburuy <span
+                          style="color: #8a9099; font-size: 12px"
+                        >▾</span>
+                      </div>
+                    </div>
+                    <div style="display: flex; gap: 8px; align-items: center">
+                      <span
+                        style="display: inline-flex; align-items: center; gap: 5px; background: #f8ecd6; color: #8a5808; border: 1px solid #ecd7a6; border-radius: 999px; padding: 4px 9px; font-size: 11px; font-weight: 600"
+                      ><span
+                          style="width: 7px; height: 7px; border-radius: 50%; background: #b8730a"
+                        ></span>Offline</span>
+                      <span
+                        style="position: relative; width: 34px; height: 34px; border-radius: 10px; background: #fff; border: 1px solid #e4e7e2; display: flex; align-items: center; justify-content: center"
+                      >
+                        <span
+                          style="width: 14px; height: 14px; border: 1.6px solid #3a3f45; border-radius: 4px 4px 3px 3px"
+                        ></span>
+                        <span
+                          style="position: absolute; top: 6px; right: 7px; width: 8px; height: 8px; border-radius: 50%; background: #c0392b; border: 1.6px solid #fff"
+                        ></span>
+                      </span>
+                    </div>
+                  </div>
+                </div>
+                <!-- scroll content -->
+                <div
+                  style="flex: 1; overflow: hidden; padding: 0 18px 12px; display: flex; flex-direction: column; gap: 14px"
+                >
+                  <!-- CTA -->
+                  <button
+                    style="border: 0; cursor: pointer; background: #0f7a6b; color: #fff; border-radius: 14px; padding: 17px 18px; display: flex; align-items: center; gap: 13px; box-shadow: 0 10px 22px -12px rgba(15, 122, 107, 0.9); text-align: left"
+                  >
+                    <span
+                      style="width: 40px; height: 40px; border-radius: 11px; background: rgba(255, 255, 255, 0.16); display: flex; align-items: center; justify-content: center; flex: none"
+                    ><span
+                        style="position: relative; width: 18px; height: 18px"
+                      ><span
+                          style="position: absolute; top: 8px; left: 2px; width: 14px; height: 2px; background: #fff; border-radius: 2px"
+                        ></span><span
+                          style="position: absolute; left: 8px; top: 2px; height: 14px; width: 2px; background: #fff; border-radius: 2px"
+                        ></span></span></span>
+                    <span><span
+                        style="display: block; font-size: 16px; font-weight: 700"
+                      >Buat laporan</span><span
+                        style="display: block; font-size: 12px; opacity: 0.85; margin-top: 1px"
+                      >Foto, lokasi, dan kondisi lapangan</span></span>
+                  </button>
+                  <!-- action card -->
+                  <div
+                    style="background: #f8ecd6; border: 1px solid #ecd7a6; border-radius: 13px; padding: 13px 14px; display: flex; gap: 11px; align-items: flex-start"
+                  >
+                    <span
+                      style="width: 30px; height: 30px; border-radius: 8px; background: #b8730a; color: #fff; display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 14px; flex: none"
+                    >2</span>
+                    <div style="flex: 1">
+                      <div
+                        style="font-size: 13.5px; font-weight: 600; color: #7a4d06"
+                      >
+                        2 laporan belum tersinkron
+                      </div>
+                      <div
+                        style="font-size: 12px; color: #8a5808; line-height: 1.4; margin-top: 1px"
+                      >
+                        Aman tersimpan di perangkat. Akan terkirim otomatis saat
+                        ada koneksi.
+                      </div>
+                      <div
+                        style="margin-top: 8px; font-size: 12.5px; font-weight: 600; color: #0a5c50"
+                      >
+                        Buka Pusat Sinkronisasi →
+                      </div>
+                    </div>
+                  </div>
+                  <!-- ringkasan status -->
+                  <div>
+                    <div
+                      style="display: flex; justify-content: space-between; align-items: baseline; margin-bottom: 8px"
+                    >
+                      <span style="font-size: 13px; font-weight: 700"
+                      >Laporan saya</span>
+                      <span
+                        style="font-size: 12px; color: #0f7a6b; font-weight: 600"
+                      >Lihat semua</span>
+                    </div>
+                    <div
+                      style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 8px"
+                    >
+                      <div
+                        style="background: #fff; border: 1px solid #e4e7e2; border-radius: 11px; padding: 11px 10px"
+                      >
+                        <div
+                          class="tnum"
+                          style="font-size: 22px; font-weight: 700; color: #c0392b"
+                        >
+                          1
+                        </div>
+                        <div
+                          style="font-size: 11px; color: #616770; line-height: 1.25; margin-top: 2px"
+                        >
+                          Perlu tindakan
+                        </div>
+                      </div>
+                      <div
+                        style="background: #fff; border: 1px solid #e4e7e2; border-radius: 11px; padding: 11px 10px"
+                      >
+                        <div
+                          class="tnum"
+                          style="font-size: 22px; font-weight: 700; color: #2563eb"
+                        >
+                          3
+                        </div>
+                        <div
+                          style="font-size: 11px; color: #616770; line-height: 1.25; margin-top: 2px"
+                        >
+                          Diproses
+                        </div>
+                      </div>
+                      <div
+                        style="background: #fff; border: 1px solid #e4e7e2; border-radius: 11px; padding: 11px 10px"
+                      >
+                        <div
+                          class="tnum"
+                          style="font-size: 22px; font-weight: 700; color: #0f7a6b"
+                        >
+                          4
+                        </div>
+                        <div
+                          style="font-size: 11px; color: #616770; line-height: 1.25; margin-top: 2px"
+                        >
+                          Selesai
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                  <!-- kasus terdekat -->
+                  <div>
+                    <div
+                      style="display: flex; justify-content: space-between; align-items: baseline; margin-bottom: 8px"
+                    >
+                      <span style="font-size: 13px; font-weight: 700"
+                      >Kasus terdekat</span>
+                      <span
+                        style="font-size: 12px; color: #0f7a6b; font-weight: 600"
+                      >Lihat peta</span>
+                    </div>
+                    <div
+                      style="display: flex; flex-direction: column; gap: 9px"
+                    >
+                      <div
+                        style="background: #fff; border: 1px solid #e4e7e2; border-radius: 12px; padding: 12px; display: flex; gap: 11px"
+                      >
+                        <span
+                          style="width: 38px; height: 38px; border-radius: 9px; background: #e2f1ee; color: #0a5c50; display: flex; align-items: center; justify-content: center; font-family: 'IBM Plex Mono', monospace; font-weight: 600; font-size: 13px; flex: none"
+                        >JL</span>
+                        <div style="flex: 1; min-width: 0">
+                          <div
+                            style="font-size: 13.5px; font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis"
+                          >
+                            Jalan berlubang dekat Pasar
+                          </div>
+                          <div
+                            style="font-size: 11.5px; color: #616770; margin-top: 1px"
+                          >
+                            RW 04 · 320 m · 5 laporan pendukung
+                          </div>
+                          <div
+                            style="margin-top: 6px; display: inline-flex; align-items: center; gap: 5px; background: #e5edfd; color: #1d4ed8; border-radius: 6px; padding: 2px 8px; font-size: 11px; font-weight: 600"
+                          >
+                            <span
+                              style="width: 6px; height: 6px; border-radius: 50%; background: #2563eb"
+                            ></span>Sedang ditangani
+                          </div>
+                        </div>
+                      </div>
+                      <div
+                        style="background: #fff; border: 1px solid #e4e7e2; border-radius: 12px; padding: 12px; display: flex; gap: 11px"
+                      >
+                        <span
+                          style="width: 38px; height: 38px; border-radius: 9px; background: #e2f1ee; color: #0a5c50; display: flex; align-items: center; justify-content: center; font-family: 'IBM Plex Mono', monospace; font-weight: 600; font-size: 13px; flex: none"
+                        >AR</span>
+                        <div style="flex: 1; min-width: 0">
+                          <div
+                            style="font-size: 13.5px; font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis"
+                          >
+                            Pipa air bocor RW 02
+                          </div>
+                          <div
+                            style="font-size: 11.5px; color: #616770; margin-top: 1px"
+                          >
+                            RW 02 · 780 m · 2 laporan pendukung
+                          </div>
+                          <div
+                            style="margin-top: 6px; display: inline-flex; align-items: center; gap: 5px; background: #e2f1ee; color: #0a5c50; border-radius: 6px; padding: 2px 8px; font-size: 11px; font-weight: 600"
+                          >
+                            <span
+                              style="width: 6px; height: 6px; border-radius: 50%; background: #0f7a6b"
+                            ></span>Terverifikasi
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+                <!-- bottom nav -->
+                <div
+                  style="flex: none; background: #fff; border-top: 1px solid #e4e7e2; padding: 9px 12px 20px; display: flex; justify-content: space-between; align-items: flex-end"
+                >
+                  <div
+                    style="display: flex; flex-direction: column; align-items: center; gap: 4px; width: 56px; color: #0f7a6b"
+                  >
+                    <span
+                      style="width: 18px; height: 18px; border: 2px solid #0f7a6b; border-radius: 5px"
+                    ></span><span style="font-size: 10px; font-weight: 600"
+                    >Beranda</span>
+                  </div>
+                  <div
+                    style="display: flex; flex-direction: column; align-items: center; gap: 4px; width: 56px; color: #8a9099"
+                  >
+                    <span
+                      style="width: 16px; height: 16px; border: 2px solid #8a9099; transform: rotate(45deg); border-radius: 3px"
+                    ></span><span style="font-size: 10px; font-weight: 500"
+                    >Peta</span>
+                  </div>
+                  <div
+                    style="display: flex; flex-direction: column; align-items: center; gap: 4px; width: 60px; margin-top: -14px"
+                  >
+                    <span
+                      style="width: 50px; height: 50px; border-radius: 16px; background: #0f7a6b; display: flex; align-items: center; justify-content: center; box-shadow: 0 10px 20px -8px rgba(15, 122, 107, 0.9)"
+                    ><span
+                        style="position: relative; width: 20px; height: 20px"
+                      ><span
+                          style="position: absolute; top: 9px; left: 2px; width: 16px; height: 2.4px; background: #fff; border-radius: 2px"
+                        ></span><span
+                          style="position: absolute; left: 9px; top: 2px; height: 16px; width: 2.4px; background: #fff; border-radius: 2px"
+                        ></span></span></span><span
+                      style="font-size: 10px; font-weight: 600; color: #0f7a6b"
+                    >Buat</span>
+                  </div>
+                  <div
+                    style="display: flex; flex-direction: column; align-items: center; gap: 4px; width: 56px; color: #8a9099"
+                  >
+                    <span
+                      style="width: 16px; height: 18px; border: 2px solid #8a9099; border-radius: 3px"
+                    ></span><span style="font-size: 10px; font-weight: 500"
+                    >Laporan</span>
+                  </div>
+                  <div
+                    style="display: flex; flex-direction: column; align-items: center; gap: 4px; width: 56px; color: #8a9099"
+                  >
+                    <span
+                      style="width: 17px; height: 17px; border: 2px solid #8a9099; border-radius: 50%"
+                    ></span><span style="font-size: 10px; font-weight: 500"
+                    >Akun</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- 1b Review Kiriman M-11 -->
+          <div
+            style="display: flex; flex-direction: column; align-items: center; gap: 14px"
+          >
+            <div style="display: flex; align-items: center; gap: 9px">
+              <span
+                style="font-family: 'IBM Plex Mono', monospace; font-size: 11px; font-weight: 600; padding: 3px 7px; border-radius: 5px; background: #1f2226; color: #fff"
+              >M-11</span>
+              <span style="font-size: 13px; font-weight: 600; color: #3a3f45"
+              >Kasus Serupa &amp; Review Kiriman</span>
+            </div>
+            <div
+              style="width: 392px; height: 812px; background: #1f2226; border-radius: 44px; padding: 11px; box-shadow: 0 28px 60px -22px rgba(0, 0, 0, 0.5)"
+            >
+              <div
+                style="position: relative; width: 100%; height: 100%; background: #f4f5f3; border-radius: 34px; overflow: hidden; display: flex; flex-direction: column"
+              >
+                <div
+                  style="height: 44px; display: flex; align-items: center; justify-content: space-between; padding: 0 24px; flex: none"
+                >
+                  <span class="tnum" style="font-size: 13px; font-weight: 600"
+                  >09:41</span>
+                  <div style="display: flex; gap: 5px; align-items: center">
+                    <span
+                      style="width: 16px; height: 9px; border: 1.4px solid #17191c; border-radius: 2px; display: inline-block"
+                    ></span><span
+                      style="width: 6px; height: 9px; background: #17191c; border-radius: 1px"
+                    ></span>
+                  </div>
+                </div>
+                <!-- header + stepper -->
+                <div
+                  style="padding: 2px 18px 12px; flex: none; border-bottom: 1px solid #e4e7e2"
+                >
+                  <div style="display: flex; align-items: center; gap: 12px">
+                    <span style="font-size: 22px; color: #3a3f45">←</span>
+                    <div>
+                      <div style="font-size: 16px; font-weight: 700">
+                        Review laporan
+                      </div>
+                      <div style="font-size: 11.5px; color: #616770">
+                        Langkah 5 dari 5
+                      </div>
+                    </div>
+                  </div>
+                  <div style="display: flex; gap: 5px; margin-top: 11px">
+                    <span
+                      style="flex: 1; height: 4px; border-radius: 2px; background: #0f7a6b"
+                    ></span><span
+                      style="flex: 1; height: 4px; border-radius: 2px; background: #0f7a6b"
+                    ></span><span
+                      style="flex: 1; height: 4px; border-radius: 2px; background: #0f7a6b"
+                    ></span><span
+                      style="flex: 1; height: 4px; border-radius: 2px; background: #0f7a6b"
+                    ></span><span
+                      style="flex: 1; height: 4px; border-radius: 2px; background: #0f7a6b"
+                    ></span>
+                  </div>
+                </div>
+                <div
+                  style="flex: 1; overflow: hidden; padding: 14px 18px; display: flex; flex-direction: column; gap: 13px"
+                >
+                  <!-- kandidat serupa -->
+                  <div
+                    style="background: #e5edfd; border: 1px solid #c7d7fb; border-radius: 13px; padding: 13px"
+                  >
+                    <div
+                      style="font-size: 12.5px; font-weight: 700; color: #1d4ed8; margin-bottom: 9px"
+                    >
+                      1 kasus serupa ditemukan di dekat sini
+                    </div>
+                    <div
+                      style="background: #fff; border: 1px solid #d5e0fb; border-radius: 10px; padding: 11px; display: flex; gap: 10px"
+                    >
+                      <span
+                        style="width: 34px; height: 34px; border-radius: 8px; background: #e2f1ee; color: #0a5c50; display: flex; align-items: center; justify-content: center; font-family: 'IBM Plex Mono', monospace; font-weight: 600; font-size: 12px; flex: none"
+                      >JL</span>
+                      <div style="flex: 1; min-width: 0">
+                        <div style="font-size: 13px; font-weight: 600">
+                          Jalan berlubang dekat Pasar
+                        </div>
+                        <div
+                          style="font-size: 11px; color: #616770; margin-top: 1px"
+                        >
+                          42 m · kemiripan 86% · 5 laporan
+                        </div>
+                      </div>
+                    </div>
+                    <div style="display: flex; gap: 8px; margin-top: 10px">
+                      <button
+                        style="flex: 1; border: 0; cursor: pointer; background: #1d4ed8; color: #fff; border-radius: 9px; padding: 10px; font-size: 12.5px; font-weight: 600; font-family: inherit"
+                      >
+                        Tambahkan bukti ke kasus ini
+                      </button>
+                      <button
+                        style="border: 1px solid #c7d7fb; cursor: pointer; background: transparent; color: #1d4ed8; border-radius: 9px; padding: 10px 12px; font-size: 12.5px; font-weight: 600; font-family: inherit"
+                      >
+                        Buat terpisah
+                      </button>
+                    </div>
+                  </div>
+                  <!-- ringkasan -->
+                  <div
+                    style="font-size: 12px; font-weight: 700; color: #616770; text-transform: uppercase; letter-spacing: 0.04em"
+                  >
+                    Ringkasan laporan
+                  </div>
+                  <div
+                    style="background: #fff; border: 1px solid #e4e7e2; border-radius: 13px; overflow: hidden"
+                  >
+                    <div style="display: flex; gap: 9px; padding: 11px">
+                      <div
+                        style="width: 64px; height: 64px; border-radius: 9px; flex: none; background: repeating-linear-gradient(135deg, #e4e7e2, #e4e7e2 6px, #eef0ec 6px, #eef0ec 12px); display: flex; align-items: flex-end; justify-content: center; padding-bottom: 4px"
+                      >
+                        <span
+                          style="font-family: 'IBM Plex Mono', monospace; font-size: 8px; color: #8a9099"
+                        >foto 1/3</span>
+                      </div>
+                      <div style="flex: 1">
+                        <div
+                          style="display: flex; align-items: center; gap: 6px"
+                        >
+                          <span
+                            style="font-family: 'IBM Plex Mono', monospace; font-size: 10px; font-weight: 600; background: #e2f1ee; color: #0a5c50; padding: 2px 6px; border-radius: 5px"
+                          >JALAN</span><span
+                            style="font-size: 11px; color: #616770"
+                          >Kondisi: Berat</span>
+                        </div>
+                        <div
+                          style="font-size: 13px; font-weight: 600; margin-top: 6px; line-height: 1.35"
+                        >
+                          Lubang besar di jalan utama, dalam ±40 cm,
+                          membahayakan motor.
+                        </div>
+                      </div>
+                    </div>
+                    <div
+                      style="border-top: 1px solid #eef0ec; padding: 10px 12px; display: flex; justify-content: space-between"
+                    >
+                      <span style="font-size: 12px; color: #616770"
+                      >Lokasi</span><span
+                        style="font-size: 12px; font-weight: 600"
+                      >Jl. Raya Ciburuy · Akurasi baik <span
+                          style="color: #0f7a6b"
+                        >✎</span></span>
+                    </div>
+                    <div
+                      style="border-top: 1px solid #eef0ec; padding: 10px 12px; display: flex; justify-content: space-between"
+                    >
+                      <span style="font-size: 12px; color: #616770"
+                      >Waktu</span><span
+                        class="tnum"
+                        style="font-size: 12px; font-weight: 600"
+                      >17 Jul 2026, 09:32 <span style="color: #0f7a6b"
+                        >✎</span></span>
+                    </div>
+                    <div
+                      style="border-top: 1px solid #eef0ec; padding: 10px 12px; display: flex; justify-content: space-between"
+                    >
+                      <span style="font-size: 12px; color: #616770"
+                      >Dampak</span><span
+                        style="font-size: 12px; font-weight: 600; text-align: right"
+                      >Keselamatan · akses terganggu</span>
+                    </div>
+                  </div>
+                  <!-- privasi + truth -->
+                  <div
+                    style="background: #fff; border: 1px solid #e4e7e2; border-radius: 13px; padding: 12px; display: flex; flex-direction: column; gap: 11px"
+                  >
+                    <div
+                      style="display: flex; justify-content: space-between; align-items: center"
+                    >
+                      <div>
+                        <div style="font-size: 13px; font-weight: 600">
+                          Identitas saya di publik
+                        </div>
+                        <div
+                          style="font-size: 11px; color: #616770; margin-top: 1px"
+                        >
+                          Default: privat · hanya petugas melihat
+                        </div>
+                      </div><span
+                        style="width: 42px; height: 24px; border-radius: 999px; background: #d3d7d0; position: relative; flex: none"
+                      ><span
+                          style="position: absolute; top: 2px; left: 2px; width: 20px; height: 20px; border-radius: 50%; background: #fff; box-shadow: 0 1px 2px rgba(0, 0, 0, 0.2)"
+                        ></span></span>
+                    </div>
+                    <label
+                      style="display: flex; gap: 9px; align-items: flex-start; font-size: 12px; color: #3a3f45; line-height: 1.4"
+                    ><span
+                        style="width: 18px; height: 18px; border-radius: 5px; background: #0f7a6b; flex: none; display: flex; align-items: center; justify-content: center; color: #fff; font-size: 12px"
+                      >✓</span>Saya menyatakan informasi ini benar sesuai
+                      kondisi yang saya lihat.</label>
+                  </div>
+                </div>
+                <!-- sticky footer CTA -->
+                <div
+                  style="flex: none; background: #fff; border-top: 1px solid #e4e7e2; padding: 12px 18px 22px; display: flex; flex-direction: column; gap: 8px"
+                >
+                  <div
+                    style="display: flex; align-items: center; gap: 6px; font-size: 11.5px; color: #8a5808"
+                  >
+                    <span
+                      style="width: 7px; height: 7px; border-radius: 50%; background: #b8730a"
+                    ></span>Tidak ada koneksi — laporan akan masuk antrean.
+                  </div>
+                  <button
+                    style="border: 0; cursor: pointer; background: #0f7a6b; color: #fff; border-radius: 12px; padding: 15px; font-size: 15px; font-weight: 700; font-family: inherit"
+                  >
+                    Simpan dan sinkronkan nanti
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- 1c Detail Laporan M-14 -->
+          <div
+            style="display: flex; flex-direction: column; align-items: center; gap: 14px"
+          >
+            <div style="display: flex; align-items: center; gap: 9px">
+              <span
+                style="font-family: 'IBM Plex Mono', monospace; font-size: 11px; font-weight: 600; padding: 3px 7px; border-radius: 5px; background: #1f2226; color: #fff"
+              >M-14</span>
+              <span style="font-size: 13px; font-weight: 600; color: #3a3f45"
+              >Detail Laporan Saya</span>
+            </div>
+            <div
+              style="width: 392px; height: 812px; background: #1f2226; border-radius: 44px; padding: 11px; box-shadow: 0 28px 60px -22px rgba(0, 0, 0, 0.5)"
+            >
+              <div
+                style="position: relative; width: 100%; height: 100%; background: #f4f5f3; border-radius: 34px; overflow: hidden; display: flex; flex-direction: column"
+              >
+                <div
+                  style="height: 44px; display: flex; align-items: center; justify-content: space-between; padding: 0 24px; flex: none"
+                >
+                  <span class="tnum" style="font-size: 13px; font-weight: 600"
+                  >09:41</span>
+                  <div style="display: flex; gap: 5px; align-items: center">
+                    <span
+                      style="width: 16px; height: 9px; border: 1.4px solid #17191c; border-radius: 2px; display: inline-block"
+                    ></span><span
+                      style="width: 6px; height: 9px; background: #17191c; border-radius: 1px"
+                    ></span>
+                  </div>
+                </div>
+                <div
+                  style="padding: 2px 18px 12px; flex: none; display: flex; align-items: center; gap: 12px"
+                >
+                  <span style="font-size: 22px; color: #3a3f45">←</span>
+                  <div style="flex: 1">
+                    <div style="font-size: 16px; font-weight: 700">
+                      Detail laporan
+                    </div>
+                    <div
+                      class="tnum"
+                      style="font-size: 11px; color: #616770; font-family: 'IBM Plex Mono', monospace"
+                    >
+                      Lokal #LR-0271 · Server #CB-1842
+                    </div>
+                  </div>
+                  <span style="font-size: 20px; color: #3a3f45">⋯</span>
+                </div>
+                <div
+                  style="flex: 1; overflow: hidden; padding: 0 18px 12px; display: flex; flex-direction: column; gap: 14px"
+                >
+                  <!-- status banner -->
+                  <div
+                    style="background: #f8ecd6; border: 1px solid #ecd7a6; border-radius: 13px; padding: 14px"
+                  >
+                    <div
+                      style="display: inline-flex; align-items: center; gap: 6px; background: #b8730a; color: #fff; border-radius: 7px; padding: 4px 10px; font-size: 12px; font-weight: 700"
+                    >
+                      Perlu tindakan Anda
+                    </div>
+                    <div
+                      style="font-size: 12.5px; color: #7a4d06; line-height: 1.45; margin-top: 9px"
+                    >
+                      Verifikator meminta 1 foto tambahan dari sisi yang berbeda
+                      agar lubang terlihat jelas. Tenggat <b>19 Jul 2026</b>.
+                    </div>
+                    <button
+                      style="margin-top: 11px; border: 0; cursor: pointer; background: #0f7a6b; color: #fff; border-radius: 10px; padding: 11px 16px; font-size: 13px; font-weight: 700; font-family: inherit; width: 100%"
+                    >
+                      Lengkapi laporan
+                    </button>
+                  </div>
+                  <!-- kasus induk -->
+                  <div
+                    style="background: #fff; border: 1px solid #e4e7e2; border-radius: 12px; padding: 12px; display: flex; align-items: center; gap: 10px"
+                  >
+                    <span
+                      style="width: 34px; height: 34px; border-radius: 8px; background: #e2f1ee; color: #0a5c50; display: flex; align-items: center; justify-content: center; font-family: 'IBM Plex Mono', monospace; font-weight: 600; font-size: 12px; flex: none"
+                    >JL</span>
+                    <div style="flex: 1">
+                      <div style="font-size: 11px; color: #616770">
+                        Bagian dari kasus
+                      </div>
+                      <div style="font-size: 13px; font-weight: 600">
+                        Jalan berlubang dekat Pasar
+                      </div>
+                    </div>
+                    <span
+                      style="color: #0f7a6b; font-size: 12.5px; font-weight: 600"
+                    >Lihat →</span>
+                  </div>
+                  <!-- timeline -->
+                  <div
+                    style="font-size: 12px; font-weight: 700; color: #616770; text-transform: uppercase; letter-spacing: 0.04em"
+                  >
+                    Perjalanan laporan
+                  </div>
+                  <div
+                    style="display: flex; flex-direction: column; gap: 0; padding-left: 4px"
+                  >
+                    <div style="display: flex; gap: 12px">
+                      <div
+                        style="display: flex; flex-direction: column; align-items: center"
+                      >
+                        <span
+                          style="width: 13px; height: 13px; border-radius: 50%; background: #b8730a; border: 2px solid #fff; box-shadow: 0 0 0 2px #b8730a"
+                        ></span><span
+                          style="flex: 1; width: 2px; background: #e4e7e2; min-height: 22px"
+                        ></span>
+                      </div>
+                      <div style="padding-bottom: 16px">
+                        <div style="font-size: 13px; font-weight: 600">
+                          Perlu dilengkapi
+                        </div>
+                        <div
+                          class="tnum"
+                          style="font-size: 11px; color: #616770"
+                        >
+                          17 Jul, 14:20 · oleh verifikator RW
+                        </div>
+                      </div>
+                    </div>
+                    <div style="display: flex; gap: 12px">
+                      <div
+                        style="display: flex; flex-direction: column; align-items: center"
+                      >
+                        <span
+                          style="width: 11px; height: 11px; border-radius: 50%; background: #0f7a6b; margin-top: 1px"
+                        ></span><span
+                          style="flex: 1; width: 2px; background: #e4e7e2; min-height: 22px"
+                        ></span>
+                      </div>
+                      <div style="padding-bottom: 16px">
+                        <div style="font-size: 13px; font-weight: 600">
+                          Sedang diperiksa
+                        </div>
+                        <div
+                          class="tnum"
+                          style="font-size: 11px; color: #616770"
+                        >
+                          17 Jul, 11:05 · sistem
+                        </div>
+                      </div>
+                    </div>
+                    <div style="display: flex; gap: 12px">
+                      <div
+                        style="display: flex; flex-direction: column; align-items: center"
+                      >
+                        <span
+                          style="width: 11px; height: 11px; border-radius: 50%; background: #0f7a6b; margin-top: 1px"
+                        ></span><span
+                          style="flex: 1; width: 2px; background: #e4e7e2; min-height: 22px"
+                        ></span>
+                      </div>
+                      <div style="padding-bottom: 16px">
+                        <div style="font-size: 13px; font-weight: 600">
+                          Laporan diterima
+                        </div>
+                        <div
+                          class="tnum"
+                          style="font-size: 11px; color: #616770"
+                        >
+                          17 Jul, 10:48 · ID server dibuat
+                        </div>
+                      </div>
+                    </div>
+                    <div style="display: flex; gap: 12px">
+                      <div
+                        style="display: flex; flex-direction: column; align-items: center"
+                      >
+                        <span
+                          style="width: 11px; height: 11px; border-radius: 50%; background: #0f7a6b; margin-top: 1px"
+                        ></span>
+                      </div>
+                      <div>
+                        <div style="font-size: 13px; font-weight: 600">
+                          Tersimpan di perangkat
+                        </div>
+                        <div
+                          class="tnum"
+                          style="font-size: 11px; color: #616770"
+                        >
+                          17 Jul, 09:33 · offline
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                  <!-- who can see -->
+                  <div
+                    style="background: #eef0ec; border-radius: 11px; padding: 11px 12px; display: flex; gap: 9px; align-items: flex-start"
+                  >
+                    <span
+                      style="width: 18px; height: 18px; border-radius: 50%; border: 2px solid #616770; color: #616770; display: flex; align-items: center; justify-content: center; font-size: 11px; font-weight: 700; flex: none"
+                    >i</span>
+                    <span
+                      style="font-size: 11.5px; color: #4a5058; line-height: 1.4"
+                    >Identitas &amp; lokasi presisi Anda hanya terlihat oleh
+                      petugas terkait. Publik melihat lokasi yang
+                      digeneralisasi.</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- ============================ SECTION 2: SURVEYOR ============================ -->
+        <div
+          style="display: flex; align-items: baseline; gap: 14px; margin-top: 52px; padding-bottom: 10px; border-bottom: 2px solid #cfd3cc"
+        >
+          <div
+            style="font-family: 'IBM Plex Mono', monospace; font-size: 13px; font-weight: 600; color: #0f7a6b"
+          >
+            02
+          </div>
+          <div
+            style="font-size: 19px; font-weight: 700; letter-spacing: -0.01em"
+          >
+            Aplikasi Mobile Surveyor
+          </div>
+          <div style="font-size: 14px; color: #616770">
+            Tugas &amp; verifikasi lapangan · persona Dedi, surveyor
+          </div>
+        </div>
+
+        <div
+          style="display: flex; gap: 40px; flex-wrap: wrap; padding-top: 8px"
+        >
+          <!-- 2a Daftar Tugas S-01 -->
+          <div
+            style="display: flex; flex-direction: column; align-items: center; gap: 14px"
+          >
+            <div style="display: flex; align-items: center; gap: 9px">
+              <span
+                style="font-family: 'IBM Plex Mono', monospace; font-size: 11px; font-weight: 600; padding: 3px 7px; border-radius: 5px; background: #1f2226; color: #fff"
+              >S-01</span>
+              <span style="font-size: 13px; font-weight: 600; color: #3a3f45"
+              >Daftar Tugas</span>
+            </div>
+            <div
+              style="width: 392px; height: 812px; background: #1f2226; border-radius: 44px; padding: 11px; box-shadow: 0 28px 60px -22px rgba(0, 0, 0, 0.5)"
+            >
+              <div
+                style="position: relative; width: 100%; height: 100%; background: #f4f5f3; border-radius: 34px; overflow: hidden; display: flex; flex-direction: column"
+              >
+                <div
+                  style="height: 44px; display: flex; align-items: center; justify-content: space-between; padding: 0 24px; flex: none"
+                >
+                  <span class="tnum" style="font-size: 13px; font-weight: 600"
+                  >08:15</span>
+                  <div style="display: flex; gap: 5px; align-items: center">
+                    <span
+                      style="width: 16px; height: 9px; border: 1.4px solid #17191c; border-radius: 2px; display: inline-block"
+                    ></span><span
+                      style="width: 6px; height: 9px; background: #17191c; border-radius: 1px"
+                    ></span>
+                  </div>
+                </div>
+                <div style="padding: 2px 18px 10px; flex: none">
+                  <div
+                    style="display: flex; justify-content: space-between; align-items: center"
+                  >
+                    <div>
+                      <div style="font-size: 19px; font-weight: 700">
+                        Tugas hari ini
+                      </div>
+                      <div class="tnum" style="font-size: 12px; color: #616770">
+                        6 tugas · 4 siap offline
+                      </div>
+                    </div>
+                    <span
+                      style="display: inline-flex; align-items: center; gap: 5px; background: #e2f1ee; color: #0a5c50; border: 1px solid #bfe0d9; border-radius: 999px; padding: 4px 10px; font-size: 11px; font-weight: 600"
+                    ><span
+                        style="width: 7px; height: 7px; border-radius: 50%; background: #0f7a6b"
+                      ></span>Online</span>
+                  </div>
+                  <div
+                    style="display: flex; gap: 8px; margin-top: 12px; overflow: hidden"
+                  >
+                    <span
+                      style="background: #1f2226; color: #fff; border-radius: 999px; padding: 6px 13px; font-size: 12px; font-weight: 600; white-space: nowrap"
+                    >Hari ini <span style="opacity: 0.7">6</span></span>
+                    <span
+                      style="background: #f8e2de; color: #a5271a; border: 1px solid #ecc4bd; border-radius: 999px; padding: 6px 13px; font-size: 12px; font-weight: 600; white-space: nowrap"
+                    >Terlambat 2</span>
+                    <span
+                      style="background: #fff; color: #3a3f45; border: 1px solid #e4e7e2; border-radius: 999px; padding: 6px 13px; font-size: 12px; font-weight: 500; white-space: nowrap"
+                    >Belum diunduh 2</span>
+                  </div>
+                  <div
+                    style="display: flex; justify-content: space-between; align-items: center; margin-top: 11px"
+                  >
+                    <span style="font-size: 12px; color: #616770"
+                    >Urutkan: <b style="color: #17191c">SLA terdekat</b>
+                      ▾</span>
+                    <span
+                      style="font-size: 12px; color: #0f7a6b; font-weight: 600"
+                    >Unduh 4 tugas</span>
+                  </div>
+                </div>
+                <div
+                  style="flex: 1; overflow: hidden; padding: 2px 18px 12px; display: flex; flex-direction: column; gap: 11px"
+                >
+                  <!-- task card terlambat -->
+                  <div
+                    style="background: #fff; border: 1px solid #e4e7e2; border-left: 4px solid #c0392b; border-radius: 12px; padding: 13px"
+                  >
+                    <div
+                      style="display: flex; justify-content: space-between; align-items: flex-start"
+                    >
+                      <div style="display: flex; gap: 9px">
+                        <span
+                          style="width: 34px; height: 34px; border-radius: 8px; background: #e2f1ee; color: #0a5c50; display: flex; align-items: center; justify-content: center; font-family: 'IBM Plex Mono', monospace; font-weight: 600; font-size: 12px; flex: none"
+                        >JB</span><div>
+                          <div style="font-size: 13.5px; font-weight: 600">
+                            Jembatan retak RW 07
+                          </div>
+                          <div
+                            class="tnum"
+                            style="font-size: 11px; color: #616770; font-family: 'IBM Plex Mono', monospace"
+                          >
+                            TGS-3391
+                          </div>
+                        </div>
+                      </div>
+                      <span
+                        style="background: #f8e2de; color: #a5271a; border-radius: 6px; padding: 3px 8px; font-size: 11px; font-weight: 700"
+                      >Terlambat 1h</span>
+                    </div>
+                    <div
+                      style="display: flex; gap: 14px; margin-top: 11px; font-size: 11.5px; color: #616770"
+                    >
+                      <span>📍 Dusun Kaler · 4,2 km</span>
+                    </div>
+                    <div
+                      style="display: flex; justify-content: space-between; align-items: center; margin-top: 10px"
+                    >
+                      <span
+                        style="display: inline-flex; align-items: center; gap: 5px; font-size: 11px; color: #a5271a; font-weight: 600"
+                      ><span
+                          style="width: 7px; height: 7px; border-radius: 50%; background: #c0392b"
+                        ></span>Prioritas tinggi</span><span
+                        style="display: inline-flex; align-items: center; gap: 5px; font-size: 11px; color: #0a5c50; font-weight: 600"
+                      ><span
+                          style="width: 14px; height: 14px; border-radius: 50%; background: #e2f1ee; color: #0a5c50; display: flex; align-items: center; justify-content: center; font-size: 9px"
+                        >↓</span>Siap offline</span>
+                    </div>
+                  </div>
+                  <!-- task card hari ini -->
+                  <div
+                    style="background: #fff; border: 1px solid #e4e7e2; border-left: 4px solid #b8730a; border-radius: 12px; padding: 13px"
+                  >
+                    <div
+                      style="display: flex; justify-content: space-between; align-items: flex-start"
+                    >
+                      <div style="display: flex; gap: 9px">
+                        <span
+                          style="width: 34px; height: 34px; border-radius: 8px; background: #e2f1ee; color: #0a5c50; display: flex; align-items: center; justify-content: center; font-family: 'IBM Plex Mono', monospace; font-weight: 600; font-size: 12px; flex: none"
+                        >JL</span><div>
+                          <div style="font-size: 13.5px; font-weight: 600">
+                            Jalan berlubang dekat Pasar
+                          </div>
+                          <div
+                            class="tnum"
+                            style="font-size: 11px; color: #616770; font-family: 'IBM Plex Mono', monospace"
+                          >
+                            TGS-3402
+                          </div>
+                        </div>
+                      </div>
+                      <span
+                        style="background: #f8ecd6; color: #8a5808; border-radius: 6px; padding: 3px 8px; font-size: 11px; font-weight: 700"
+                      >SLA 4j</span>
+                    </div>
+                    <div
+                      style="display: flex; gap: 14px; margin-top: 11px; font-size: 11.5px; color: #616770"
+                    >
+                      <span>📍 RW 04 · 1,1 km</span>
+                    </div>
+                    <div
+                      style="display: flex; justify-content: space-between; align-items: center; margin-top: 10px"
+                    >
+                      <span
+                        style="display: inline-flex; align-items: center; gap: 5px; font-size: 11px; color: #8a5808; font-weight: 600"
+                      ><span
+                          style="width: 7px; height: 7px; border-radius: 50%; background: #b8730a"
+                        ></span>Prioritas sedang</span><span
+                        style="display: inline-flex; align-items: center; gap: 5px; font-size: 11px; color: #0a5c50; font-weight: 600"
+                      ><span
+                          style="width: 14px; height: 14px; border-radius: 50%; background: #e2f1ee; color: #0a5c50; display: flex; align-items: center; justify-content: center; font-size: 9px"
+                        >↓</span>Siap offline</span>
+                    </div>
+                  </div>
+                  <!-- task card belum diunduh -->
+                  <div
+                    style="background: #fff; border: 1px solid #e4e7e2; border-left: 4px solid #d3d7d0; border-radius: 12px; padding: 13px"
+                  >
+                    <div
+                      style="display: flex; justify-content: space-between; align-items: flex-start"
+                    >
+                      <div style="display: flex; gap: 9px">
+                        <span
+                          style="width: 34px; height: 34px; border-radius: 8px; background: #e2f1ee; color: #0a5c50; display: flex; align-items: center; justify-content: center; font-family: 'IBM Plex Mono', monospace; font-weight: 600; font-size: 12px; flex: none"
+                        >AR</span><div>
+                          <div style="font-size: 13.5px; font-weight: 600">
+                            Sumur bor tak berfungsi
+                          </div>
+                          <div
+                            class="tnum"
+                            style="font-size: 11px; color: #616770; font-family: 'IBM Plex Mono', monospace"
+                          >
+                            TGS-3410
+                          </div>
+                        </div>
+                      </div>
+                      <span
+                        style="background: #eef0ec; color: #616770; border-radius: 6px; padding: 3px 8px; font-size: 11px; font-weight: 600"
+                      >SLA besok</span>
+                    </div>
+                    <div
+                      style="display: flex; gap: 14px; margin-top: 11px; font-size: 11.5px; color: #616770"
+                    >
+                      <span>📍 RW 09 · 6,8 km</span>
+                    </div>
+                    <div
+                      style="display: flex; justify-content: space-between; align-items: center; margin-top: 10px"
+                    >
+                      <span
+                        style="display: inline-flex; align-items: center; gap: 5px; font-size: 11px; color: #616770; font-weight: 600"
+                      ><span
+                          style="width: 7px; height: 7px; border-radius: 50%; background: #8a9099"
+                        ></span>Prioritas rendah</span><span
+                        style="font-size: 11px; color: #0f7a6b; font-weight: 700"
+                      >Unduh untuk offline</span>
+                    </div>
+                  </div>
+                </div>
+                <div
+                  style="flex: none; background: #fff; border-top: 1px solid #e4e7e2; padding: 9px 12px 20px; display: flex; justify-content: space-between; align-items: flex-end"
+                >
+                  <div
+                    style="display: flex; flex-direction: column; align-items: center; gap: 4px; width: 60px; color: #0f7a6b"
+                  >
+                    <span
+                      style="width: 16px; height: 18px; border: 2px solid #0f7a6b; border-radius: 3px"
+                    ></span><span style="font-size: 10px; font-weight: 600"
+                    >Tugas</span>
+                  </div>
+                  <div
+                    style="display: flex; flex-direction: column; align-items: center; gap: 4px; width: 60px; color: #8a9099"
+                  >
+                    <span
+                      style="width: 16px; height: 16px; border: 2px solid #8a9099; transform: rotate(45deg); border-radius: 3px"
+                    ></span><span style="font-size: 10px; font-weight: 500"
+                    >Peta</span>
+                  </div>
+                  <div
+                    style="display: flex; flex-direction: column; align-items: center; gap: 4px; width: 60px; color: #8a9099"
+                  >
+                    <span
+                      style="position: relative; width: 18px; height: 18px"
+                    ><span
+                        style="position: absolute; inset: 0; border: 2px solid #8a9099; border-radius: 50%"
+                      ></span><span
+                        style="position: absolute; top: 7px; left: 3px; width: 12px; height: 2px; background: #8a9099"
+                      ></span></span><span
+                      style="font-size: 10px; font-weight: 500"
+                    >Sinkron</span>
+                  </div>
+                  <div
+                    style="display: flex; flex-direction: column; align-items: center; gap: 4px; width: 60px; color: #8a9099"
+                  >
+                    <span
+                      style="width: 16px; height: 16px; border: 2px solid #8a9099; border-radius: 3px; border-top-width: 5px"
+                    ></span><span style="font-size: 10px; font-weight: 500"
+                    >Riwayat</span>
+                  </div>
+                  <div
+                    style="display: flex; flex-direction: column; align-items: center; gap: 4px; width: 60px; color: #8a9099"
+                  >
+                    <span
+                      style="width: 17px; height: 17px; border: 2px solid #8a9099; border-radius: 50%"
+                    ></span><span style="font-size: 10px; font-weight: 500"
+                    >Akun</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- 2b Detail Tugas S-02 -->
+          <div
+            style="display: flex; flex-direction: column; align-items: center; gap: 14px"
+          >
+            <div style="display: flex; align-items: center; gap: 9px">
+              <span
+                style="font-family: 'IBM Plex Mono', monospace; font-size: 11px; font-weight: 600; padding: 3px 7px; border-radius: 5px; background: #1f2226; color: #fff"
+              >S-02</span>
+              <span style="font-size: 13px; font-weight: 600; color: #3a3f45"
+              >Detail Tugas</span>
+            </div>
+            <div
+              style="width: 392px; height: 812px; background: #1f2226; border-radius: 44px; padding: 11px; box-shadow: 0 28px 60px -22px rgba(0, 0, 0, 0.5)"
+            >
+              <div
+                style="position: relative; width: 100%; height: 100%; background: #f4f5f3; border-radius: 34px; overflow: hidden; display: flex; flex-direction: column"
+              >
+                <div
+                  style="height: 44px; display: flex; align-items: center; justify-content: space-between; padding: 0 24px; flex: none"
+                >
+                  <span class="tnum" style="font-size: 13px; font-weight: 600"
+                  >08:22</span>
+                  <div style="display: flex; gap: 5px; align-items: center">
+                    <span
+                      style="width: 16px; height: 9px; border: 1.4px solid #17191c; border-radius: 2px; display: inline-block"
+                    ></span><span
+                      style="width: 6px; height: 9px; background: #17191c; border-radius: 1px"
+                    ></span>
+                  </div>
+                </div>
+                <div
+                  style="padding: 2px 18px 12px; flex: none; display: flex; align-items: center; gap: 12px; border-bottom: 1px solid #e4e7e2"
+                >
+                  <span style="font-size: 22px; color: #3a3f45">←</span>
+                  <div style="flex: 1">
+                    <div style="font-size: 16px; font-weight: 700">
+                      Detail tugas
+                    </div>
+                    <div
+                      class="tnum"
+                      style="font-size: 11px; color: #616770; font-family: 'IBM Plex Mono', monospace"
+                    >
+                      TGS-3402
+                    </div>
+                  </div>
+                  <span
+                    style="display: inline-flex; align-items: center; gap: 5px; background: #f8ecd6; color: #8a5808; border-radius: 6px; padding: 4px 9px; font-size: 11px; font-weight: 700"
+                  >SLA 4j</span>
+                </div>
+                <div
+                  style="flex: 1; overflow: hidden; padding: 14px 18px; display: flex; flex-direction: column; gap: 13px"
+                >
+                  <div>
+                    <div style="display: flex; align-items: center; gap: 8px">
+                      <span
+                        style="font-family: 'IBM Plex Mono', monospace; font-size: 10px; font-weight: 600; background: #e2f1ee; color: #0a5c50; padding: 2px 6px; border-radius: 5px"
+                      >JALAN</span><span
+                        style="font-size: 11px; color: #c0392b; font-weight: 600"
+                      >Verifikasi lapangan</span>
+                    </div>
+                    <div
+                      style="font-size: 17px; font-weight: 700; margin-top: 7px; line-height: 1.3"
+                    >
+                      Jalan berlubang dekat Pasar Ciburuy
+                    </div>
+                  </div>
+                  <!-- instruksi -->
+                  <div
+                    style="background: #fff; border: 1px solid #e4e7e2; border-radius: 12px; padding: 12px"
+                  >
+                    <div
+                      style="font-size: 11px; font-weight: 700; color: #616770; text-transform: uppercase; letter-spacing: 0.04em; margin-bottom: 6px"
+                    >
+                      Instruksi
+                    </div>
+                    <div
+                      style="font-size: 13px; line-height: 1.5; color: #3a3f45"
+                    >
+                      Konfirmasi lebar &amp; kedalaman lubang, ambil foto dari 3
+                      sudut, dan periksa apakah sudah ada perbaikan sementara.
+                    </div>
+                  </div>
+                  <!-- checklist wajib -->
+                  <div>
+                    <div
+                      style="font-size: 11px; font-weight: 700; color: #616770; text-transform: uppercase; letter-spacing: 0.04em; margin-bottom: 8px"
+                    >
+                      Checklist wajib
+                    </div>
+                    <div
+                      style="background: #fff; border: 1px solid #e4e7e2; border-radius: 12px; overflow: hidden"
+                    >
+                      <div
+                        style="display: flex; gap: 10px; align-items: center; padding: 11px 12px; border-bottom: 1px solid #eef0ec"
+                      >
+                        <span
+                          style="width: 20px; height: 20px; border-radius: 6px; border: 2px solid #cfd3cc; flex: none"
+                        ></span><span style="font-size: 13px"
+                        >Foto lubang dari 3 sudut</span>
+                      </div>
+                      <div
+                        style="display: flex; gap: 10px; align-items: center; padding: 11px 12px; border-bottom: 1px solid #eef0ec"
+                      >
+                        <span
+                          style="width: 20px; height: 20px; border-radius: 6px; border: 2px solid #cfd3cc; flex: none"
+                        ></span><span style="font-size: 13px"
+                        >Ukur perkiraan dimensi</span>
+                      </div>
+                      <div
+                        style="display: flex; gap: 10px; align-items: center; padding: 11px 12px"
+                      >
+                        <span
+                          style="width: 20px; height: 20px; border-radius: 6px; border: 2px solid #cfd3cc; flex: none"
+                        ></span><span style="font-size: 13px"
+                        >Tandai koordinat presisi</span>
+                      </div>
+                    </div>
+                  </div>
+                  <!-- bukti warga -->
+                  <div>
+                    <div
+                      style="font-size: 11px; font-weight: 700; color: #616770; text-transform: uppercase; letter-spacing: 0.04em; margin-bottom: 8px"
+                    >
+                      Bukti warga (3)
+                    </div>
+                    <div style="display: flex; gap: 8px">
+                      <div
+                        style="flex: 1; aspect-ratio: 1; border-radius: 9px; background: repeating-linear-gradient(135deg, #e4e7e2, #e4e7e2 6px, #eef0ec 6px, #eef0ec 12px)"
+                      >
+                      </div>
+                      <div
+                        style="flex: 1; aspect-ratio: 1; border-radius: 9px; background: repeating-linear-gradient(135deg, #e4e7e2, #e4e7e2 6px, #eef0ec 6px, #eef0ec 12px)"
+                      >
+                      </div>
+                      <div
+                        style="flex: 1; aspect-ratio: 1; border-radius: 9px; background: repeating-linear-gradient(135deg, #e4e7e2, #e4e7e2 6px, #eef0ec 6px, #eef0ec 12px)"
+                      >
+                      </div>
+                    </div>
+                  </div>
+                  <!-- offline status -->
+                  <div
+                    style="background: #e2f1ee; border: 1px solid #bfe0d9; border-radius: 11px; padding: 11px 12px; display: flex; gap: 9px; align-items: center"
+                  >
+                    <span
+                      style="width: 22px; height: 22px; border-radius: 50%; background: #0f7a6b; color: #fff; display: flex; align-items: center; justify-content: center; font-size: 12px; flex: none"
+                    >↓</span><div style="flex: 1">
+                      <div
+                        style="font-size: 12.5px; font-weight: 600; color: #0a5c50"
+                      >
+                        Siap dikerjakan offline
+                      </div>
+                      <div
+                        class="tnum"
+                        style="font-size: 11px; color: #0a5c50; opacity: 0.8"
+                      >
+                        Peta area + bukti diunduh · 12,4 MB
+                      </div>
+                    </div>
+                  </div>
+                </div>
+                <!-- action bar -->
+                <div
+                  style="flex: none; background: #fff; border-top: 1px solid #e4e7e2; padding: 12px 18px 22px; display: flex; flex-direction: column; gap: 8px"
+                >
+                  <button
+                    style="border: 0; cursor: pointer; background: #0f7a6b; color: #fff; border-radius: 12px; padding: 15px; font-size: 15px; font-weight: 700; font-family: inherit"
+                  >
+                    Terima &amp; mulai survei
+                  </button>
+                  <div style="display: flex; gap: 8px">
+                    <button
+                      style="flex: 1; border: 1px solid #e4e7e2; cursor: pointer; background: #fff; color: #3a3f45; border-radius: 10px; padding: 11px; font-size: 12.5px; font-weight: 600; font-family: inherit"
+                    >
+                      Minta klarifikasi
+                    </button>
+                    <button
+                      style="flex: 1; border: 1px solid #ecc4bd; cursor: pointer; background: #fff; color: #a5271a; border-radius: 10px; padding: 11px; font-size: 12.5px; font-weight: 600; font-family: inherit"
+                    >
+                      Tolak
+                    </button>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- 2c Form Survei S-04 -->
+          <div
+            style="display: flex; flex-direction: column; align-items: center; gap: 14px"
+          >
+            <div style="display: flex; align-items: center; gap: 9px">
+              <span
+                style="font-family: 'IBM Plex Mono', monospace; font-size: 11px; font-weight: 600; padding: 3px 7px; border-radius: 5px; background: #1f2226; color: #fff"
+              >S-04</span>
+              <span style="font-size: 13px; font-weight: 600; color: #3a3f45"
+              >Form Survei Lapangan</span>
+            </div>
+            <div
+              style="width: 392px; height: 812px; background: #1f2226; border-radius: 44px; padding: 11px; box-shadow: 0 28px 60px -22px rgba(0, 0, 0, 0.5)"
+            >
+              <div
+                style="position: relative; width: 100%; height: 100%; background: #f4f5f3; border-radius: 34px; overflow: hidden; display: flex; flex-direction: column"
+              >
+                <div
+                  style="height: 44px; display: flex; align-items: center; justify-content: space-between; padding: 0 24px; flex: none"
+                >
+                  <span class="tnum" style="font-size: 13px; font-weight: 600"
+                  >10:03</span>
+                  <div style="display: flex; gap: 5px; align-items: center">
+                    <span
+                      style="width: 16px; height: 9px; border: 1.4px solid #17191c; border-radius: 2px; display: inline-block"
+                    ></span><span
+                      style="width: 6px; height: 9px; background: #17191c; border-radius: 1px"
+                    ></span>
+                  </div>
+                </div>
+                <div
+                  style="padding: 2px 18px 11px; flex: none; border-bottom: 1px solid #e4e7e2"
+                >
+                  <div style="display: flex; align-items: center; gap: 12px">
+                    <span style="font-size: 22px; color: #3a3f45">←</span><div
+                      style="flex: 1"
+                    >
+                      <div style="font-size: 16px; font-weight: 700">
+                        Form survei
+                      </div>
+                      <div
+                        class="tnum"
+                        style="font-size: 11px; color: #616770; font-family: 'IBM Plex Mono', monospace"
+                      >
+                        TGS-3402 · offline
+                      </div>
+                    </div><span
+                      style="display: inline-flex; align-items: center; gap: 5px; font-size: 11px; color: #0a5c50; font-weight: 600"
+                    ><span
+                        style="width: 7px; height: 7px; border-radius: 50%; background: #0f7a6b"
+                      ></span>Tersimpan 10:02</span>
+                  </div>
+                  <div
+                    style="display: flex; align-items: center; gap: 9px; margin-top: 11px"
+                  >
+                    <div
+                      style="flex: 1; height: 6px; border-radius: 3px; background: #e4e7e2; overflow: hidden"
+                    >
+                      <span
+                        style="display: block; width: 66%; height: 100%; background: #0f7a6b"
+                      ></span>
+                    </div><span
+                      class="tnum"
+                      style="font-size: 12px; font-weight: 700; color: #0a5c50"
+                    >66%</span>
+                  </div>
+                </div>
+                <div
+                  style="flex: 1; overflow: hidden; padding: 14px 18px; display: flex; flex-direction: column; gap: 14px"
+                >
+                  <!-- foto wajib -->
+                  <div>
+                    <div
+                      style="display: flex; justify-content: space-between; align-items: baseline; margin-bottom: 8px"
+                    >
+                      <span style="font-size: 13px; font-weight: 700">Foto per
+                        sudut <span style="color: #c0392b">*</span></span><span
+                        style="font-size: 11px; color: #616770"
+                      >2 dari 3</span>
+                    </div>
+                    <div style="display: flex; gap: 8px">
+                      <div style="flex: 1">
+                        <div
+                          style="aspect-ratio: 1; border-radius: 9px; background: repeating-linear-gradient(135deg, #e4e7e2, #e4e7e2 6px, #eef0ec 6px, #eef0ec 12px)"
+                        >
+                        </div>
+                        <div
+                          style="font-size: 10px; color: #616770; text-align: center; margin-top: 4px"
+                        >
+                          Depan ✓
+                        </div>
+                      </div>
+                      <div style="flex: 1">
+                        <div
+                          style="aspect-ratio: 1; border-radius: 9px; background: repeating-linear-gradient(135deg, #e4e7e2, #e4e7e2 6px, #eef0ec 6px, #eef0ec 12px)"
+                        >
+                        </div>
+                        <div
+                          style="font-size: 10px; color: #616770; text-align: center; margin-top: 4px"
+                        >
+                          Samping ✓
+                        </div>
+                      </div>
+                      <div style="flex: 1">
+                        <div
+                          style="aspect-ratio: 1; border-radius: 9px; border: 2px dashed #cfd3cc; display: flex; align-items: center; justify-content: center; color: #8a9099; font-size: 22px"
+                        >
+                          +
+                        </div>
+                        <div
+                          style="font-size: 10px; color: #c0392b; text-align: center; margin-top: 4px"
+                        >
+                          Atas
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                  <!-- kondisi aktual -->
+                  <div>
+                    <div
+                      style="font-size: 13px; font-weight: 700; margin-bottom: 8px"
+                    >
+                      Kondisi aktual <span style="color: #c0392b">*</span>
+                    </div>
+                    <div style="display: flex; gap: 7px">
+                      <span
+                        style="flex: 1; text-align: center; background: #fff; border: 1px solid #e4e7e2; border-radius: 9px; padding: 9px 4px; font-size: 12px; color: #3a3f45"
+                      >Ringan</span>
+                      <span
+                        style="flex: 1; text-align: center; background: #0f7a6b; color: #fff; border: 1px solid #0f7a6b; border-radius: 9px; padding: 9px 4px; font-size: 12px; font-weight: 600"
+                      >Berat</span>
+                      <span
+                        style="flex: 1; text-align: center; background: #fff; border: 1px solid #e4e7e2; border-radius: 9px; padding: 9px 4px; font-size: 12px; color: #3a3f45"
+                      >Kritis</span>
+                    </div>
+                  </div>
+                  <!-- GPS -->
+                  <div
+                    style="background: #fff; border: 1px solid #e4e7e2; border-radius: 12px; padding: 12px; display: flex; align-items: center; gap: 10px"
+                  >
+                    <span
+                      style="width: 34px; height: 34px; border-radius: 9px; background: #e2f1ee; color: #0a5c50; display: flex; align-items: center; justify-content: center; flex: none"
+                    ><span
+                        style="width: 14px; height: 14px; transform: rotate(45deg); border: 2px solid #0a5c50; border-radius: 3px"
+                      ></span></span>
+                    <div style="flex: 1">
+                      <div
+                        class="tnum"
+                        style="font-size: 12.5px; font-weight: 600"
+                      >
+                        -6.8721, 107.5314
+                      </div>
+                      <div style="font-size: 11px; color: #0a5c50">
+                        Akurasi baik · ±6 m
+                      </div>
+                    </div>
+                    <span
+                      style="font-size: 12px; color: #0f7a6b; font-weight: 600"
+                    >Ambil ulang</span>
+                  </div>
+                  <!-- catatan -->
+                  <div>
+                    <div
+                      style="font-size: 13px; font-weight: 700; margin-bottom: 8px"
+                    >
+                      Catatan lapangan <span
+                        style="font-size: 11px; color: #8a9099; font-weight: 500"
+                      >Opsional</span>
+                    </div>
+                    <div
+                      style="background: #fff; border: 1px solid #e4e7e2; border-radius: 11px; padding: 11px; font-size: 12.5px; color: #3a3f45; line-height: 1.5; min-height: 56px"
+                    >
+                      Lubang melebar sejak laporan warga, sudah ada tanda
+                      darurat dari RW.
+                    </div>
+                  </div>
+                  <!-- rekomendasi -->
+                  <div>
+                    <div
+                      style="font-size: 13px; font-weight: 700; margin-bottom: 8px"
+                    >
+                      Rekomendasi hasil <span style="color: #c0392b">*</span>
+                    </div>
+                    <div
+                      style="display: flex; flex-direction: column; gap: 7px"
+                    >
+                      <label
+                        style="display: flex; gap: 9px; align-items: center; background: #e2f1ee; border: 1.5px solid #0f7a6b; border-radius: 10px; padding: 11px"
+                      ><span
+                          style="width: 18px; height: 18px; border-radius: 50%; border: 5px solid #0f7a6b; background: #fff; flex: none"
+                        ></span><span
+                          style="font-size: 13px; font-weight: 600; color: #0a5c50"
+                        >Valid — perlu tindak lanjut</span></label>
+                      <label
+                        style="display: flex; gap: 9px; align-items: center; background: #fff; border: 1px solid #e4e7e2; border-radius: 10px; padding: 11px"
+                      ><span
+                          style="width: 18px; height: 18px; border-radius: 50%; border: 2px solid #cfd3cc; flex: none"
+                        ></span><span style="font-size: 13px"
+                        >Tidak ditemukan di lokasi</span></label>
+                    </div>
+                  </div>
+                </div>
+                <div
+                  style="flex: none; background: #fff; border-top: 1px solid #e4e7e2; padding: 12px 18px 22px"
+                >
+                  <button
+                    style="border: 0; cursor: pointer; background: #0f7a6b; color: #fff; border-radius: 12px; padding: 15px; font-size: 15px; font-weight: 700; font-family: inherit; width: 100%"
+                  >
+                    Lanjut ke review hasil
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- ============================ SECTION 3: WEB ============================ -->
+        <div
+          style="display: flex; align-items: baseline; gap: 14px; margin-top: 52px; padding-bottom: 10px; border-bottom: 2px solid #cfd3cc"
+        >
+          <div
+            style="font-family: 'IBM Plex Mono', monospace; font-size: 13px; font-weight: 600; color: #0f7a6b"
+          >
+            03
+          </div>
+          <div
+            style="font-size: 19px; font-weight: 700; letter-spacing: -0.01em"
+          >
+            Website
+          </div>
+          <div style="font-size: 14px; color: #616770">
+            Dashboard internal pemerintah/operator + portal publik
+          </div>
+        </div>
+
+        <div
+          style="display: flex; flex-direction: column; gap: 36px; padding-top: 8px"
+        >
+          <!-- 3a Dashboard W-02 -->
+          <div style="display: flex; flex-direction: column; gap: 13px">
+            <div style="display: flex; align-items: center; gap: 9px">
+              <span
+                style="font-family: 'IBM Plex Mono', monospace; font-size: 11px; font-weight: 600; padding: 3px 7px; border-radius: 5px; background: #1f2226; color: #fff"
+              >W-02</span>
+              <span style="font-size: 13px; font-weight: 600; color: #3a3f45"
+              >Ringkasan Operasional — Dashboard Pemerintah</span>
+            </div>
+            <div
+              style="width: 1340px; background: #fff; border-radius: 12px; border: 1px solid #d3d7d0; box-shadow: 0 24px 60px -30px rgba(0, 0, 0, 0.4); overflow: hidden"
+            >
+              <div
+                style="height: 38px; background: #eef0ec; border-bottom: 1px solid #dfe2dc; display: flex; align-items: center; gap: 8px; padding: 0 14px"
+              >
+                <span
+                  style="width: 11px; height: 11px; border-radius: 50%; background: #e06c60"
+                ></span><span
+                  style="width: 11px; height: 11px; border-radius: 50%; background: #e8bd57"
+                ></span><span
+                  style="width: 11px; height: 11px; border-radius: 50%; background: #66c07f"
+                ></span><span
+                  style="margin-left: 12px; background: #fff; border: 1px solid #dfe2dc; border-radius: 6px; font-size: 11.5px; color: #616770; padding: 4px 12px; font-family: 'IBM Plex Mono', monospace"
+                >app.pantaudesa.id/ringkasan</span>
+              </div>
+              <div style="display: flex; height: 800px">
+                <!-- sidebar -->
+                <div
+                  style="width: 220px; background: #16302b; color: #cfe4df; flex: none; display: flex; flex-direction: column; padding: 18px 0"
+                >
+                  <div
+                    style="display: flex; align-items: center; gap: 9px; padding: 0 18px 18px"
+                  >
+                    <div
+                      style="width: 30px; height: 30px; border-radius: 8px; background: #0f7a6b; display: flex; align-items: center; justify-content: center; color: #fff; font-weight: 700"
+                    >
+                      P
+                    </div><span
+                      style="font-size: 15px; font-weight: 700; color: #fff"
+                    >PantauDesa</span>
+                  </div>
+                  <div
+                    style="padding: 0 12px; display: flex; flex-direction: column; gap: 2px"
+                  >
+                    <div
+                      style="display: flex; align-items: center; gap: 10px; padding: 10px 12px; border-radius: 9px; background: #0f7a6b; color: #fff; font-size: 13px; font-weight: 600"
+                    >
+                      <span
+                        style="width: 15px; height: 15px; border: 2px solid #fff; border-radius: 4px"
+                      ></span>Ringkasan
+                    </div>
+                    <div
+                      style="display: flex; align-items: center; gap: 10px; padding: 10px 12px; border-radius: 9px; font-size: 13px"
+                    >
+                      <span
+                        style="width: 13px; height: 13px; border: 2px solid #7fa8a0; transform: rotate(45deg)"
+                      ></span>Peta &amp; Kasus
+                    </div>
+                    <div
+                      style="display: flex; align-items: center; gap: 10px; padding: 10px 12px; border-radius: 9px; font-size: 13px"
+                    >
+                      <span
+                        style="width: 14px; height: 14px; border: 2px solid #7fa8a0; border-radius: 50%"
+                      ></span>Antrean Verifikasi <span
+                        style="margin-left: auto; background: #c0392b; color: #fff; font-size: 10px; font-weight: 700; border-radius: 999px; padding: 1px 7px"
+                        class="tnum"
+                      >14</span>
+                    </div>
+                    <div
+                      style="display: flex; align-items: center; gap: 10px; padding: 10px 12px; border-radius: 9px; font-size: 13px"
+                    >
+                      <span
+                        style="width: 14px; height: 14px; border: 2px solid #7fa8a0; border-radius: 3px"
+                      ></span>Tugas &amp; Progres
+                    </div>
+                    <div
+                      style="display: flex; align-items: center; gap: 10px; padding: 10px 12px; border-radius: 9px; font-size: 13px"
+                    >
+                      <span
+                        style="width: 14px; height: 14px; border-bottom: 2px solid #7fa8a0; border-left: 2px solid #7fa8a0"
+                      ></span>Analitik
+                    </div>
+                    <div
+                      style="display: flex; align-items: center; gap: 10px; padding: 10px 12px; border-radius: 9px; font-size: 13px"
+                    >
+                      <span
+                        style="width: 14px; height: 14px; border: 2px solid #7fa8a0; border-radius: 3px; border-top-width: 5px"
+                      ></span>Ekspor
+                    </div>
+                  </div>
+                  <div
+                    style="margin-top: auto; padding: 16px 18px 0; border-top: 1px solid #234a43; margin-left: 12px; margin-right: 12px; display: flex; flex-direction: column; gap: 2px"
+                  >
+                    <div
+                      style="display: flex; align-items: center; gap: 10px; padding: 10px 12px; border-radius: 9px; font-size: 13px; color: #9dc0b9"
+                    >
+                      Administrasi
+                    </div>
+                    <div
+                      style="display: flex; align-items: center; gap: 10px; padding: 10px 12px; border-radius: 9px; font-size: 13px; color: #9dc0b9"
+                    >
+                      Audit Log
+                    </div>
+                  </div>
+                </div>
+                <!-- main -->
+                <div
+                  style="flex: 1; display: flex; flex-direction: column; min-width: 0"
+                >
+                  <!-- header -->
+                  <div
+                    style="height: 58px; border-bottom: 1px solid #e4e7e2; display: flex; align-items: center; gap: 16px; padding: 0 24px; flex: none"
+                  >
+                    <div
+                      style="flex: 1; max-width: 360px; background: #f4f5f3; border: 1px solid #e4e7e2; border-radius: 8px; padding: 8px 12px; font-size: 12.5px; color: #8a9099"
+                    >
+                      Cari kasus, desa, atau ID…
+                    </div>
+                    <div
+                      style="display: flex; align-items: center; gap: 7px; background: #e2f1ee; border: 1px solid #bfe0d9; border-radius: 8px; padding: 7px 12px; font-size: 12.5px; font-weight: 600; color: #0a5c50"
+                    >
+                      Kec. Cisarua · Jul 2026 ▾
+                    </div>
+                    <div
+                      style="margin-left: auto; display: flex; align-items: center; gap: 14px"
+                    >
+                      <span
+                        style="width: 34px; height: 34px; border-radius: 50%; background: #eef0ec; display: flex; align-items: center; justify-content: center; font-size: 13px; font-weight: 700; color: #0a5c50"
+                      >BM</span>
+                    </div>
+                  </div>
+                  <div
+                    style="flex: 1; overflow: hidden; padding: 22px 24px; display: flex; flex-direction: column; gap: 18px; background: #f9faf8"
+                  >
+                    <div>
+                      <div style="font-size: 20px; font-weight: 700">
+                        Apa yang harus ditangani hari ini?
+                      </div>
+                      <div
+                        class="tnum"
+                        style="font-size: 12.5px; color: #616770; margin-top: 2px"
+                      >
+                        Data per 17 Jul 2026 08:40 WIB · cakupan 8 desa
+                      </div>
+                    </div>
+                    <!-- queue cards -->
+                    <div
+                      style="display: grid; grid-template-columns: repeat(5, 1fr); gap: 12px"
+                    >
+                      <div
+                        style="background: #fff; border: 1px solid #e4e7e2; border-top: 3px solid #2563eb; border-radius: 11px; padding: 14px"
+                      >
+                        <div
+                          class="tnum"
+                          style="font-size: 26px; font-weight: 700"
+                        >
+                          23
+                        </div>
+                        <div
+                          style="font-size: 12px; color: #616770; margin-top: 2px"
+                        >
+                          Kasus baru
+                        </div>
+                      </div>
+                      <div
+                        style="background: #fff; border: 1px solid #e4e7e2; border-top: 3px solid #b8730a; border-radius: 11px; padding: 14px"
+                      >
+                        <div
+                          class="tnum"
+                          style="font-size: 26px; font-weight: 700; color: #8a5808"
+                        >
+                          14
+                        </div>
+                        <div
+                          style="font-size: 12px; color: #616770; margin-top: 2px"
+                        >
+                          Perlu verifikasi
+                        </div>
+                      </div>
+                      <div
+                        style="background: #fff; border: 1px solid #e4e7e2; border-top: 3px solid #c0392b; border-radius: 11px; padding: 14px"
+                      >
+                        <div
+                          class="tnum"
+                          style="font-size: 26px; font-weight: 700; color: #a5271a"
+                        >
+                          6
+                        </div>
+                        <div
+                          style="font-size: 12px; color: #616770; margin-top: 2px"
+                        >
+                          SLA terlewat
+                        </div>
+                      </div>
+                      <div
+                        style="background: #fff; border: 1px solid #e4e7e2; border-top: 3px solid #0f7a6b; border-radius: 11px; padding: 14px"
+                      >
+                        <div
+                          class="tnum"
+                          style="font-size: 26px; font-weight: 700; color: #0a5c50"
+                        >
+                          9
+                        </div>
+                        <div
+                          style="font-size: 12px; color: #616770; margin-top: 2px"
+                        >
+                          Prioritas tinggi
+                        </div>
+                      </div>
+                      <div
+                        style="background: #fff; border: 1px solid #e4e7e2; border-top: 3px solid #8a9099; border-radius: 11px; padding: 14px"
+                      >
+                        <div
+                          class="tnum"
+                          style="font-size: 26px; font-weight: 700"
+                        >
+                          11
+                        </div>
+                        <div
+                          style="font-size: 12px; color: #616770; margin-top: 2px"
+                        >
+                          Perlu kelengkapan
+                        </div>
+                      </div>
+                    </div>
+                    <!-- two columns -->
+                    <div
+                      style="display: grid; grid-template-columns: 1.5fr 1fr; gap: 18px; flex: 1; min-height: 0"
+                    >
+                      <!-- left: trend + map -->
+                      <div
+                        style="display: flex; flex-direction: column; gap: 16px"
+                      >
+                        <div
+                          style="background: #fff; border: 1px solid #e4e7e2; border-radius: 12px; padding: 16px"
+                        >
+                          <div
+                            style="display: flex; justify-content: space-between; align-items: baseline; margin-bottom: 14px"
+                          >
+                            <div style="font-size: 13.5px; font-weight: 700">
+                              Umur backlog kasus
+                            </div>
+                            <div style="font-size: 11px; color: #616770">
+                              30 hari · <b style="color: #17191c">laporan</b>
+                              vs <b style="color: #17191c">kasus</b>
+                            </div>
+                          </div>
+                          <div
+                            style="display: flex; align-items: flex-end; gap: 5px; height: 110px"
+                          >
+                            <div
+                              style="flex: 1; display: flex; flex-direction: column; justify-content: flex-end; gap: 2px"
+                            >
+                              <span
+                                style="height: 40%; background: #c7d7fb; border-radius: 2px 2px 0 0"
+                              ></span><span
+                                style="height: 24%; background: #0f7a6b; border-radius: 2px 2px 0 0"
+                              ></span>
+                            </div>
+                            <div
+                              style="flex: 1; display: flex; flex-direction: column; justify-content: flex-end; gap: 2px"
+                            >
+                              <span
+                                style="height: 52%; background: #c7d7fb; border-radius: 2px 2px 0 0"
+                              ></span><span
+                                style="height: 30%; background: #0f7a6b; border-radius: 2px 2px 0 0"
+                              ></span>
+                            </div>
+                            <div
+                              style="flex: 1; display: flex; flex-direction: column; justify-content: flex-end; gap: 2px"
+                            >
+                              <span
+                                style="height: 46%; background: #c7d7fb; border-radius: 2px 2px 0 0"
+                              ></span><span
+                                style="height: 34%; background: #0f7a6b; border-radius: 2px 2px 0 0"
+                              ></span>
+                            </div>
+                            <div
+                              style="flex: 1; display: flex; flex-direction: column; justify-content: flex-end; gap: 2px"
+                            >
+                              <span
+                                style="height: 64%; background: #c7d7fb; border-radius: 2px 2px 0 0"
+                              ></span><span
+                                style="height: 40%; background: #0f7a6b; border-radius: 2px 2px 0 0"
+                              ></span>
+                            </div>
+                            <div
+                              style="flex: 1; display: flex; flex-direction: column; justify-content: flex-end; gap: 2px"
+                            >
+                              <span
+                                style="height: 58%; background: #c7d7fb; border-radius: 2px 2px 0 0"
+                              ></span><span
+                                style="height: 46%; background: #0f7a6b; border-radius: 2px 2px 0 0"
+                              ></span>
+                            </div>
+                            <div
+                              style="flex: 1; display: flex; flex-direction: column; justify-content: flex-end; gap: 2px"
+                            >
+                              <span
+                                style="height: 72%; background: #c7d7fb; border-radius: 2px 2px 0 0"
+                              ></span><span
+                                style="height: 50%; background: #0f7a6b; border-radius: 2px 2px 0 0"
+                              ></span>
+                            </div>
+                            <div
+                              style="flex: 1; display: flex; flex-direction: column; justify-content: flex-end; gap: 2px"
+                            >
+                              <span
+                                style="height: 66%; background: #c7d7fb; border-radius: 2px 2px 0 0"
+                              ></span><span
+                                style="height: 44%; background: #0f7a6b; border-radius: 2px 2px 0 0"
+                              ></span>
+                            </div>
+                            <div
+                              style="flex: 1; display: flex; flex-direction: column; justify-content: flex-end; gap: 2px"
+                            >
+                              <span
+                                style="height: 80%; background: #c7d7fb; border-radius: 2px 2px 0 0"
+                              ></span><span
+                                style="height: 56%; background: #0f7a6b; border-radius: 2px 2px 0 0"
+                              ></span>
+                            </div>
+                          </div>
+                        </div>
+                        <div
+                          style="background: #fff; border: 1px solid #e4e7e2; border-radius: 12px; padding: 16px; flex: 1; display: flex; flex-direction: column"
+                        >
+                          <div
+                            style="display: flex; justify-content: space-between; align-items: baseline; margin-bottom: 10px"
+                          >
+                            <div style="font-size: 13.5px; font-weight: 700">
+                              Peta ringkas kasus
+                            </div><span
+                              style="font-size: 12px; color: #0f7a6b; font-weight: 600"
+                            >Buka Peta &amp; Kasus →</span>
+                          </div>
+                          <div
+                            style="flex: 1; border-radius: 9px; position: relative; overflow: hidden; background: #eaeee9; min-height: 150px"
+                          >
+                            <div
+                              style="position: absolute; inset: 0; background-image:
+  linear-gradient(#dfe4de 1px, transparent 1px),
+  linear-gradient(90deg, #dfe4de 1px, transparent 1px); background-size: 34px 34px"
+                            >
+                            </div>
+                            <span
+                              style="position: absolute; left: 22%; top: 34%; transform: translate(-50%, -50%); width: 30px; height: 30px; border-radius: 50%; background: #c0392b; color: #fff; display: flex; align-items: center; justify-content: center; font-size: 12px; font-weight: 700; border: 2px solid #fff"
+                            >6</span>
+                            <span
+                              style="position: absolute; left: 52%; top: 56%; transform: translate(-50%, -50%); width: 34px; height: 34px; border-radius: 50%; background: #b8730a; color: #fff; display: flex; align-items: center; justify-content: center; font-size: 12px; font-weight: 700; border: 2px solid #fff"
+                            >14</span>
+                            <span
+                              style="position: absolute; left: 74%; top: 30%; transform: translate(-50%, -50%); width: 26px; height: 26px; border-radius: 50%; background: #0f7a6b; color: #fff; display: flex; align-items: center; justify-content: center; font-size: 11px; font-weight: 700; border: 2px solid #fff"
+                            >9</span>
+                            <span
+                              style="position: absolute; left: 68%; top: 72%; transform: translate(-50%, -50%); width: 22px; height: 22px; border-radius: 50%; background: #2563eb; color: #fff; display: flex; align-items: center; justify-content: center; font-size: 10px; font-weight: 700; border: 2px solid #fff"
+                            >4</span>
+                          </div>
+                        </div>
+                      </div>
+                      <!-- right: kasus kritis + aktivitas -->
+                      <div
+                        style="display: flex; flex-direction: column; gap: 16px; min-height: 0"
+                      >
+                        <div
+                          style="background: #fff; border: 1px solid #e4e7e2; border-radius: 12px; padding: 16px; flex: 1; display: flex; flex-direction: column"
+                        >
+                          <div
+                            style="font-size: 13.5px; font-weight: 700; margin-bottom: 12px"
+                          >
+                            Kasus kritis
+                          </div>
+                          <div
+                            style="display: flex; flex-direction: column; gap: 0"
+                          >
+                            <div
+                              style="display: flex; gap: 10px; align-items: center; padding-bottom: 11px; border-bottom: 1px solid #eef0ec"
+                            >
+                              <span
+                                style="width: 8px; height: 8px; border-radius: 50%; background: #c0392b; flex: none"
+                              ></span><div style="flex: 1; min-width: 0">
+                                <div
+                                  style="font-size: 12.5px; font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis"
+                                >
+                                  Jembatan retak RW 07
+                                </div>
+                                <div
+                                  class="tnum"
+                                  style="font-size: 11px; color: #616770"
+                                >
+                                  CB-1790 · Ds. Kaler
+                                </div>
+                              </div><span
+                                class="tnum"
+                                style="font-size: 11px; font-weight: 700; color: #a5271a"
+                              >SLA -1h</span>
+                            </div>
+                            <div
+                              style="display: flex; gap: 10px; align-items: center; padding: 11px 0; border-bottom: 1px solid #eef0ec"
+                            >
+                              <span
+                                style="width: 8px; height: 8px; border-radius: 50%; background: #c0392b; flex: none"
+                              ></span><div style="flex: 1; min-width: 0">
+                                <div
+                                  style="font-size: 12.5px; font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis"
+                                >
+                                  Jalan longsor akses utama
+                                </div>
+                                <div
+                                  class="tnum"
+                                  style="font-size: 11px; color: #616770"
+                                >
+                                  CB-1802 · Ds. Girang
+                                </div>
+                              </div><span
+                                class="tnum"
+                                style="font-size: 11px; font-weight: 700; color: #a5271a"
+                              >SLA -3h</span>
+                            </div>
+                            <div
+                              style="display: flex; gap: 10px; align-items: center; padding: 11px 0; border-bottom: 1px solid #eef0ec"
+                            >
+                              <span
+                                style="width: 8px; height: 8px; border-radius: 50%; background: #b8730a; flex: none"
+                              ></span><div style="flex: 1; min-width: 0">
+                                <div
+                                  style="font-size: 12.5px; font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis"
+                                >
+                                  Air keruh 3 dusun
+                                </div>
+                                <div
+                                  class="tnum"
+                                  style="font-size: 11px; color: #616770"
+                                >
+                                  CB-1811 · Ds. Ciburuy
+                                </div>
+                              </div><span
+                                class="tnum"
+                                style="font-size: 11px; font-weight: 700; color: #8a5808"
+                              >SLA 2j</span>
+                            </div>
+                            <div
+                              style="display: flex; gap: 10px; align-items: center; padding-top: 11px"
+                            >
+                              <span
+                                style="width: 8px; height: 8px; border-radius: 50%; background: #b8730a; flex: none"
+                              ></span><div style="flex: 1; min-width: 0">
+                                <div
+                                  style="font-size: 12.5px; font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis"
+                                >
+                                  Penerangan jalan mati
+                                </div>
+                                <div
+                                  class="tnum"
+                                  style="font-size: 11px; color: #616770"
+                                >
+                                  CB-1815 · Ds. Wetan
+                                </div>
+                              </div><span
+                                class="tnum"
+                                style="font-size: 11px; font-weight: 700; color: #8a5808"
+                              >SLA 5j</span>
+                            </div>
+                          </div>
+                        </div>
+                        <div
+                          style="background: #fff; border: 1px solid #e4e7e2; border-radius: 12px; padding: 16px"
+                        >
+                          <div
+                            style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px"
+                          >
+                            <div style="font-size: 13.5px; font-weight: 700">
+                              Kualitas &amp; sinkronisasi data
+                            </div>
+                          </div>
+                          <div style="display: flex; gap: 12px">
+                            <div style="flex: 1">
+                              <div
+                                class="tnum"
+                                style="font-size: 20px; font-weight: 700; color: #0a5c50"
+                              >
+                                98%
+                              </div>
+                              <div
+                                style="font-size: 11px; color: #616770; line-height: 1.3; margin-top: 1px"
+                              >
+                                Laporan tersinkron
+                              </div>
+                            </div>
+                            <div style="flex: 1">
+                              <div
+                                class="tnum"
+                                style="font-size: 20px; font-weight: 700; color: #8a5808"
+                              >
+                                7
+                              </div>
+                              <div
+                                style="font-size: 11px; color: #616770; line-height: 1.3; margin-top: 1px"
+                              >
+                                Menunggu koneksi surveyor
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- 3b Detail Kasus W-04 -->
+          <div style="display: flex; flex-direction: column; gap: 13px">
+            <div style="display: flex; align-items: center; gap: 9px">
+              <span
+                style="font-family: 'IBM Plex Mono', monospace; font-size: 11px; font-weight: 600; padding: 3px 7px; border-radius: 5px; background: #1f2226; color: #fff"
+              >W-04</span>
+              <span style="font-size: 13px; font-weight: 600; color: #3a3f45"
+              >Detail Kasus — Workspace Operator</span>
+            </div>
+            <div
+              style="width: 1340px; background: #fff; border-radius: 12px; border: 1px solid #d3d7d0; box-shadow: 0 24px 60px -30px rgba(0, 0, 0, 0.4); overflow: hidden"
+            >
+              <div
+                style="height: 38px; background: #eef0ec; border-bottom: 1px solid #dfe2dc; display: flex; align-items: center; gap: 8px; padding: 0 14px"
+              >
+                <span
+                  style="width: 11px; height: 11px; border-radius: 50%; background: #e06c60"
+                ></span><span
+                  style="width: 11px; height: 11px; border-radius: 50%; background: #e8bd57"
+                ></span><span
+                  style="width: 11px; height: 11px; border-radius: 50%; background: #66c07f"
+                ></span><span
+                  style="margin-left: 12px; background: #fff; border: 1px solid #dfe2dc; border-radius: 6px; font-size: 11.5px; color: #616770; padding: 4px 12px; font-family: 'IBM Plex Mono', monospace"
+                >app.pantaudesa.id/kasus/CB-1790</span>
+              </div>
+              <div
+                style="height: 800px; display: flex; flex-direction: column; background: #f9faf8"
+              >
+                <!-- case header -->
+                <div
+                  style="background: #fff; border-bottom: 1px solid #e4e7e2; padding: 16px 24px 0; flex: none"
+                >
+                  <div
+                    style="display: flex; align-items: flex-start; gap: 14px"
+                  >
+                    <div style="flex: 1">
+                      <div
+                        style="display: flex; align-items: center; gap: 10px"
+                      >
+                        <span
+                          style="font-size: 12px; color: #0f7a6b; font-weight: 600"
+                        >Peta &amp; Kasus /</span><span
+                          class="tnum"
+                          style="font-family: 'IBM Plex Mono', monospace; font-size: 12px; color: #616770"
+                        >CB-1790</span>
+                      </div>
+                      <div
+                        style="display: flex; align-items: center; gap: 11px; margin-top: 5px"
+                      >
+                        <span
+                          style="font-family: 'IBM Plex Mono', monospace; font-size: 10px; font-weight: 600; background: #e2f1ee; color: #0a5c50; padding: 2px 7px; border-radius: 5px"
+                        >JEMBATAN</span><h2
+                          style="margin: 0; font-size: 20px; font-weight: 700"
+                        >
+                          Jembatan retak RW 07, Dusun Kaler
+                        </h2>
+                      </div>
+                      <div
+                        style="display: flex; align-items: center; gap: 8px; margin-top: 9px"
+                      >
+                        <span
+                          style="display: inline-flex; align-items: center; gap: 5px; background: #f8ecd6; color: #8a5808; border-radius: 6px; padding: 4px 10px; font-size: 12px; font-weight: 600"
+                        ><span
+                            style="width: 7px; height: 7px; border-radius: 50%; background: #b8730a"
+                          ></span>Menunggu verifikasi</span>
+                        <span
+                          style="display: inline-flex; align-items: center; gap: 5px; background: #f8e2de; color: #a5271a; border-radius: 6px; padding: 4px 10px; font-size: 12px; font-weight: 700"
+                        >Prioritas tinggi</span>
+                        <span
+                          class="tnum"
+                          style="display: inline-flex; align-items: center; gap: 5px; background: #f8e2de; color: #a5271a; border-radius: 6px; padding: 4px 10px; font-size: 12px; font-weight: 700"
+                        >SLA terlewat 1j</span>
+                        <span style="font-size: 12px; color: #616770"
+                        >Desa Kaler · 8 laporan pendukung</span>
+                      </div>
+                    </div>
+                    <div style="display: flex; gap: 8px">
+                      <button
+                        style="border: 1px solid #e4e7e2; cursor: pointer; background: #fff; color: #3a3f45; border-radius: 8px; padding: 9px 14px; font-size: 12.5px; font-weight: 600; font-family: inherit"
+                      >
+                        Gabungkan
+                      </button>
+                      <button
+                        style="border: 0; cursor: pointer; background: #0f7a6b; color: #fff; border-radius: 8px; padding: 9px 16px; font-size: 12.5px; font-weight: 700; font-family: inherit"
+                      >
+                        Verifikasi kasus
+                      </button>
+                    </div>
+                  </div>
+                  <!-- tabs -->
+                  <div style="display: flex; gap: 22px; margin-top: 16px">
+                    <div
+                      style="padding-bottom: 11px; font-size: 13px; font-weight: 600; color: #0f7a6b; border-bottom: 2px solid #0f7a6b"
+                    >
+                      Ringkasan
+                    </div>
+                    <div
+                      style="padding-bottom: 11px; font-size: 13px; color: #616770"
+                    >
+                      Bukti &amp; Laporan
+                    </div>
+                    <div
+                      style="padding-bottom: 11px; font-size: 13px; color: #616770"
+                    >
+                      Verifikasi
+                    </div>
+                    <div
+                      style="padding-bottom: 11px; font-size: 13px; color: #616770"
+                    >
+                      Tugas &amp; Progres
+                    </div>
+                    <div
+                      style="padding-bottom: 11px; font-size: 13px; color: #616770"
+                    >
+                      Riwayat Audit
+                    </div>
+                  </div>
+                </div>
+                <!-- body -->
+                <div
+                  style="flex: 1; overflow: hidden; display: grid; grid-template-columns: 1fr 340px"
+                >
+                  <!-- main col -->
+                  <div
+                    style="padding: 20px 24px; overflow: hidden; display: flex; flex-direction: column; gap: 16px"
+                  >
+                    <div
+                      style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px"
+                    >
+                      <div
+                        style="background: #fff; border: 1px solid #e4e7e2; border-radius: 12px; overflow: hidden"
+                      >
+                        <div
+                          style="height: 150px; position: relative; background: #eaeee9"
+                        >
+                          <div
+                            style="position: absolute; inset: 0; background-image:
+  linear-gradient(#dfe4de 1px, transparent 1px),
+  linear-gradient(90deg, #dfe4de 1px, transparent 1px); background-size: 30px 30px"
+                          >
+                          </div><span
+                            style="position: absolute; left: 50%; top: 50%; transform: translate(-50%, -100%); width: 16px; height: 16px; border-radius: 50% 50% 50% 0; background: #c0392b; rotate: -45deg; border: 2px solid #fff"
+                          ></span>
+                        </div>
+                        <div
+                          style="padding: 11px 13px; display: flex; justify-content: space-between; align-items: center"
+                        >
+                          <span
+                            class="tnum"
+                            style="font-size: 11.5px; color: #616770"
+                          >-6.8698, 107.5401</span><span
+                            style="font-size: 11.5px; color: #0f7a6b; font-weight: 600"
+                          >Buka peta penuh</span>
+                        </div>
+                      </div>
+                      <div
+                        style="background: #fff; border: 1px solid #e4e7e2; border-radius: 12px; padding: 15px"
+                      >
+                        <div
+                          style="font-size: 12px; font-weight: 700; color: #616770; text-transform: uppercase; letter-spacing: 0.04em; margin-bottom: 10px"
+                        >
+                          Dampak
+                        </div>
+                        <div
+                          style="display: flex; flex-direction: column; gap: 9px"
+                        >
+                          <div
+                            style="display: flex; gap: 9px; align-items: center"
+                          >
+                            <span
+                              style="width: 8px; height: 8px; background: #c0392b; border-radius: 2px"
+                            ></span><span style="font-size: 13px"
+                            >Akses terputus untuk ±2 dusun</span>
+                          </div>
+                          <div
+                            style="display: flex; gap: 9px; align-items: center"
+                          >
+                            <span
+                              style="width: 8px; height: 8px; background: #c0392b; border-radius: 2px"
+                            ></span><span style="font-size: 13px"
+                            >Risiko keselamatan tinggi</span>
+                          </div>
+                          <div
+                            style="display: flex; gap: 9px; align-items: center"
+                          >
+                            <span
+                              style="width: 8px; height: 8px; background: #b8730a; border-radius: 2px"
+                            ></span><span style="font-size: 13px"
+                            >Layanan sekolah terganggu</span>
+                          </div>
+                        </div>
+                        <div
+                          style="margin-top: 13px; padding-top: 13px; border-top: 1px solid #eef0ec; font-size: 12px; color: #616770; line-height: 1.5"
+                        >
+                          Konsolidasi dari <b style="color: #17191c"
+                          >8 laporan warga</b> dalam radius 120 m sejak 12 Jul
+                          2026.
+                        </div>
+                      </div>
+                    </div>
+                    <!-- score panel -->
+                    <div
+                      style="background: #fff; border: 1px solid #e4e7e2; border-radius: 12px; padding: 16px"
+                    >
+                      <div
+                        style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 14px"
+                      >
+                        <div
+                          style="display: flex; align-items: center; gap: 14px"
+                        >
+                          <div>
+                            <div
+                              class="tnum"
+                              style="font-size: 30px; font-weight: 700; color: #0a5c50; line-height: 1"
+                            >
+                              82
+                            </div>
+                            <div style="font-size: 11px; color: #616770">
+                              Skor prioritas / 100
+                            </div>
+                          </div><span
+                            style="display: inline-flex; align-items: center; gap: 5px; background: #e2f1ee; color: #0a5c50; border-radius: 6px; padding: 3px 9px; font-size: 11px; font-weight: 600"
+                          >Confidence tinggi</span>
+                        </div>
+                        <div style="text-align: right">
+                          <div
+                            class="tnum"
+                            style="font-size: 11px; color: #616770; font-family: 'IBM Plex Mono', monospace"
+                          >
+                            model v2.3
+                          </div>
+                          <button
+                            style="margin-top: 6px; border: 1px solid #e4e7e2; cursor: pointer; background: #fff; color: #3a3f45; border-radius: 7px; padding: 6px 12px; font-size: 12px; font-weight: 600; font-family: inherit"
+                          >
+                            Override beralasan
+                          </button>
+                        </div>
+                      </div>
+                      <div
+                        style="display: flex; flex-direction: column; gap: 9px"
+                      >
+                        <div
+                          style="display: flex; align-items: center; gap: 12px"
+                        >
+                          <span
+                            style="width: 130px; font-size: 12px; color: #3a3f45"
+                          >Keselamatan</span><span
+                            style="flex: 1; height: 8px; border-radius: 4px; background: #eef0ec; overflow: hidden"
+                          ><span
+                              style="display: block; width: 90%; height: 100%; background: #0f7a6b"
+                            ></span></span><span
+                            class="tnum"
+                            style="width: 34px; text-align: right; font-size: 12px; font-weight: 600"
+                          >+34</span>
+                        </div>
+                        <div
+                          style="display: flex; align-items: center; gap: 12px"
+                        >
+                          <span
+                            style="width: 130px; font-size: 12px; color: #3a3f45"
+                          >Jumlah terdampak</span><span
+                            style="flex: 1; height: 8px; border-radius: 4px; background: #eef0ec; overflow: hidden"
+                          ><span
+                              style="display: block; width: 70%; height: 100%; background: #0f7a6b"
+                            ></span></span><span
+                            class="tnum"
+                            style="width: 34px; text-align: right; font-size: 12px; font-weight: 600"
+                          >+22</span>
+                        </div>
+                        <div
+                          style="display: flex; align-items: center; gap: 12px"
+                        >
+                          <span
+                            style="width: 130px; font-size: 12px; color: #3a3f45"
+                          >Laporan pendukung</span><span
+                            style="flex: 1; height: 8px; border-radius: 4px; background: #eef0ec; overflow: hidden"
+                          ><span
+                              style="display: block; width: 55%; height: 100%; background: #0f7a6b"
+                            ></span></span><span
+                            class="tnum"
+                            style="width: 34px; text-align: right; font-size: 12px; font-weight: 600"
+                          >+16</span>
+                        </div>
+                        <div
+                          style="display: flex; align-items: center; gap: 12px"
+                        >
+                          <span
+                            style="width: 130px; font-size: 12px; color: #3a3f45"
+                          >Kelewatan SLA</span><span
+                            style="flex: 1; height: 8px; border-radius: 4px; background: #eef0ec; overflow: hidden"
+                          ><span
+                              style="display: block; width: 35%; height: 100%; background: #b8730a"
+                            ></span></span><span
+                            class="tnum"
+                            style="width: 34px; text-align: right; font-size: 12px; font-weight: 600"
+                          >+10</span>
+                        </div>
+                      </div>
+                    </div>
+                    <!-- laporan pendukung -->
+                    <div
+                      style="background: #fff; border: 1px solid #e4e7e2; border-radius: 12px; padding: 16px; flex: 1; min-height: 0; overflow: hidden"
+                    >
+                      <div
+                        style="display: flex; justify-content: space-between; align-items: baseline; margin-bottom: 11px"
+                      >
+                        <div style="font-size: 13.5px; font-weight: 700">
+                          Laporan pendukung <span
+                            class="tnum"
+                            style="color: #616770; font-weight: 500"
+                          >(8)</span>
+                        </div><span
+                          style="font-size: 12px; color: #0f7a6b; font-weight: 600"
+                        >Bandingkan kandidat duplikat →</span>
+                      </div>
+                      <div style="display: flex; gap: 10px">
+                        <div
+                          style="width: 88px; height: 66px; border-radius: 8px; background: repeating-linear-gradient(135deg, #e4e7e2, #e4e7e2 6px, #eef0ec 6px, #eef0ec 12px); flex: none"
+                        >
+                        </div>
+                        <div
+                          style="width: 88px; height: 66px; border-radius: 8px; background: repeating-linear-gradient(135deg, #e4e7e2, #e4e7e2 6px, #eef0ec 6px, #eef0ec 12px); flex: none"
+                        >
+                        </div>
+                        <div
+                          style="width: 88px; height: 66px; border-radius: 8px; background: repeating-linear-gradient(135deg, #e4e7e2, #e4e7e2 6px, #eef0ec 6px, #eef0ec 12px); flex: none"
+                        >
+                        </div>
+                        <div
+                          style="width: 88px; height: 66px; border-radius: 8px; background: #eef0ec; display: flex; align-items: center; justify-content: center; font-size: 13px; font-weight: 700; color: #616770; flex: none"
+                        >
+                          +5
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                  <!-- right timeline col -->
+                  <div
+                    style="border-left: 1px solid #e4e7e2; background: #fff; padding: 20px; overflow: hidden; display: flex; flex-direction: column; gap: 14px"
+                  >
+                    <div
+                      style="font-size: 12px; font-weight: 700; color: #616770; text-transform: uppercase; letter-spacing: 0.04em"
+                    >
+                      Timeline &amp; keputusan
+                    </div>
+                    <div style="display: flex; flex-direction: column">
+                      <div style="display: flex; gap: 11px">
+                        <div
+                          style="display: flex; flex-direction: column; align-items: center"
+                        >
+                          <span
+                            style="width: 11px; height: 11px; border-radius: 50%; background: #b8730a; margin-top: 2px"
+                          ></span><span
+                            style="flex: 1; width: 2px; background: #e4e7e2; min-height: 26px"
+                          ></span>
+                        </div>
+                        <div style="padding-bottom: 16px">
+                          <div style="font-size: 12.5px; font-weight: 600">
+                            Menunggu verifikasi manual
+                          </div>
+                          <div
+                            class="tnum"
+                            style="font-size: 11px; color: #616770"
+                          >
+                            17 Jul 08:10 · sistem (risiko tinggi)
+                          </div>
+                        </div>
+                      </div>
+                      <div style="display: flex; gap: 11px">
+                        <div
+                          style="display: flex; flex-direction: column; align-items: center"
+                        >
+                          <span
+                            style="width: 11px; height: 11px; border-radius: 50%; background: #0f7a6b; margin-top: 2px"
+                          ></span><span
+                            style="flex: 1; width: 2px; background: #e4e7e2; min-height: 26px"
+                          ></span>
+                        </div>
+                        <div style="padding-bottom: 16px">
+                          <div style="font-size: 12.5px; font-weight: 600">
+                            3 laporan digabung
+                          </div>
+                          <div
+                            class="tnum"
+                            style="font-size: 11px; color: #616770"
+                          >
+                            16 Jul 19:22 · operator B. Maulana
+                          </div>
+                        </div>
+                      </div>
+                      <div style="display: flex; gap: 11px">
+                        <div
+                          style="display: flex; flex-direction: column; align-items: center"
+                        >
+                          <span
+                            style="width: 11px; height: 11px; border-radius: 50%; background: #0f7a6b; margin-top: 2px"
+                          ></span><span
+                            style="flex: 1; width: 2px; background: #e4e7e2; min-height: 26px"
+                          ></span>
+                        </div>
+                        <div style="padding-bottom: 16px">
+                          <div style="font-size: 12.5px; font-weight: 600">
+                            Kasus dibuat dari konsolidasi
+                          </div>
+                          <div
+                            class="tnum"
+                            style="font-size: 11px; color: #616770"
+                          >
+                            16 Jul 18:40 · AI + operator
+                          </div>
+                        </div>
+                      </div>
+                      <div style="display: flex; gap: 11px">
+                        <div
+                          style="display: flex; flex-direction: column; align-items: center"
+                        >
+                          <span
+                            style="width: 11px; height: 11px; border-radius: 50%; background: #8a9099; margin-top: 2px"
+                          ></span>
+                        </div>
+                        <div>
+                          <div style="font-size: 12.5px; font-weight: 600">
+                            Laporan pertama diterima
+                          </div>
+                          <div
+                            class="tnum"
+                            style="font-size: 11px; color: #616770"
+                          >
+                            12 Jul 07:15
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                    <div
+                      style="margin-top: auto; background: #eef0ec; border-radius: 10px; padding: 11px 12px; display: flex; gap: 9px"
+                    >
+                      <span
+                        style="width: 18px; height: 18px; border-radius: 50%; border: 2px solid #616770; color: #616770; display: flex; align-items: center; justify-content: center; font-size: 11px; font-weight: 700; flex: none"
+                      >i</span><span
+                        style="font-size: 11px; color: #4a5058; line-height: 1.4"
+                      >Identitas pelapor &amp; metadata EXIF berada di
+                        disclosure terpisah, hanya untuk peran berwenang.</span>
+                    </div>
+                  </div>
+                </div>
+                <!-- sticky action bar -->
+                <div
+                  style="flex: none; background: #fff; border-top: 1px solid #e4e7e2; padding: 13px 24px; display: flex; align-items: center; gap: 10px"
+                >
+                  <span
+                    style="font-size: 12px; color: #616770; margin-right: auto"
+                  >Aksi kasus:</span>
+                  <button
+                    style="border: 1px solid #e4e7e2; cursor: pointer; background: #fff; color: #3a3f45; border-radius: 8px; padding: 10px 15px; font-size: 12.5px; font-weight: 600; font-family: inherit"
+                  >
+                    Ubah status
+                  </button>
+                  <button
+                    style="border: 1px solid #e4e7e2; cursor: pointer; background: #fff; color: #3a3f45; border-radius: 8px; padding: 10px 15px; font-size: 12.5px; font-weight: 600; font-family: inherit"
+                  >
+                    Ekspor kasus
+                  </button>
+                  <button
+                    style="border: 1px solid #e4e7e2; cursor: pointer; background: #fff; color: #3a3f45; border-radius: 8px; padding: 10px 15px; font-size: 12.5px; font-weight: 600; font-family: inherit"
+                  >
+                    Tugaskan unit
+                  </button>
+                  <button
+                    style="border: 0; cursor: pointer; background: #0f7a6b; color: #fff; border-radius: 8px; padding: 10px 18px; font-size: 12.5px; font-weight: 700; font-family: inherit"
+                  >
+                    Verifikasi &amp; prioritaskan
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- 3c Portal Publik P-02 -->
+          <div style="display: flex; flex-direction: column; gap: 13px">
+            <div style="display: flex; align-items: center; gap: 9px">
+              <span
+                style="font-family: 'IBM Plex Mono', monospace; font-size: 11px; font-weight: 600; padding: 3px 7px; border-radius: 5px; background: #1f2226; color: #fff"
+              >P-02</span>
+              <span style="font-size: 13px; font-weight: 600; color: #3a3f45"
+              >Portal Publik — Peta &amp; Daftar (tanpa login)</span>
+            </div>
+            <div
+              style="width: 1340px; background: #fff; border-radius: 12px; border: 1px solid #d3d7d0; box-shadow: 0 24px 60px -30px rgba(0, 0, 0, 0.4); overflow: hidden"
+            >
+              <div
+                style="height: 38px; background: #eef0ec; border-bottom: 1px solid #dfe2dc; display: flex; align-items: center; gap: 8px; padding: 0 14px"
+              >
+                <span
+                  style="width: 11px; height: 11px; border-radius: 50%; background: #e06c60"
+                ></span><span
+                  style="width: 11px; height: 11px; border-radius: 50%; background: #e8bd57"
+                ></span><span
+                  style="width: 11px; height: 11px; border-radius: 50%; background: #66c07f"
+                ></span><span
+                  style="margin-left: 12px; background: #fff; border: 1px solid #dfe2dc; border-radius: 6px; font-size: 11.5px; color: #616770; padding: 4px 12px; font-family: 'IBM Plex Mono', monospace"
+                >pantaudesa.id/peta?wilayah=cisarua&amp;status=penanganan</span>
+              </div>
+              <div style="height: 760px; display: flex; flex-direction: column">
+                <!-- public header -->
+                <div
+                  style="height: 60px; border-bottom: 1px solid #e4e7e2; display: flex; align-items: center; padding: 0 28px; flex: none"
+                >
+                  <div style="display: flex; align-items: center; gap: 9px">
+                    <div
+                      style="width: 28px; height: 28px; border-radius: 7px; background: #0f7a6b; display: flex; align-items: center; justify-content: center; color: #fff; font-weight: 700; font-size: 14px"
+                    >
+                      P
+                    </div><span style="font-size: 16px; font-weight: 700"
+                    >PantauDesa</span><span
+                      style="font-size: 12px; color: #616770; background: #eef0ec; border-radius: 5px; padding: 2px 8px; margin-left: 2px"
+                    >Portal Publik</span>
+                  </div>
+                  <div
+                    style="margin-left: 32px; display: flex; gap: 22px; font-size: 13px; color: #616770"
+                  >
+                    <span>Ringkasan</span><span
+                      style="color: #0f7a6b; font-weight: 600"
+                    >Peta &amp; Daftar</span><span>Statistik</span><span
+                    >Metodologi</span>
+                  </div>
+                  <div style="margin-left: auto; display: flex; gap: 9px">
+                    <button
+                      style="border: 1px solid #e4e7e2; cursor: pointer; background: #fff; color: #3a3f45; border-radius: 8px; padding: 8px 14px; font-size: 12.5px; font-weight: 600; font-family: inherit"
+                    >
+                      Masuk
+                    </button>
+                    <button
+                      style="border: 0; cursor: pointer; background: #0f7a6b; color: #fff; border-radius: 8px; padding: 8px 14px; font-size: 12.5px; font-weight: 700; font-family: inherit"
+                    >
+                      Buat laporan
+                    </button>
+                  </div>
+                </div>
+                <!-- filter bar -->
+                <div
+                  style="height: 56px; border-bottom: 1px solid #e4e7e2; display: flex; align-items: center; gap: 10px; padding: 0 28px; flex: none; background: #f9faf8"
+                >
+                  <div
+                    style="background: #fff; border: 1px solid #e4e7e2; border-radius: 8px; padding: 8px 12px; font-size: 12.5px; color: #3a3f45; font-weight: 600"
+                  >
+                    Kec. Cisarua ▾
+                  </div>
+                  <div
+                    style="background: #fff; border: 1px solid #e4e7e2; border-radius: 8px; padding: 8px 12px; font-size: 12.5px; color: #3a3f45"
+                  >
+                    Semua kategori ▾
+                  </div>
+                  <div
+                    style="background: #e2f1ee; border: 1px solid #bfe0d9; border-radius: 999px; padding: 6px 12px; font-size: 12px; color: #0a5c50; font-weight: 600; display: flex; align-items: center; gap: 6px"
+                  >
+                    Sedang ditangani <span style="cursor: pointer">✕</span>
+                  </div>
+                  <div
+                    style="background: #e2f1ee; border: 1px solid #bfe0d9; border-radius: 999px; padding: 6px 12px; font-size: 12px; color: #0a5c50; font-weight: 600; display: flex; align-items: center; gap: 6px"
+                  >
+                    Jul 2026 <span style="cursor: pointer">✕</span>
+                  </div>
+                  <span
+                    style="font-size: 12px; color: #0f7a6b; font-weight: 600; cursor: pointer"
+                  >Reset</span>
+                  <div
+                    style="margin-left: auto; display: flex; align-items: center; gap: 12px"
+                  >
+                    <span
+                      class="tnum"
+                      style="font-size: 12.5px; color: #616770"
+                    ><b style="color: #17191c">37</b> kasus</span><div
+                      style="display: flex; border: 1px solid #e4e7e2; border-radius: 8px; overflow: hidden"
+                    >
+                      <span
+                        style="background: #0f7a6b; color: #fff; padding: 6px 13px; font-size: 12px; font-weight: 600"
+                      >Peta</span><span
+                        style="background: #fff; color: #616770; padding: 6px 13px; font-size: 12px"
+                      >Daftar</span>
+                    </div>
+                  </div>
+                </div>
+                <!-- map + list -->
+                <div style="flex: 1; display: flex; min-height: 0">
+                  <div
+                    style="flex: 1; position: relative; background: #eaeee9; overflow: hidden"
+                  >
+                    <div
+                      style="position: absolute; inset: 0; background-image:
+  linear-gradient(#dfe4de 1px, transparent 1px),
+  linear-gradient(90deg, #dfe4de 1px, transparent 1px); background-size: 40px 40px"
+                    >
+                    </div>
+                    <!-- generalized clusters -->
+                    <span
+                      style="position: absolute; left: 30%; top: 38%; transform: translate(-50%, -50%); width: 44px; height: 44px; border-radius: 50%; background: rgba(37, 99, 235, 0.25); display: flex; align-items: center; justify-content: center"
+                    ><span
+                        style="width: 26px; height: 26px; border-radius: 50%; background: #2563eb; color: #fff; display: flex; align-items: center; justify-content: center; font-size: 12px; font-weight: 700"
+                      >12</span></span>
+                    <span
+                      style="position: absolute; left: 58%; top: 52%; transform: translate(-50%, -50%); width: 52px; height: 52px; border-radius: 50%; background: rgba(15, 122, 107, 0.22); display: flex; align-items: center; justify-content: center"
+                    ><span
+                        style="width: 30px; height: 30px; border-radius: 50%; background: #0f7a6b; color: #fff; display: flex; align-items: center; justify-content: center; font-size: 12px; font-weight: 700"
+                      >18</span></span>
+                    <span
+                      style="position: absolute; left: 72%; top: 32%; transform: translate(-50%, -50%); width: 38px; height: 38px; border-radius: 50%; background: rgba(184, 115, 10, 0.22); display: flex; align-items: center; justify-content: center"
+                    ><span
+                        style="width: 24px; height: 24px; border-radius: 50%; background: #b8730a; color: #fff; display: flex; align-items: center; justify-content: center; font-size: 11px; font-weight: 700"
+                      >7</span></span>
+                    <!-- legend -->
+                    <div
+                      style="position: absolute; left: 16px; bottom: 16px; background: #fff; border: 1px solid #e4e7e2; border-radius: 10px; padding: 11px 13px; box-shadow: 0 6px 16px -8px rgba(0, 0, 0, 0.3)"
+                    >
+                      <div
+                        style="font-size: 11px; font-weight: 700; color: #616770; text-transform: uppercase; letter-spacing: 0.04em; margin-bottom: 7px"
+                      >
+                        Status kasus
+                      </div>
+                      <div
+                        style="display: flex; flex-direction: column; gap: 6px"
+                      >
+                        <div
+                          style="display: flex; gap: 8px; align-items: center; font-size: 12px"
+                        >
+                          <span
+                            style="width: 11px; height: 11px; border-radius: 50%; background: #2563eb"
+                          ></span>Terverifikasi
+                        </div>
+                        <div
+                          style="display: flex; gap: 8px; align-items: center; font-size: 12px"
+                        >
+                          <span
+                            style="width: 11px; height: 11px; border-radius: 50%; background: #b8730a"
+                          ></span>Menunggu verifikasi
+                        </div>
+                        <div
+                          style="display: flex; gap: 8px; align-items: center; font-size: 12px"
+                        >
+                          <span
+                            style="width: 11px; height: 11px; border-radius: 50%; background: #0f7a6b"
+                          ></span>Sedang ditangani
+                        </div>
+                      </div>
+                    </div>
+                    <div
+                      style="position: absolute; right: 16px; bottom: 16px; background: #fff; border: 1px solid #e4e7e2; border-radius: 8px; padding: 8px 11px; font-size: 11px; color: #616770; max-width: 220px; line-height: 1.4"
+                    >
+                      Lokasi digeneralisasi untuk melindungi privasi pelapor.
+                    </div>
+                  </div>
+                  <!-- list -->
+                  <div
+                    style="width: 400px; border-left: 1px solid #e4e7e2; flex: none; overflow: hidden; display: flex; flex-direction: column"
+                  >
+                    <div
+                      style="padding: 14px 18px; border-bottom: 1px solid #e4e7e2"
+                    >
+                      <div
+                        style="background: #f4f5f3; border: 1px solid #e4e7e2; border-radius: 8px; padding: 9px 12px; font-size: 12.5px; color: #8a9099"
+                      >
+                        Cari wilayah atau fasilitas…
+                      </div>
+                    </div>
+                    <div
+                      style="flex: 1; overflow: hidden; padding: 14px 18px; display: flex; flex-direction: column; gap: 11px"
+                    >
+                      <div
+                        style="background: #fff; border: 1px solid #e4e7e2; border-radius: 12px; padding: 13px; display: flex; gap: 11px"
+                      >
+                        <span
+                          style="width: 38px; height: 38px; border-radius: 9px; background: #e2f1ee; color: #0a5c50; display: flex; align-items: center; justify-content: center; font-family: 'IBM Plex Mono', monospace; font-weight: 600; font-size: 12px; flex: none"
+                        >JB</span>
+                        <div style="flex: 1; min-width: 0">
+                          <div style="font-size: 13.5px; font-weight: 600">
+                            Jembatan retak RW 07
+                          </div>
+                          <div
+                            style="font-size: 11.5px; color: #616770; margin-top: 1px"
+                          >
+                            Desa Kaler · diperbarui 2 jam lalu
+                          </div>
+                          <div style="margin-top: 7px; display: flex; gap: 6px">
+                            <span
+                              style="display: inline-flex; align-items: center; gap: 5px; background: #e5edfd; color: #1d4ed8; border-radius: 6px; padding: 2px 8px; font-size: 11px; font-weight: 600"
+                            >Sedang ditangani</span><span
+                              class="tnum"
+                              style="font-size: 11px; color: #616770; align-self: center"
+                            >8 laporan</span>
+                          </div>
+                        </div>
+                      </div>
+                      <div
+                        style="background: #fff; border: 1px solid #e4e7e2; border-radius: 12px; padding: 13px; display: flex; gap: 11px"
+                      >
+                        <span
+                          style="width: 38px; height: 38px; border-radius: 9px; background: #e2f1ee; color: #0a5c50; display: flex; align-items: center; justify-content: center; font-family: 'IBM Plex Mono', monospace; font-weight: 600; font-size: 12px; flex: none"
+                        >AR</span>
+                        <div style="flex: 1; min-width: 0">
+                          <div style="font-size: 13.5px; font-weight: 600">
+                            Air keruh 3 dusun
+                          </div>
+                          <div
+                            style="font-size: 11.5px; color: #616770; margin-top: 1px"
+                          >
+                            Desa Ciburuy · diperbarui hari ini
+                          </div>
+                          <div style="margin-top: 7px; display: flex; gap: 6px">
+                            <span
+                              style="display: inline-flex; align-items: center; gap: 5px; background: #f8ecd6; color: #8a5808; border-radius: 6px; padding: 2px 8px; font-size: 11px; font-weight: 600"
+                            >Menunggu verifikasi</span><span
+                              class="tnum"
+                              style="font-size: 11px; color: #616770; align-self: center"
+                            >5 laporan</span>
+                          </div>
+                        </div>
+                      </div>
+                      <div
+                        style="background: #fff; border: 1px solid #e4e7e2; border-radius: 12px; padding: 13px; display: flex; gap: 11px"
+                      >
+                        <span
+                          style="width: 38px; height: 38px; border-radius: 9px; background: #e2f1ee; color: #0a5c50; display: flex; align-items: center; justify-content: center; font-family: 'IBM Plex Mono', monospace; font-weight: 600; font-size: 12px; flex: none"
+                        >JL</span>
+                        <div style="flex: 1; min-width: 0">
+                          <div style="font-size: 13.5px; font-weight: 600">
+                            Jalan berlubang dekat Pasar
+                          </div>
+                          <div
+                            style="font-size: 11.5px; color: #616770; margin-top: 1px"
+                          >
+                            Desa Ciburuy · diperbarui kemarin
+                          </div>
+                          <div style="margin-top: 7px; display: flex; gap: 6px">
+                            <span
+                              style="display: inline-flex; align-items: center; gap: 5px; background: #e2f1ee; color: #0a5c50; border-radius: 6px; padding: 2px 8px; font-size: 11px; font-weight: 600"
+                            >Terverifikasi</span><span
+                              class="tnum"
+                              style="font-size: 11px; color: #616770; align-self: center"
+                            >6 laporan</span>
+                          </div>
+                        </div>
+                      </div>
+                      <div
+                        style="background: #fff; border: 1px solid #e4e7e2; border-radius: 12px; padding: 13px; display: flex; gap: 11px"
+                      >
+                        <span
+                          style="width: 38px; height: 38px; border-radius: 9px; background: #e2f1ee; color: #0a5c50; display: flex; align-items: center; justify-content: center; font-family: 'IBM Plex Mono', monospace; font-weight: 600; font-size: 12px; flex: none"
+                        >LP</span>
+                        <div style="flex: 1; min-width: 0">
+                          <div style="font-size: 13.5px; font-weight: 600">
+                            Penerangan jalan mati
+                          </div>
+                          <div
+                            style="font-size: 11.5px; color: #616770; margin-top: 1px"
+                          >
+                            Desa Wetan · diperbarui 3 hari lalu
+                          </div>
+                          <div style="margin-top: 7px; display: flex; gap: 6px">
+                            <span
+                              style="display: inline-flex; align-items: center; gap: 5px; background: #e5edfd; color: #1d4ed8; border-radius: 6px; padding: 2px 8px; font-size: 11px; font-weight: 600"
+                            >Sedang ditangani</span><span
+                              class="tnum"
+                              style="font-size: 11px; color: #616770; align-self: center"
+                            >3 laporan</span>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div style="height: 20px"></div>
+      </div>
+    </x-dc>
+  </body>
+</html>

@@ -1,0 +1,71 @@
+{
+  "$schema": "./node_modules/wrangler/config-schema.json",
+  "name": "kmipn-26-deno",
+  "main": "./src/index.ts",
+  "compatibility_date": "2026-08-08",
+  "compatibility_flags": ["nodejs_compat"],
+  "assets": {
+    "directory": "./web/dist",
+    "not_found_handling": "single-page-application",
+    "binding": "ASSETS",
+    "run_worker_first": ["/api/*"]
+  },
+  "r2_buckets": [
+    {
+      "binding": "R2",
+      "bucket_name": "kmipn-26-deno",
+      "preview_bucket_name": "kmipn-26-deno-preview"
+    }
+  ],
+  "d1_databases": [
+    {
+      "binding": "D1",
+      "database_name": "kmpin-26-deno",
+      "database_id": "e9e20a26-629e-4316-95b0-12282eb05b5b"
+    }
+  ],
+  "hyperdrive": [
+    {
+      "binding": "HYPERDRIVE",
+      "id": "0daf12aa49d043859c5af3fb96c6c9a0"
+    }
+  ],
+  "kv_namespaces": [
+    {
+      "binding": "RATE_LIMITER",
+      "id": "cc37532524584f83af9cef7908d99134"
+    }
+  ],
+  "triggers": {
+    "crons": ["*/5 * * * *", "0 2 * * *"]
+  },
+  "vars": {
+    "PGPASSWORD": "SKIP_PGPASS",
+    "HOME": "/tmp",
+    "DISABLE_LOGIN_AUDIT": "true",
+    "ENVIRONMENT": "production"
+  },
+  "env": {
+    "pilot-kabupaten-a": {
+      "vars": {
+        "WILAYAH_KABUPATEN_ID": "00000000-0000-0000-0000-000000000001",
+        "DEPLOY_REGION": "kabupaten-a",
+        "PILOT_NAME": "Pilot Kabupaten A"
+      }
+    },
+    "pilot-kabupaten-b": {
+      "vars": {
+        "WILAYAH_KABUPATEN_ID": "00000000-0000-0000-0000-000000000002",
+        "DEPLOY_REGION": "kabupaten-b",
+        "PILOT_NAME": "Pilot Kabupaten B"
+      }
+    },
+    "pilot-kabupaten-c": {
+      "vars": {
+        "WILAYAH_KABUPATEN_ID": "00000000-0000-0000-0000-000000000003",
+        "DEPLOY_REGION": "kabupaten-c",
+        "PILOT_NAME": "Pilot Kabupaten C"
+      }
+    }
+  }
+}
