@@ -62,7 +62,22 @@ export const AdminLogin = () => {
       navigate("/admin");
     } catch (err) {
       logger.error("Failed to login", { error: err });
-      setError((err as Error).message);
+      const error = err as Error & { status?: number };
+      let message: string;
+      if (!email) {
+        message = "Email harus diisi";
+      } else if (error.status === 401) {
+        message = "Email atau password salah";
+      } else if (error.status === 403) {
+        message = "Akun tidak memiliki akses";
+      } else if (error.status && error.status >= 500) {
+        message = "Server sedang bermasalah, coba lagi nanti";
+      } else if (error.message === "Failed to fetch" || error.message === "NetworkError" || error.message === "network error") {
+        message = "Tidak ada koneksi internet";
+      } else {
+        message = error.message || "Login gagal";
+      }
+      setError(message);
     } finally {
       setLoading(false);
     }

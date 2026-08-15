@@ -21,6 +21,43 @@ export default {
           textTertiary: "#616770",
           textMuted: "#8a9099",
         },
+        primary: {
+          50: "#e2f1ee",
+          100: "#bfe0d9",
+          500: "#0f7a6b",
+          600: "#0a5c50",
+          700: "#0a5c50",
+        },
+        warning: {
+          100: "#f8ecd6",
+          500: "#b8730a",
+          600: "#8a5808",
+        },
+        danger: {
+          100: "#f8e2de",
+          500: "#c0392b",
+          600: "#a5271a",
+        },
+        info: {
+          100: "#e5edfd",
+          500: "#2563eb",
+          600: "#1d4ed8",
+        },
+        neutral: {
+          0: "#ffffff",
+          50: "#f4f5f3",
+          100: "#e6e8e3",
+          200: "#e4e7e2",
+          300: "#cfd3cc",
+          400: "#8a9099",
+          500: "#616770",
+          700: "#3a3f45",
+          900: "#17191c",
+        },
+        surface: {
+          sidebar: "#16302b",
+          sidebarAccent: "#234a43",
+        },
       },
       spacing: {
         xs: "5px",
@@ -29,10 +66,17 @@ export default {
         lg: "18px",
         xl: "24px",
       },
+      boxShadow: {
+        card: "0 24px 60px -30px rgba(0,0,0,0.4)",
+        "btn-primary": "0 10px 22px -12px rgba(15,122,107,0.9)",
+      },
       borderRadius: {
         sm: "5px",
         md: "11px",
         lg: "13px",
+        card: "12px",
+        btn: "10px",
+        pill: "999px",
       },
       fontFamily: {
         sans: "'IBM Plex Sans', system-ui, sans-serif",

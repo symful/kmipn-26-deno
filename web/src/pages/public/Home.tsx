@@ -57,24 +57,20 @@ export const PublicHome = () => {
   };
 
   return (
-    <div className="min-h-screen bg-sigap-background">
-      <header className="bg-sigap-surface px-6 py-4 border-b border-sigap-border">
-        <div className="flex items-center justify-between">
-          <div className="flex items-center gap-3">
-            <div
-              className="w-9 h-9 rounded-lg flex items-center justify-center text-white font-bold"
-              style={{ backgroundColor: colors.primary }}
-            >
-              S
-            </div>
-            <div>
-              <h1 className="text-2xl font-bold tracking-tight">SIGAP</h1>
-              <p className="text-sm text-sigap-textTertiary">
-                Platform pemetaan &amp; monitoring pembangunan desa
-              </p>
-            </div>
+    <div className="min-h-screen bg-neutral-100">
+      <header className="bg-white border-b border-neutral-200 px-7 py-[15px]">
+        <div className="flex items-center gap-3">
+          <div className="w-7 h-7 rounded-[7px] bg-sigap-primary flex items-center justify-center text-white font-bold text-sm">
+            P
           </div>
-          <ShareLinkButton filters={{}} label="Bagikan" />
+          <span className="text-base font-bold tracking-tight text-sigap-textPrimary">PantauDesa</span>
+          <span className="text-xs text-sigap-textTertiary bg-neutral-100 rounded px-2 py-0.5 ml-1">Portal Publik</span>
+        </div>
+        <div className="flex gap-6 text-sm text-sigap-textTertiary mt-3 ml-10">
+          <span className="text-sigap-primary font-semibold">Ringkasan</span>
+          <Link to="/public/cases" className="hover:text-sigap-primary transition-colors">Peta &amp; Daftar</Link>
+          <Link to="/public/statistics" className="hover:text-sigap-primary transition-colors">Statistik</Link>
+          <Link to="/methodology" className="hover:text-sigap-primary transition-colors">Metodologi</Link>
         </div>
       </header>
 
@@ -100,7 +96,7 @@ export const PublicHome = () => {
         )}
 
         <div
-          className="bg-white rounded-lg overflow-hidden border border-sigap-border"
+          className="bg-white rounded-xl border border-neutral-200 overflow-hidden"
           style={{ height: 600 }}
         >
           {loading ? (
@@ -167,18 +163,6 @@ export const PublicHome = () => {
                       year: "numeric",
                     })}
                   </p>
-                  {report.photo_urls && report.photo_urls.length > 0 && (
-                    <div className="mb-2">
-                      <img
-                        src={report.photo_urls[0]}
-                        alt="Foto lokasi"
-                        className="w-full h-24 object-cover rounded"
-                        onError={(e) => {
-                          (e.target as HTMLImageElement).style.display = "none";
-                        }}
-                      />
-                    </div>
-                  )}
                   <Link
                     to={`/case/${report.id}`}
                     className="block w-full text-center px-3 py-1.5 bg-sigap-primary text-white text-xs font-medium rounded hover:bg-sigap-primary/90 transition-colors"
@@ -213,7 +197,7 @@ const StatCard = ({
   value: number;
   color?: string;
 }) => (
-  <div className="bg-white rounded-lg p-4 border border-sigap-border">
+  <div className="bg-white rounded-xl p-4 border border-neutral-200">
     <div
       className="text-3xl font-bold tracking-tight"
       style={{ color: color ?? colors.textPrimary }}

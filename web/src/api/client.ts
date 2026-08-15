@@ -114,12 +114,22 @@ export async function request<T>(
       let errMsg: string;
       try {
         const err = await res.json().catch(() => null);
-        errMsg = (err as { error?: string })?.error ?? res.statusText;
+        // Handle nested error object: { error: { message: "..." } } or { error: "string" }
+        const errObj = err as { error?: { message?: string; code?: string } | string };
+        if (typeof errObj?.error === "object" && errObj.error !== null) {
+          errMsg = errObj.error.message ?? errObj.error.code ?? res.statusText;
+        } else if (typeof errObj?.error === "string") {
+          errMsg = errObj.error;
+        } else {
+          errMsg = res.statusText;
+        }
       } catch {
         errMsg = res.statusText;
       }
       logger.error(`API request failed: ${path}`, { status: res.status, error: errMsg });
-      throw new Error(errMsg);
+      const error = new Error(errMsg);
+      (error as Error & { status?: number }).status = res.status;
+      throw error;
     }
     if (res.status === 204) return {} as T;
     switch (responseType) {

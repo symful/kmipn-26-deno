@@ -10,14 +10,12 @@ import { z } from "zod";
 
 const WilayahCreateSchema = z.object({
   name: z.string().min(1).max(255),
-  code: z.string().min(1).max(50),
   parent_id: z.string().uuid().optional(),
   level: z.enum(["PROVINSI", "KABUPATEN", "KECAMATAN", "DESA"]),
 });
 
 const WilayahUpdateSchema = z.object({
   name: z.string().min(1).max(255).optional(),
-  code: z.string().min(1).max(50).optional(),
 });
 
 export const wilayahRoute = new Hono<{ Bindings: Env; Variables: AuthVariables }>();
@@ -29,8 +27,8 @@ wilayahRoute.get(
     const rows = await withClient(c.env, async (client: PgClient) => {
       const r = await client.query(
         parentId
-          ? "SELECT id, parent_id, level, name, code FROM wilayah WHERE parent_id = $1 ORDER BY name"
-          : "SELECT id, parent_id, level, name, code FROM wilayah WHERE parent_id IS NULL ORDER BY name",
+          ? "SELECT id, parent_id, level, name FROM wilayah WHERE parent_id = $1 ORDER BY name"
+          : "SELECT id, parent_id, level, name FROM wilayah WHERE parent_id IS NULL ORDER BY name",
         parentId ? [parentId] : []
       );
       return r.rows;
@@ -50,10 +48,10 @@ wilayahRoute.post(
 
     const result = await withClient(c.env, async (client: PgClient) => {
       const r = await client.query(
-        `INSERT INTO wilayah (name, code, parent_id, level, created_at, updated_at)
-         VALUES ($1, $2, $3, $4, NOW(), NOW())
-         RETURNING id, parent_id, level, name, code`,
-        [parsed.data.name, parsed.data.code, parsed.data.parent_id ?? null, parsed.data.level]
+        `INSERT INTO wilayah (name, parent_id, level, created_at)
+         VALUES ($1, $2, $3, NOW())
+         RETURNING id, parent_id, level, name`,
+        [parsed.data.name, parsed.data.parent_id ?? null, parsed.data.level]
       );
       return r.rows[0];
     });
@@ -78,10 +76,6 @@ wilayahRoute.patch(
     if (parsed.data.name !== undefined) {
       updates.push(`name = $${i++}`);
       values.push(parsed.data.name);
-    }
-    if (parsed.data.code !== undefined) {
-      updates.push(`code = $${i++}`);
-      values.push(parsed.data.code);
     }
 
     if (updates.length === 0) {

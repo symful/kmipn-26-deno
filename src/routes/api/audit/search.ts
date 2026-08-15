@@ -55,6 +55,7 @@ auditSearchRoute.get(
       );
       const total = totalR.rows[0]?.total ?? 0;
 
+      i = params.length + 1;
       const listParams = [...params, limit, offset];
       const entriesR = await client.query(
         `SELECT id, actor, action, object_type, object_id, before_data, after_data, reason, prev_hash, entry_hash, created_at

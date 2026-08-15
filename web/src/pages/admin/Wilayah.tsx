@@ -22,6 +22,13 @@ const LEVEL_ORDER: Record<WilayahLevel, number> = {
   DESA: 4,
 };
 
+const LEVEL_COLORS: Record<WilayahLevel, { bg: string; text: string; border: string }> = {
+  PROVINSI: { bg: "bg-teal-100", text: "text-teal-700", border: "border-teal-200" },
+  KABUPATEN: { bg: "bg-cyan-100", text: "text-cyan-700", border: "border-cyan-200" },
+  KECAMATAN: { bg: "bg-sky-100", text: "text-sky-700", border: "border-sky-200" },
+  DESA: { bg: "bg-indigo-100", text: "text-indigo-700", border: "border-indigo-200" },
+};
+
 interface FormData {
   name: string;
   code: string;
@@ -63,59 +70,124 @@ interface TreeNodeProps {
   node: WilayahNode;
   level: number;
   selectedId: string | null;
+  expandedNodes: Set<string>;
+  onToggle: (nodeId: string) => void;
   onSelect: (node: WilayahNode) => void;
   onEdit: (node: WilayahNode) => void;
   onDelete: (node: WilayahNode) => void;
   canEdit: boolean;
 }
 
-const TreeNode = ({ node, level, selectedId, onSelect, onEdit, onDelete, canEdit }: TreeNodeProps) => {
-  const [expanded, setExpanded] = useState(level < 2);
+const TreeNode = ({
+  node,
+  level,
+  selectedId,
+  expandedNodes,
+  onToggle,
+  onSelect,
+  onEdit,
+  onDelete,
+  canEdit,
+}: TreeNodeProps) => {
   const hasChildren = node.children && node.children.length > 0;
+  const isExpanded = expandedNodes.has(node.id);
   const isSelected = selectedId === node.id;
+  const levelStyle = LEVEL_COLORS[node.level as WilayahLevel] ?? LEVEL_COLORS.DESA;
+  const indentPx = level * 24;
 
   return (
-    <div>
+    <div className="relative">
+      {level > 0 && (
+        <div
+          className="absolute top-0 bottom-0 w-px bg-sigap-border"
+          style={{ left: `${indentPx - 12}px` }}
+        />
+      )}
+
       <div
-        className={`flex items-center gap-2 py-2 px-3 rounded cursor-pointer group transition-colors ${
-          isSelected ? "bg-sigap-primary/10 border border-sigap-primary/30" : "hover:bg-sigap-background border border-transparent"
-        }`}
-        style={{ paddingLeft: `${level * 20 + 12}px` }}
-        onClick={() => { onSelect(node); if (hasChildren) setExpanded(!expanded); }}
+        className={`
+          relative flex items-center gap-2 py-2.5 px-3 rounded-[8px] cursor-pointer
+          transition-all duration-150 group
+          ${isSelected
+            ? "bg-teal-50 border border-teal-200 shadow-sm"
+            : "hover:bg-sigap-surface border border-transparent"
+          }
+        `}
+        style={{ paddingLeft: `${indentPx + 12}px`, marginLeft: level === 0 ? "0" : "12px" }}
+        onClick={() => {
+          onSelect(node);
+          if (hasChildren) onToggle(node.id);
+        }}
       >
-        {hasChildren ? (
-          <span className="text-sigap-textMuted text-xs w-3">{expanded ? "▼" : "▶"}</span>
-        ) : (
-          <span className="text-sigap-textMuted text-xs w-3" />
+        {level > 0 && (
+          <div
+            className="absolute top-1/2 -translate-y-1/2 w-4 h-px bg-sigap-border"
+            style={{ left: `${indentPx - 12}px` }}
+          />
         )}
-        <span className={`font-medium text-sm ${isSelected ? "text-sigap-primary" : ""}`}>{node.name}</span>
-        <span className="text-xs text-sigap-textMuted">({node.level})</span>
-        <span className="text-xs text-sigap-textMuted font-mono">{node.code}</span>
+
+        <div className="w-5 h-5 flex items-center justify-center shrink-0">
+          {hasChildren ? (
+            <button
+              onClick={(e) => { e.stopPropagation(); onToggle(node.id); }}
+              className="w-5 h-5 rounded bg-sigap-surface border border-sigap-border flex items-center justify-center text-sigap-textMuted hover:bg-teal-50 hover:border-teal-200 transition-colors"
+            >
+              <svg
+                className={`w-3 h-3 transition-transform duration-200 ${isExpanded ? "rotate-90" : ""}`}
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+              </svg>
+            </button>
+          ) : (
+            <div className="w-2 h-2 rounded-full bg-sigap-border" />
+          )}
+        </div>
+
+        <span className={`px-1.5 py-0.5 rounded text-[10px] font-semibold uppercase tracking-wide ${levelStyle.bg} ${levelStyle.text}`}>
+          {node.level === "PROVINSI" ? "Prov" : node.level === "KABUPATEN" ? "Kab" : node.level === "KECAMATAN" ? "Kec" : "Desa"}
+        </span>
+
+        <div className="flex-1 min-w-0">
+          <span className={`font-medium text-sm block truncate ${isSelected ? "text-teal-700" : "text-sigap-textPrimary"}`}>
+            {node.name}
+          </span>
+        </div>
+
+        <span className="text-xs font-mono text-sigap-textMuted shrink-0">
+          {node.code}
+        </span>
+
         {canEdit && (
-          <div className="ml-auto flex items-center gap-2 opacity-0 group-hover:opacity-100">
+          <div className="flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
             <button
               onClick={(e) => { e.stopPropagation(); onEdit(node); }}
-              className="text-xs text-sigap-primary hover:underline"
+              className="px-2 py-1 text-xs font-medium text-teal-600 hover:text-teal-700 hover:bg-teal-50 rounded transition-colors"
             >
               Edit
             </button>
             <button
               onClick={(e) => { e.stopPropagation(); onDelete(node); }}
-              className="text-xs text-red-500 hover:underline"
+              className="px-2 py-1 text-xs font-medium text-red-500 hover:text-red-600 hover:bg-red-50 rounded transition-colors"
             >
               Hapus
             </button>
           </div>
         )}
       </div>
-      {hasChildren && expanded && (
-        <div>
+
+      {hasChildren && isExpanded && (
+        <div className="mt-1">
           {node.children!.map((child) => (
             <TreeNode
               key={child.id}
               node={child}
               level={level + 1}
               selectedId={selectedId}
+              expandedNodes={expandedNodes}
+              onToggle={onToggle}
               onSelect={onSelect}
               onEdit={onEdit}
               onDelete={onDelete}
@@ -172,87 +244,6 @@ function filterTreeByScope(tree: WilayahNode[], scopeId: string | null): Wilayah
   return [{ ...scopeNode }];
 }
 
-interface AuditPanelProps {
-  wilayahId: string;
-  wilayahName: string;
-  onClose: () => void;
-}
-
-interface WilayahAuditEntry {
-  id: string;
-  actor: string | null;
-  action: string;
-  object_type: string;
-  object_id: string | null;
-  before: unknown;
-  after: unknown;
-  created_at: string;
-}
-
-const AuditPanel = ({ wilayahId, wilayahName, onClose }: AuditPanelProps) => {
-  const [entries, setEntries] = useState<WilayahAuditEntry[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
-
-  useEffect(() => {
-    setLoading(true);
-    api
-      .wilayahAudit(wilayahId)
-      .then((data) => setEntries(data.entries))
-      .catch((e) => { logger.error("Failed to fetch wilayah audit trail", { error: e }); setError("Gagal memuat audit trail"); })
-      .finally(() => setLoading(false));
-  }, [wilayahId]);
-
-  return (
-    <div className="bg-sigap-surface rounded-lg border border-sigap-border p-4">
-      <div className="flex items-center justify-between mb-4">
-        <div>
-          <h3 className="text-base font-semibold">Riwayat Perubahan</h3>
-          <p className="text-xs text-sigap-textMuted">{wilayahName}</p>
-        </div>
-        <button
-          onClick={onClose}
-          className="text-sigap-textMuted hover:text-sigap-textSecondary"
-        >
-          <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-          </svg>
-        </button>
-      </div>
-
-      {loading ? (
-        <p className="text-sigap-textMuted text-sm py-4 text-center">Memuat...</p>
-      ) : error ? (
-        <p className="text-red-500 text-sm">{error}</p>
-      ) : entries.length === 0 ? (
-        <p className="text-sigap-textMuted text-sm py-4 text-center">Tidak ada riwayat perubahan.</p>
-      ) : (
-        <div className="space-y-3 max-h-64 overflow-y-auto">
-          {entries.map((entry) => (
-            <div key={entry.id} className="border-b border-sigap-border pb-3 last:border-0">
-              <div className="flex items-center justify-between mb-1">
-                <span className="text-xs font-medium text-sigap-primary">{entry.action.replace("wilayah_", "").toUpperCase()}</span>
-                <span className="text-xs text-sigap-textMuted">
-                  {new Date(entry.created_at).toLocaleString("id-ID")}
-                </span>
-              </div>
-              <p className="text-xs text-sigap-textMuted">Actor: {entry.actor ?? "-"}</p>
-              {entry.before !== null && entry.after !== null && typeof entry.before === "object" && typeof entry.after === "object" && (
-                <div className="mt-1 text-xs">
-                  <span className="text-sigap-textMuted">Sebelum: </span>
-                  <span className="font-mono">{String((entry.before as { name?: string; code?: string }).name ?? "-")}</span>
-                  <span className="text-sigap-textMuted ml-2">→ Sesudah: </span>
-                  <span className="font-mono">{String((entry.after as { name?: string; code?: string }).name ?? "-")}</span>
-                </div>
-              )}
-            </div>
-          ))}
-        </div>
-      )}
-    </div>
-  );
-};
-
 interface DeleteConfirmModalProps {
   node: WilayahNode;
   onConfirm: () => void;
@@ -262,26 +253,40 @@ interface DeleteConfirmModalProps {
 
 const DeleteConfirmModal = ({ node, onConfirm, onCancel, isDeleting }: DeleteConfirmModalProps) => (
   <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
-    <div className="bg-sigap-surface rounded-lg border border-sigap-border p-6 w-full max-w-sm mx-4">
-      <h3 className="text-lg font-semibold mb-2">Hapus Wilayah</h3>
+    <div className="bg-sigap-surface rounded-[12px] border border-sigap-border p-6 w-full max-w-sm mx-4 shadow-xl">
+      <div className="flex items-center gap-3 mb-4">
+        <div className="w-10 h-10 rounded-full bg-red-100 flex items-center justify-center">
+          <svg className="w-5 h-5 text-red-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+          </svg>
+        </div>
+        <div>
+          <h3 className="text-lg font-semibold text-sigap-textPrimary">Hapus Wilayah</h3>
+          <p className="text-xs text-sigap-textMuted">Aksi ini tidak dapat dibatalkan</p>
+        </div>
+      </div>
       <p className="text-sm text-sigap-textSecondary mb-4">
-        Apakah Anda yakin ingin menghapus <strong>{node.name}</strong> ({node.code})?
-        {node.children && node.children.length > 0 && (
-          <span className="block mt-2 text-red-500">Wilayah ini memiliki {node.children.length} anak. Menghapus parent akan memengaruhi seluruh hierarki.</span>
-        )}
+        Apakah Anda yakin ingin menghapus <strong className="text-sigap-textPrimary">{node.name}</strong> ({node.code})?
       </p>
+      {node.children && node.children.length > 0 && (
+        <div className="mb-4 p-3 rounded-[8px] bg-red-50 border border-red-200">
+          <p className="text-xs text-red-600">
+            <strong>Perhatian:</strong> Wilayah ini memiliki {node.children.length} anak wilayah. Menghapus parent akan menghapus seluruh hierarki di bawahnya.
+          </p>
+        </div>
+      )}
       <div className="flex gap-3">
         <button
           onClick={onConfirm}
           disabled={isDeleting}
-          className="px-4 py-2 bg-red-500 text-white text-sm font-medium rounded hover:bg-red-600 disabled:opacity-50"
+          className="flex-1 px-4 py-2.5 bg-red-500 text-white text-sm font-semibold rounded-[8px] hover:bg-red-600 disabled:opacity-50 transition-colors"
         >
-          {isDeleting ? "Menghapus..." : "Hapus"}
+          {isDeleting ? "Menghapus..." : "Ya, Hapus"}
         </button>
         <button
           onClick={onCancel}
           disabled={isDeleting}
-          className="px-4 py-2 border border-sigap-border text-sm font-medium rounded hover:bg-sigap-background disabled:opacity-50"
+          className="flex-1 px-4 py-2.5 border border-sigap-border text-sm font-semibold rounded-[8px] hover:bg-sigap-background disabled:opacity-50 transition-colors"
         >
           Batal
         </button>
@@ -299,6 +304,7 @@ export const AdminWilayah = () => {
   const [deleteNode, setDeleteNode] = useState<WilayahNode | null>(null);
   const [isDeleting, setIsDeleting] = useState(false);
   const [selectedNode, setSelectedNode] = useState<WilayahNode | null>(null);
+  const [expandedNodes, setExpandedNodes] = useState<Set<string>>(new Set());
   const [formData, setFormData] = useState<FormData>({ name: "", code: "", level: "PROVINSI", parent_id: null });
   const [formErrors, setFormErrors] = useState<FormErrors>({});
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -324,6 +330,24 @@ export const AdminWilayah = () => {
   useEffect(() => {
     fetchWilayah();
   }, []);
+
+  useEffect(() => {
+    if (scopedTree.length > 0) {
+      const toExpand = new Set<string>();
+      const expandLevel = (nodes: WilayahNode[], level: number) => {
+        if (level < 2) {
+          nodes.forEach((n) => {
+            if (n.children && n.children.length > 0) {
+              toExpand.add(n.id);
+              expandLevel(n.children, level + 1);
+            }
+          });
+        }
+      };
+      expandLevel(scopedTree, 0);
+      setExpandedNodes(toExpand);
+    }
+  }, [scopedTree]);
 
   const validParents = useMemo(() => {
     if (!formData.level) return [];
@@ -435,188 +459,142 @@ export const AdminWilayah = () => {
     setShowForm(false);
   };
 
+  const handleToggle = (nodeId: string) => {
+    setExpandedNodes((prev) => {
+      const next = new Set(prev);
+      if (next.has(nodeId)) {
+        next.delete(nodeId);
+      } else {
+        next.add(nodeId);
+      }
+      return next;
+    });
+  };
+
+  const countNodes = (nodes: WilayahNode[]): number => {
+    return nodes.reduce((acc, n) => acc + 1 + (n.children ? countNodes(n.children) : 0), 0);
+  };
+
   return (
     <div className="min-h-screen bg-sigap-background">
-      <header className="bg-sigap-surface px-6 py-4 border-b border-sigap-border">
-        <div className="flex items-center justify-between">
-          <div className="flex items-center gap-3">
-            <div
-              className="w-9 h-9 rounded-lg flex items-center justify-center text-white font-bold"
-              style={{ backgroundColor: colors.primary }}
-            >
-              S
+      <header className="bg-sigap-surface border-b border-sigap-border">
+        <div className="max-w-7xl mx-auto px-6 py-4">
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-4">
+              <div
+                className="w-10 h-10 rounded-[10px] flex items-center justify-center text-white font-bold text-lg"
+                style={{ backgroundColor: colors.primary }}
+              >
+                W
+              </div>
+              <div>
+                <h1 className="text-xl font-bold tracking-tight text-sigap-textPrimary">Manajemen Wilayah</h1>
+                <p className="text-xs text-sigap-textMuted">
+                  {user?.name ?? ""} ({user?.role ?? ""})
+                  {isAdminDaerah && userWilayahId && (
+                    <span className="ml-1 text-teal-600">• Lingkup: {userWilayahId.slice(0, 8)}...</span>
+                  )}
+                </p>
+              </div>
             </div>
-            <div>
-              <h1 className="text-xl font-bold tracking-tight">SIGAP Admin</h1>
-              <p className="text-xs text-sigap-textMuted">
-                {user?.name ?? ""} ({user?.role ?? ""})
-                {isAdminDaerah && userWilayahId && (
-                  <span className="ml-1 text-sigap-primary">• Lingkup: {userWilayahId.slice(0, 8)}...</span>
-                )}
-              </p>
+            <div className="flex items-center gap-4">
+              <Link
+                to="/admin"
+                className="text-sm font-medium text-teal-600 hover:text-teal-700 transition-colors"
+              >
+                Beranda
+              </Link>
+              <button
+                onClick={() => useAuthStore.getState().clear()}
+                className="text-sm text-sigap-perluTindakan hover:underline"
+              >
+                Keluar
+              </button>
             </div>
-          </div>
-          <div className="flex items-center gap-3">
-            <Link
-              to="/admin"
-              className="text-sm font-medium text-sigap-primary hover:underline"
-            >
-              Beranda
-            </Link>
-            <button
-              onClick={() => useAuthStore.getState().clear()}
-              className="text-sm text-sigap-perluTindakan hover:underline"
-            >
-              Keluar
-            </button>
           </div>
         </div>
       </header>
 
-      <main className="p-6 max-w-7xl mx-auto">
+      <main className="max-w-7xl mx-auto px-6 py-6">
         <div className="flex items-center justify-between mb-6">
           <div>
-            <h2 className="text-lg font-semibold">Wilayah</h2>
-            {isAdminDaerah && (
-              <p className="text-xs text-sigap-textMuted">Menampilkan wilayah dalam lingkup Anda</p>
-            )}
+            <h2 className="text-lg font-semibold text-sigap-textPrimary">Hierarki Wilayah</h2>
+            <p className="text-xs text-sigap-textMuted mt-0.5">
+              {loading ? "Memuat..." : `${countNodes(scopedTree)} wilayah dalam hierarki`}
+              {isAdminDaerah && " • Menampilkan wilayah dalam lingkup Anda"}
+            </p>
           </div>
           {isAdmin && (
             <button
               onClick={() => openCreateForm()}
-              className="px-4 py-2 bg-sigap-primary text-white text-sm font-medium rounded hover:opacity-90"
+              className="inline-flex items-center gap-2 px-4 py-2.5 bg-teal-600 text-white text-sm font-semibold rounded-[8px] hover:bg-teal-700 transition-colors shadow-sm"
+              style={{ boxShadow: "0 4px 12px -2px rgba(15,122,107,0.4)" }}
             >
-              + Tambah Wilayah
+              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
+              </svg>
+              Tambah Wilayah
             </button>
           )}
         </div>
 
-        {showForm && (
-          <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
-            <div className="bg-sigap-surface rounded-lg border border-sigap-border p-6 w-full max-w-md mx-4">
-              <h3 className="text-lg font-semibold mb-4">
-                {editingNode ? "Edit Wilayah" : "Tambah Wilayah"}
-              </h3>
-              <form onSubmit={handleSubmit} className="space-y-4">
-                <div>
-                  <label className="block text-sm font-medium mb-1">Nama Wilayah</label>
-                  <input
-                    type="text"
-                    name="name"
-                    value={formData.name}
-                    onChange={handleInputChange}
-                    className={`w-full px-3 py-2 border rounded text-sm bg-sigap-background ${
-                      formErrors.name ? "border-red-500" : "border-sigap-border"
-                    }`}
-                    placeholder="Contoh: Jakarta Selatan"
-                  />
-                  {formErrors.name && <p className="text-xs text-red-500 mt-1">{formErrors.name}</p>}
-                </div>
-                <div>
-                  <label className="block text-sm font-medium mb-1">Kode Wilayah</label>
-                  <input
-                    type="text"
-                    name="code"
-                    value={formData.code}
-                    onChange={handleInputChange}
-                    className={`w-full px-3 py-2 border rounded text-sm bg-sigap-background ${
-                      formErrors.code ? "border-red-500" : "border-sigap-border"
-                    }`}
-                    placeholder="Contoh: JK-SEL"
-                  />
-                  {formErrors.code && <p className="text-xs text-red-500 mt-1">{formErrors.code}</p>}
-                </div>
-                <div>
-                  <label className="block text-sm font-medium mb-1">Level</label>
-                  <select
-                    name="level"
-                    value={formData.level}
-                    onChange={handleInputChange}
-                    disabled={!!editingNode}
-                    className={`w-full px-3 py-2 border rounded text-sm bg-sigap-background ${
-                      formErrors.level ? "border-red-500" : "border-sigap-border"
-                    } ${editingNode ? "opacity-60 cursor-not-allowed" : ""}`}
-                  >
-                    {LEVEL_OPTIONS.map((opt) => (
-                      <option key={opt.value} value={opt.value}>{opt.label}</option>
-                    ))}
-                  </select>
-                  {formErrors.level && <p className="text-xs text-red-500 mt-1">{formErrors.level}</p>}
-                </div>
-                <div>
-                  <label className="block text-sm font-medium mb-1">
-                    Parent {formData.level === "PROVINSI" && "(opsional)"}
-                  </label>
-                  <select
-                    name="parent_id"
-                    value={formData.parent_id ?? ""}
-                    onChange={handleInputChange}
-                    disabled={formData.level === "PROVINSI"}
-                    className={`w-full px-3 py-2 border rounded text-sm bg-sigap-background ${
-                      formErrors.parent_id ? "border-red-500" : "border-sigap-border"
-                    } ${formData.level === "PROVINSI" ? "opacity-60 cursor-not-allowed" : ""}`}
-                  >
-                    <option value="">-- Pilih Parent --</option>
-                    {validParents.map((p) => (
-                      <option key={p.id} value={p.id}>{p.name} ({p.code})</option>
-                    ))}
-                  </select>
-                  {formErrors.parent_id && <p className="text-xs text-red-500 mt-1">{formErrors.parent_id}</p>}
-                </div>
-                {submitError && (
-                  <p className="text-sm text-red-500">{submitError}</p>
-                )}
-                <div className="flex gap-3 pt-2">
-                  <button
-                    type="submit"
-                    disabled={isSubmitting}
-                    className="px-4 py-2 bg-sigap-primary text-white text-sm font-medium rounded hover:opacity-90 disabled:opacity-50"
-                  >
-                    {isSubmitting ? "Menyimpan..." : "Simpan"}
-                  </button>
-                  <button
-                    type="button"
-                    onClick={closeForm}
-                    disabled={isSubmitting}
-                    className="px-4 py-2 border border-sigap-border text-sm font-medium rounded hover:bg-sigap-background disabled:opacity-50"
-                  >
-                    Batal
-                  </button>
-                </div>
-              </form>
+        <div className="bg-sigap-surface rounded-[12px] border border-sigap-border shadow-sm overflow-hidden">
+          {loading ? (
+            <div className="flex items-center justify-center py-16">
+              <div className="flex flex-col items-center gap-3">
+                <div className="w-8 h-8 border-2 border-teal-200 border-t-teal-600 rounded-full animate-spin" />
+                <p className="text-sm text-sigap-textMuted">Memuat hierarki wilayah...</p>
+              </div>
             </div>
-          </div>
-        )}
-
-        {deleteNode && (
-          <DeleteConfirmModal
-            node={deleteNode}
-            onConfirm={handleDelete}
-            onCancel={() => setDeleteNode(null)}
-            isDeleting={isDeleting}
-          />
-        )}
-
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-          <div className="lg:col-span-2">
-            {loading ? (
-              <p className="text-sigap-textMuted py-8 text-center">Memuat...</p>
-            ) : error ? (
-              <div className="p-4 rounded bg-red-50 border border-red-200 text-sm text-red-700">
+          ) : error ? (
+            <div className="p-6">
+              <div className="p-4 rounded-[8px] bg-red-50 border border-red-200 text-sm text-red-700">
                 {error}
               </div>
-            ) : scopedTree.length === 0 ? (
-              <p className="text-center text-sigap-textMuted py-8">
-                Tidak ada data wilayah.
-              </p>
-            ) : (
-              <div className="bg-sigap-surface rounded-lg border border-sigap-border">
+            </div>
+          ) : scopedTree.length === 0 ? (
+            <div className="flex flex-col items-center justify-center py-16">
+              <div className="w-16 h-16 rounded-full bg-sigap-background flex items-center justify-center mb-4">
+                <svg className="w-8 h-8 text-sigap-textMuted" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M3.055 11H5a2 2 0 012 2v1a2 2 0 002 2 2 2 0 012 2v2.945M8 3.935V5.5A2.5 2.5 0 0010.5 8h.5a2 2 0 012 2 2 2 0 104 0 2 2 0 012-2h1.064M15 20.488V18a2 2 0 012-2h3.064M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                </svg>
+              </div>
+              <p className="text-sm text-sigap-textMuted text-center">Tidak ada data wilayah.</p>
+              {isAdmin && (
+                <button
+                  onClick={() => openCreateForm()}
+                  className="mt-4 text-sm text-teal-600 hover:text-teal-700 font-medium"
+                >
+                  Tambah wilayah pertama →
+                </button>
+              )}
+            </div>
+          ) : (
+            <div className="p-4">
+              <div className="flex items-center gap-4 mb-4 pb-4 border-b border-sigap-border">
+                <span className="text-xs text-sigap-textMuted">Level:</span>
+                <div className="flex items-center gap-3">
+                  {LEVEL_OPTIONS.map((opt) => (
+                    <span
+                      key={opt.value}
+                      className={`inline-flex items-center gap-1.5 px-2 py-1 rounded text-[10px] font-semibold uppercase tracking-wide ${LEVEL_COLORS[opt.value].bg} ${LEVEL_COLORS[opt.value].text}`}
+                    >
+                      <span className={`w-1.5 h-1.5 rounded-full ${opt.value === "PROVINSI" ? "bg-teal-500" : opt.value === "KABUPATEN" ? "bg-cyan-500" : opt.value === "KECAMATAN" ? "bg-sky-500" : "bg-indigo-500"}`} />
+                      {opt.label}
+                    </span>
+                  ))}
+                </div>
+              </div>
+
+              <div className="space-y-1">
                 {scopedTree.map((node) => (
                   <TreeNode
                     key={node.id}
                     node={node}
                     level={0}
                     selectedId={selectedNode?.id ?? null}
+                    expandedNodes={expandedNodes}
+                    onToggle={handleToggle}
                     onSelect={handleNodeSelect}
                     onEdit={openEditForm}
                     onDelete={setDeleteNode}
@@ -624,55 +602,183 @@ export const AdminWilayah = () => {
                   />
                 ))}
               </div>
-            )}
-          </div>
+            </div>
+          )}
+        </div>
 
-          <div className="space-y-4">
-            {selectedNode && (
-              <AuditPanel
-                wilayahId={selectedNode.id}
-                wilayahName={selectedNode.name}
-                onClose={() => setSelectedNode(null)}
-              />
-            )}
-
-            {selectedNode && isAdmin && (
-              <div className="bg-sigap-surface rounded-lg border border-sigap-border p-4">
-                <h3 className="text-base font-semibold mb-3">Aksi</h3>
-                <div className="space-y-2">
+        {selectedNode && (
+          <div className="mt-6 bg-sigap-surface rounded-[12px] border border-sigap-border p-4 shadow-sm">
+            <div className="flex items-start justify-between">
+              <div>
+                <div className="flex items-center gap-2 mb-1">
+                  <span className={`inline-flex items-center px-2 py-0.5 rounded text-[10px] font-semibold uppercase tracking-wide ${LEVEL_COLORS[selectedNode.level as WilayahLevel]?.bg ?? "bg-gray-100"} ${LEVEL_COLORS[selectedNode.level as WilayahLevel]?.text ?? "text-gray-700"}`}>
+                    {selectedNode.level}
+                  </span>
+                  <h3 className="font-semibold text-sigap-textPrimary">{selectedNode.name}</h3>
+                </div>
+                <p className="text-sm text-sigap-textMuted font-mono">Kode: {selectedNode.code}</p>
+                {selectedNode.parent_id && (
+                  <p className="text-xs text-sigap-textMuted mt-1">
+                    Parent: {flatWilayah.find((w) => w.id === selectedNode.parent_id)?.name ?? "Unknown"}
+                  </p>
+                )}
+              </div>
+              {isAdmin && (
+                <div className="flex gap-2">
                   <button
                     onClick={() => openEditForm(selectedNode)}
-                    className="w-full px-4 py-2 bg-sigap-primary text-white text-sm font-medium rounded hover:opacity-90"
+                    className="px-3 py-1.5 text-xs font-medium text-teal-600 hover:text-teal-700 hover:bg-teal-50 rounded-[6px] transition-colors"
                   >
-                    Edit Wilayah
+                    Edit
                   </button>
                   <button
                     onClick={() => openCreateForm(selectedNode)}
                     disabled={selectedNode.level === "DESA"}
-                    className="w-full px-4 py-2 border border-sigap-border text-sm font-medium rounded hover:bg-sigap-background disabled:opacity-50 disabled:cursor-not-allowed"
+                    className="px-3 py-1.5 text-xs font-medium text-sigap-primary hover:bg-teal-50 rounded-[6px] transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
                   >
-                    Tambah Child
+                    + Tambah Child
                   </button>
                   <button
                     onClick={() => setDeleteNode(selectedNode)}
-                    className="w-full px-4 py-2 border border-red-200 text-red-500 text-sm font-medium rounded hover:bg-red-50"
+                    className="px-3 py-1.5 text-xs font-medium text-red-500 hover:text-red-600 hover:bg-red-50 rounded-[6px] transition-colors"
                   >
-                    Hapus Wilayah
+                    Hapus
                   </button>
                 </div>
-              </div>
-            )}
+              )}
+            </div>
+          </div>
+        )}
+      </main>
 
-            {!selectedNode && (
-              <div className="bg-sigap-surface rounded-lg border border-sigap-border p-4">
-                <p className="text-sm text-sigap-textMuted text-center">
-                  Pilih wilayah untuk melihat riwayat perubahan dan aksi
+      {showForm && (
+        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
+          <div className="bg-sigap-surface rounded-[12px] border border-sigap-border p-6 w-full max-w-md shadow-xl">
+            <div className="flex items-center justify-between mb-6">
+              <div>
+                <h3 className="text-lg font-semibold text-sigap-textPrimary">
+                  {editingNode ? "Edit Wilayah" : "Tambah Wilayah"}
+                </h3>
+                <p className="text-xs text-sigap-textMuted mt-0.5">
+                  {editingNode ? `Mengedit ${editingNode.name}` : "Tambah wilayah baru ke hierarki"}
                 </p>
               </div>
-            )}
+              <button
+                onClick={closeForm}
+                className="w-8 h-8 rounded-[6px] hover:bg-sigap-background flex items-center justify-center text-sigap-textMuted hover:text-sigap-textSecondary transition-colors"
+              >
+                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                </svg>
+              </button>
+            </div>
+
+            <form onSubmit={handleSubmit} className="space-y-4">
+              <div>
+                <label className="block text-sm font-medium text-sigap-textPrimary mb-1.5">Nama Wilayah</label>
+                <input
+                  type="text"
+                  name="name"
+                  value={formData.name}
+                  onChange={handleInputChange}
+                  className={`w-full px-3 py-2.5 border rounded-[8px] text-sm bg-sigap-background focus:outline-none focus:ring-2 focus:ring-teal-500/20 focus:border-teal-500 transition-colors ${
+                    formErrors.name ? "border-red-400" : "border-sigap-border"
+                  }`}
+                  placeholder="Contoh: Jakarta Selatan"
+                />
+                {formErrors.name && <p className="text-xs text-red-500 mt-1">{formErrors.name}</p>}
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-sigap-textPrimary mb-1.5">Kode Wilayah</label>
+                <input
+                  type="text"
+                  name="code"
+                  value={formData.code}
+                  onChange={handleInputChange}
+                  className={`w-full px-3 py-2.5 border rounded-[8px] text-sm bg-sigap-background font-mono focus:outline-none focus:ring-2 focus:ring-teal-500/20 focus:border-teal-500 transition-colors ${
+                    formErrors.code ? "border-red-400" : "border-sigap-border"
+                  }`}
+                  placeholder="Contoh: JK-SEL"
+                />
+                {formErrors.code && <p className="text-xs text-red-500 mt-1">{formErrors.code}</p>}
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-sigap-textPrimary mb-1.5">Level</label>
+                <select
+                  name="level"
+                  value={formData.level}
+                  onChange={handleInputChange}
+                  disabled={!!editingNode}
+                  className={`w-full px-3 py-2.5 border rounded-[8px] text-sm bg-sigap-background focus:outline-none focus:ring-2 focus:ring-teal-500/20 focus:border-teal-500 transition-colors ${
+                    formErrors.level ? "border-red-400" : "border-sigap-border"
+                  } ${editingNode ? "opacity-60 cursor-not-allowed" : ""}`}
+                >
+                  {LEVEL_OPTIONS.map((opt) => (
+                    <option key={opt.value} value={opt.value}>{opt.label}</option>
+                  ))}
+                </select>
+                {formErrors.level && <p className="text-xs text-red-500 mt-1">{formErrors.level}</p>}
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-sigap-textPrimary mb-1.5">
+                  Parent {formData.level === "PROVINSI" && "(opsional)"}
+                </label>
+                <select
+                  name="parent_id"
+                  value={formData.parent_id ?? ""}
+                  onChange={handleInputChange}
+                  disabled={formData.level === "PROVINSI"}
+                  className={`w-full px-3 py-2.5 border rounded-[8px] text-sm bg-sigap-background focus:outline-none focus:ring-2 focus:ring-teal-500/20 focus:border-teal-500 transition-colors ${
+                    formErrors.parent_id ? "border-red-400" : "border-sigap-border"
+                  } ${formData.level === "PROVINSI" ? "opacity-60 cursor-not-allowed" : ""}`}
+                >
+                  <option value="">-- Pilih Parent --</option>
+                  {validParents.map((p) => (
+                    <option key={p.id} value={p.id}>{p.name} ({p.code})</option>
+                  ))}
+                </select>
+                {formErrors.parent_id && <p className="text-xs text-red-500 mt-1">{formErrors.parent_id}</p>}
+              </div>
+
+              {submitError && (
+                <div className="p-3 rounded-[8px] bg-red-50 border border-red-200 text-xs text-red-600">
+                  {submitError}
+                </div>
+              )}
+
+              <div className="flex gap-3 pt-2">
+                <button
+                  type="submit"
+                  disabled={isSubmitting}
+                  className="flex-1 px-4 py-2.5 bg-teal-600 text-white text-sm font-semibold rounded-[8px] hover:bg-teal-700 disabled:opacity-50 transition-colors"
+                >
+                  {isSubmitting ? "Menyimpan..." : "Simpan"}
+                </button>
+                <button
+                  type="button"
+                  onClick={closeForm}
+                  disabled={isSubmitting}
+                  className="flex-1 px-4 py-2.5 border border-sigap-border text-sm font-semibold rounded-[8px] hover:bg-sigap-background disabled:opacity-50 transition-colors"
+                >
+                  Batal
+                </button>
+              </div>
+            </form>
           </div>
         </div>
-      </main>
+      )}
+
+      {deleteNode && (
+        <DeleteConfirmModal
+          node={deleteNode}
+          onConfirm={handleDelete}
+          onCancel={() => setDeleteNode(null)}
+          isDeleting={isDeleting}
+        />
+      )}
     </div>
   );
 };

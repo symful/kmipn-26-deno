@@ -76,41 +76,106 @@ export async function saveAssessment(env: Env, input: AssessmentInput): Promise<
   }
 }
 
-export async function getAssessments(
-  env: Env,
-  reportId: string
-): Promise<Array<{
+export interface AssessmentResponse {
   id: string;
   tool_name: string;
-  model_version: string;
+  agent_version: string;
   rule_version: string;
   confidence: number;
-  supporting_factors: string[];
-  risk_factors: string[];
-  correlation_ids: string[];
+  factors: {
+    supporting: string[];
+    risk: string[];
+    correlation_ids: string[];
+  };
   status: string;
   result: Record<string, unknown>;
   created_at: string;
-}>> {
+}
+
+export async function getAssessments(
+  env: Env,
+  reportId: string,
+  modelVersion?: string
+): Promise<AssessmentResponse[]> {
   return await withClient(env, async (c) => {
-    const result = await c.query(
-      `SELECT id, assessment_kind, model_version, rule_version, confidence,
-              supporting_factors, risk_factors, correlation_ids,
-              assessment_status, result, created_at
-       FROM agent_assessments
-       WHERE report_id = $1
-       ORDER BY created_at ASC`,
-      [reportId]
-    );
+    let query = `SELECT id, assessment_kind, COALESCE(agent_version, model_version) as agent_version,
+                        rule_version, confidence,
+                        supporting_factors, risk_factors, correlation_ids,
+                        assessment_status, result, created_at
+                 FROM agent_assessments
+                 WHERE report_id = $1`;
+    const params: (string | undefined)[] = [reportId];
+
+    if (modelVersion) {
+      query += ` AND COALESCE(agent_version, model_version) = $2`;
+      params.push(modelVersion);
+    }
+
+    query += ` ORDER BY created_at ASC`;
+
+    const result = await c.query(query, params);
     return result.rows.map((r) => ({
       id: r.id as string,
       tool_name: r.assessment_kind as string,
-      model_version: r.model_version as string,
-      rule_version: r.rule_version as string,
+      agent_version: (r.agent_version || '') as string,
+      rule_version: (r.rule_version || '') as string,
       confidence: Number(r.confidence),
-      supporting_factors: (r.supporting_factors || []) as string[],
-      risk_factors: (r.risk_factors || []) as string[],
-      correlation_ids: (r.correlation_ids || []) as string[],
+      factors: {
+        supporting: (r.supporting_factors || []) as string[],
+        risk: (r.risk_factors || []) as string[],
+        correlation_ids: (r.correlation_ids || []) as string[],
+      },
+      status: r.assessment_status as string,
+      result: (r.result || {}) as Record<string, unknown>,
+      created_at: new Date(r.created_at as string).toISOString(),
+    }));
+  });
+}
+
+export async function getAllAssessments(
+  env: Env,
+  reportId?: string,
+  modelVersion?: string
+): Promise<AssessmentResponse[]> {
+  return await withClient(env, async (c) => {
+    const conditions: string[] = [];
+    const params: (string | undefined)[] = [];
+    let paramIndex = 1;
+
+    if (reportId) {
+      conditions.push(`report_id = $${paramIndex++}`);
+      params.push(reportId);
+    }
+
+    if (modelVersion) {
+      conditions.push(`COALESCE(agent_version, model_version) = $${paramIndex++}`);
+      params.push(modelVersion);
+    }
+
+    const whereClause = conditions.length > 0 ? `WHERE ${conditions.join(' AND ')}` : '';
+
+    const result = await c.query(
+      `SELECT id, assessment_kind, COALESCE(agent_version, model_version) as agent_version,
+              rule_version, confidence,
+              supporting_factors, risk_factors, correlation_ids,
+              assessment_status, result, created_at
+       FROM agent_assessments
+       ${whereClause}
+       ORDER BY created_at DESC`,
+      params
+    );
+
+    return result.rows.map((r) => ({
+      id: r.id as string,
+      tool_name: r.assessment_kind as string,
+      agent_version: (r.agent_version || '') as string,
+      rule_version: (r.rule_version || '') as string,
+      confidence: Number(r.confidence),
+      factors: {
+        supporting: (r.supporting_factors || []) as string[],
+        risk: (r.risk_factors || []) as string[],
+        correlation_ids: (r.correlation_ids || []) as string[],
+      },
       status: r.assessment_status as string,
       result: (r.result || {}) as Record<string, unknown>,
       created_at: new Date(r.created_at as string).toISOString(),
@@ -125,12 +190,14 @@ export async function getAssessmentTrace(
   id: string;
   report_id: string;
   tool_name: string;
-  model_version: string;
+  agent_version: string;
   rule_version: string;
   confidence: number;
-  supporting_factors: string[];
-  risk_factors: string[];
-  correlation_ids: string[];
+  factors: {
+    supporting: string[];
+    risk: string[];
+    correlation_ids: string[];
+  };
   idempotency_key: string | null;
   status: string;
   result: Record<string, unknown>;
@@ -138,7 +205,8 @@ export async function getAssessmentTrace(
 } | null> {
   return await withClient(env, async (c) => {
     const result = await c.query(
-      `SELECT id, report_id, assessment_kind, model_version, rule_version, confidence,
+      `SELECT id, report_id, assessment_kind, COALESCE(agent_version, model_version) as agent_version,
+              rule_version, confidence,
               supporting_factors, risk_factors, correlation_ids,
               idempotency_key, assessment_status, result, created_at
        FROM agent_assessments
@@ -151,12 +219,14 @@ export async function getAssessmentTrace(
       id: r.id as string,
       report_id: r.report_id as string,
       tool_name: r.assessment_kind as string,
-      model_version: r.model_version as string,
-      rule_version: r.rule_version as string,
+      agent_version: (r.agent_version || '') as string,
+      rule_version: (r.rule_version || '') as string,
       confidence: Number(r.confidence),
-      supporting_factors: (r.supporting_factors || []) as string[],
-      risk_factors: (r.risk_factors || []) as string[],
-      correlation_ids: (r.correlation_ids || []) as string[],
+      factors: {
+        supporting: (r.supporting_factors || []) as string[],
+        risk: (r.risk_factors || []) as string[],
+        correlation_ids: (r.correlation_ids || []) as string[],
+      },
       idempotency_key: r.idempotency_key as string | null,
       status: r.assessment_status as string,
       result: (r.result || {}) as Record<string, unknown>,
