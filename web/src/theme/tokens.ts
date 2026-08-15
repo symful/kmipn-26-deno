@@ -49,6 +49,26 @@ export const statusColor = (status: string): string => {
   return colors.textTertiary;
 };
 
+// T-W1.14: Sidebar colors
+export const sidebarBg = '#16302B';
+export const sidebarText = '#CFE4DF';
+export const sidebarTextHover = '#FFFFFF';
+export const sidebarTextMuted = '#9DC0B9';
+export const sidebarDivider = '#234A43';
+export const sidebarAccent = '#7FA8A0';
+
+// T-W1.15: Info/danger/warn/bg/border variants
+export const infoChartBar = '#C7D7FB';
+export const dangerTextStrong = '#A5271A';
+export const dangerBorder = '#ECC4BD';
+export const warningText = '#8A5808';
+export const warningBorder = '#ECD7A6';
+export const successBorder = '#BFE0D9';
+export const bgScreen = '#F9FAF8';
+export const bgSoft = '#EEF0EC';
+export const borderSoft = '#D3D7D0';
+export const warningTextStrong = '#7A4D06';
+
 export const statusLabel = (status: string): string => {
   const labels: Record<string, string> = {
     submitted: "Perlu Tindakan",
