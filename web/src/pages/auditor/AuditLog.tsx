@@ -2,8 +2,7 @@ import { useEffect, useState, useCallback } from "react";
 import { api } from "../../api/client";
 import type { AuditLogEntry } from "../../types";
 import { useAuthStore } from "../../stores/auth";
-import { colors } from "../../theme/tokens";
-import { Link } from "react-router-dom";
+import { colors, sidebarBg, sidebarText, sidebarTextHover, sidebarTextMuted, sidebarDivider, sidebarAccent } from "../../theme/tokens";
 import { logger } from "@/lib/logger";
 
 interface AuditFilters {
@@ -13,7 +12,162 @@ interface AuditFilters {
   to: string;
   wilayah: string;
   objectId: string;
+  status: string;
 }
+
+interface SelectOption {
+  value: string;
+  label: string;
+}
+
+// ─── Sidebar ──────────────────────────────────────────────────────────────────
+
+const NAV_ITEMS = [
+  { label: "Dashboard", path: "/auditor" },
+  { label: "Audit Log", path: "/auditor/audit-log", active: true },
+];
+
+const LOGO_INITIAL = "A";
+
+function Sidebar({
+  activePath,
+  onNavigate,
+}: {
+  activePath?: string;
+  onNavigate?: (path: string) => void;
+}) {
+  return (
+    <aside
+      style={{
+        width: 220,
+        minWidth: 220,
+        height: "100vh",
+        backgroundColor: sidebarBg,
+        color: sidebarText,
+        display: "flex",
+        flexDirection: "column",
+        flexShrink: 0,
+      }}
+    >
+      <div
+        style={{
+          padding: "20px 16px",
+          borderBottom: `1px solid ${sidebarDivider}`,
+        }}
+      >
+        <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
+          <div
+            style={{
+              width: 32,
+              height: 32,
+              backgroundColor: colors.primary,
+              borderRadius: 8,
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+              color: "white",
+              fontWeight: 700,
+              fontSize: 14,
+            }}
+          >
+            {LOGO_INITIAL}
+          </div>
+          <span style={{ fontWeight: 600, fontSize: 15, color: sidebarText }}>
+            PantauDesa
+          </span>
+        </div>
+      </div>
+
+      <nav style={{ flex: 1, padding: "12px 8px" }}>
+        {NAV_ITEMS.map((item) => {
+          const isActive = item.path === activePath;
+          return (
+            <div
+              key={item.path}
+              onClick={() => item.path && onNavigate?.(item.path)}
+              style={{
+                padding: "10px 12px",
+                borderRadius: 8,
+                cursor: "pointer",
+                display: "flex",
+                alignItems: "center",
+                gap: 10,
+                backgroundColor: isActive ? sidebarAccent : "transparent",
+                color: isActive ? sidebarTextHover : sidebarText,
+                marginBottom: 4,
+                fontSize: 14,
+                fontWeight: isActive ? 600 : 400,
+                transition: "background-color 150ms ease, color 150ms ease",
+              }}
+              onMouseEnter={(e) => {
+                if (!isActive) {
+                  (e.currentTarget as HTMLDivElement).style.backgroundColor = sidebarDivider;
+                  (e.currentTarget as HTMLDivElement).style.color = sidebarTextHover;
+                }
+              }}
+              onMouseLeave={(e) => {
+                if (!isActive) {
+                  (e.currentTarget as HTMLDivElement).style.backgroundColor = "transparent";
+                  (e.currentTarget as HTMLDivElement).style.color = sidebarText;
+                }
+              }}
+            >
+              {item.label}
+            </div>
+          );
+        })}
+      </nav>
+
+      <div
+        style={{
+          padding: "12px 8px",
+          borderTop: `1px solid ${sidebarDivider}`,
+        }}
+      >
+        <div
+          onClick={() => useAuthStore.getState().clear()}
+          style={{
+            padding: "10px 12px",
+            borderRadius: 8,
+            cursor: "pointer",
+            display: "flex",
+            alignItems: "center",
+            gap: 10,
+            color: sidebarTextMuted,
+            fontSize: 14,
+            transition: "background-color 150ms ease, color 150ms ease",
+          }}
+          onMouseEnter={(e) => {
+            (e.currentTarget as HTMLDivElement).style.backgroundColor = sidebarDivider;
+            (e.currentTarget as HTMLDivElement).style.color = sidebarText;
+          }}
+          onMouseLeave={(e) => {
+            (e.currentTarget as HTMLDivElement).style.backgroundColor = "transparent";
+            (e.currentTarget as HTMLDivElement).style.color = sidebarTextMuted;
+          }}
+        >
+          <svg
+            width="18"
+            height="18"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            strokeWidth="2"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+          >
+            <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4" />
+            <polyline points="16,17 21,12 16,7" />
+            <line x1="21" y1="12" x2="9" y2="12" />
+          </svg>
+          Logout
+        </div>
+      </div>
+    </aside>
+  );
+}
+
+// ─── Diff helpers ─────────────────────────────────────────────────────────────
 
 interface DiffChange {
   path: string;
@@ -59,23 +213,32 @@ const SideBySideDiff = ({ before, after }: { before: unknown; after: unknown }) 
   const changes = computeDiff(before, after);
   if (changes.length === 0 && JSON.stringify(before) === JSON.stringify(after)) {
     return (
-      <div className="text-sm text-sigap-textMuted italic">Tidak ada perubahan</div>
+      <div className="text-sm text-sigap-textTertiary italic">Tidak ada perubahan</div>
     );
   }
   return (
     <div className="space-y-2">
-      {changes.map((change, idx) => (
+      {changes.slice(0, 20).map((change, idx) => (
         <div key={idx} className="grid grid-cols-2 gap-2 text-xs font-mono">
           <div className="p-2 bg-red-50 border border-red-200 rounded overflow-x-auto">
             <span className="text-red-600 font-semibold">- {change.path}: </span>
-            <span className="text-red-700">{change.before === undefined ? "(hapus)" : JSON.stringify(change.before)}</span>
+            <span className="text-red-700">
+              {change.before === undefined ? "(hapus)" : JSON.stringify(change.before)}
+            </span>
           </div>
           <div className="p-2 bg-green-50 border border-green-200 rounded overflow-x-auto">
             <span className="text-green-600 font-semibold">+ {change.path}: </span>
-            <span className="text-green-700">{change.after === undefined ? "(hapus)" : JSON.stringify(change.after)}</span>
+            <span className="text-green-700">
+              {change.after === undefined ? "(hapus)" : JSON.stringify(change.after)}
+            </span>
           </div>
         </div>
       ))}
+      {changes.length > 20 && (
+        <p className="text-xs text-sigap-textTertiary">
+          ...dan {changes.length - 20} perubahan lainnya
+        </p>
+      )}
     </div>
   );
 };
@@ -86,7 +249,11 @@ const JsonView = ({ data }: { data: unknown }) => {
   const isLong = jsonStr.length > 200;
 
   if (!isLong) {
-    return <pre className="text-xs font-mono bg-sigap-background p-2 rounded overflow-x-auto">{jsonStr}</pre>;
+    return (
+      <pre className="text-xs font-mono bg-sigap-surface p-2 rounded overflow-x-auto">
+        {jsonStr}
+      </pre>
+    );
   }
 
   return (
@@ -98,11 +265,15 @@ const JsonView = ({ data }: { data: unknown }) => {
         {expanded ? "Sembunyikan" : "Lihat"} JSON
       </button>
       {expanded && (
-        <pre className="text-xs font-mono bg-sigap-background p-2 rounded overflow-x-auto mt-1">{jsonStr}</pre>
+        <pre className="text-xs font-mono bg-sigap-surface p-2 rounded overflow-x-auto mt-1">
+          {jsonStr}
+        </pre>
       )}
     </div>
   );
 };
+
+// ─── Download helper ───────────────────────────────────────────────────────────
 
 function downloadBlob(content: string, filename: string, mimeType: string) {
   const blob = new Blob([content], { type: mimeType });
@@ -114,54 +285,76 @@ function downloadBlob(content: string, filename: string, mimeType: string) {
   URL.revokeObjectURL(url);
 }
 
-interface EntryRowProps {
+// ─── Entry Row ───────────────────────────────────────────────────────────────
+
+const EntryRow = ({
+  entry,
+  onSelect,
+  isSelected,
+}: {
   entry: AuditLogEntry;
   onSelect: (entry: AuditLogEntry) => void;
   isSelected: boolean;
-}
-
-const EntryRow = ({ entry, onSelect, isSelected }: EntryRowProps) => {
+}) => {
   const [showDiff, setShowDiff] = useState(false);
 
   return (
     <>
       <tr
-        className={`border-b border-sigap-border hover:bg-sigap-background cursor-pointer ${isSelected ? "bg-sigap-primary/10" : ""}`}
+        className={`border-b border-sigap-border hover:bg-sigap-surface cursor-pointer transition-colors ${
+          isSelected ? "bg-sigap-primary/10" : ""
+        }`}
         onClick={() => onSelect(entry)}
+        style={{ borderBottomColor: colors.border }}
       >
-        <td className="px-3 py-2 text-xs text-sigap-textMuted whitespace-nowrap">
+        <td className="px-3 py-2.5 text-xs text-sigap-textTertiary whitespace-nowrap">
           {new Date(entry.created_at).toLocaleString("id-ID")}
         </td>
-        <td className="px-3 py-2 text-sm font-mono">{entry.actor ?? "-"}</td>
-        <td className="px-3 py-2 text-sm font-medium">{entry.action}</td>
-        <td className="px-3 py-2 text-sm">{entry.object_type}</td>
-        <td className="px-3 py-2 text-sm font-mono text-xs">{entry.object_id ?? "-"}</td>
-        <td className="px-3 py-2">
+        <td className="px-3 py-2.5 text-sm font-mono text-sigap-textPrimary">
+          {entry.actor ?? "-"}
+        </td>
+        <td className="px-3 py-2.5 text-sm font-medium text-sigap-textPrimary">
+          {entry.action}
+        </td>
+        <td className="px-3 py-2.5 text-sm text-sigap-textPrimary">{entry.object_type}</td>
+        <td className="px-3 py-2.5 text-sm font-mono text-xs text-sigap-textSecondary">
+          {entry.object_id ?? "-"}
+        </td>
+        <td className="px-3 py-2.5">
           <button
-            onClick={(e) => { e.stopPropagation(); setShowDiff(!showDiff); }}
-            className="text-xs text-sigap-primary hover:underline"
+            onClick={(e) => {
+              e.stopPropagation();
+              setShowDiff(!showDiff);
+            }}
+            className="text-xs text-sigap-primary hover:text-sigap-primaryHover font-medium"
           >
-            {showDiff ? "Sembunyikan" : "Diff"}
+            {showDiff ? "Sembunyikan" : "Detail"}
           </button>
         </td>
       </tr>
       {showDiff && (
         <tr>
-          <td colSpan={6} className="px-3 py-3 bg-sigap-surface border-b border-sigap-border">
-            <div className="mb-2">
+          <td
+            colSpan={6}
+            className="px-3 py-3 bg-sigap-surface border-b border-sigap-border"
+            style={{ borderBottomColor: colors.border }}
+          >
+            <div className="mb-3">
               <span className="text-xs font-semibold text-sigap-textSecondary">Sebelum:</span>
               <div className="mt-1">
                 <JsonView data={entry.before} />
               </div>
             </div>
-            <div>
+            <div className="mb-3">
               <span className="text-xs font-semibold text-sigap-textSecondary">Sesudah:</span>
               <div className="mt-1">
                 <JsonView data={entry.after} />
               </div>
             </div>
-            <div className="mt-3">
-              <span className="text-xs font-semibold text-sigap-textSecondary mb-2 block">Diff:</span>
+            <div>
+              <span className="text-xs font-semibold text-sigap-textSecondary mb-2 block">
+                Diff:
+              </span>
               <SideBySideDiff before={entry.before} after={entry.after} />
             </div>
           </td>
@@ -171,10 +364,218 @@ const EntryRow = ({ entry, onSelect, isSelected }: EntryRowProps) => {
   );
 };
 
-interface SelectOption {
-  value: string;
+// ─── Filter Components ────────────────────────────────────────────────────────
+
+const FilterInput = ({
+  label,
+  value,
+  onChange,
+  placeholder,
+  type = "text",
+}: {
   label: string;
-}
+  value: string;
+  onChange: (value: string) => void;
+  placeholder?: string;
+  type?: string;
+}) => (
+  <div className="flex flex-col gap-1">
+    <label className="text-xs font-medium text-sigap-textSecondary">{label}</label>
+    <input
+      type={type}
+      value={value}
+      onChange={(e) => onChange(e.target.value)}
+      placeholder={placeholder}
+      className="w-full px-3 py-1.5 rounded-lg border border-sigap-border bg-white text-sm text-sigap-textPrimary placeholder:text-sigap-textMuted focus:outline-none focus:border-sigap-primary focus:ring-1 focus:ring-sigap-primary transition-colors"
+      style={{ borderColor: colors.border }}
+    />
+  </div>
+);
+
+const FilterSelect = ({
+  label,
+  value,
+  onChange,
+  options,
+  placeholder,
+}: {
+  label: string;
+  value: string;
+  onChange: (value: string) => void;
+  options: SelectOption[];
+  placeholder?: string;
+}) => (
+  <div className="flex flex-col gap-1">
+    <label className="text-xs font-medium text-sigap-textSecondary">{label}</label>
+    <select
+      value={value}
+      onChange={(e) => onChange(e.target.value)}
+      className="w-full px-3 py-1.5 rounded-lg border border-sigap-border bg-white text-sm text-sigap-textPrimary focus:outline-none focus:border-sigap-primary focus:ring-1 focus:ring-sigap-primary transition-colors"
+      style={{ borderColor: colors.border }}
+    >
+      <option value="">{placeholder ?? `Semua ${label}`}</option>
+      {options.map((opt) => (
+        <option key={opt.value} value={opt.value}>
+          {opt.label}
+        </option>
+      ))}
+    </select>
+  </div>
+);
+
+const STATUS_CHIPS = [
+  { value: "", label: "Semua" },
+  { value: "create", label: "Buat" },
+  { value: "update", label: "Update" },
+  { value: "delete", label: "Hapus" },
+  { value: "verify", label: "Verifikasi" },
+  { value: "assign", label: "Tugaskan" },
+  { value: "reject", label: "Tolak" },
+  { value: "resolve", label: "Selesaikan" },
+];
+
+const ChipFilter = ({
+  options,
+  value,
+  onChange,
+}: {
+  options: { value: string; label: string }[];
+  value: string;
+  onChange: (v: string) => void;
+}) => (
+  <div className="flex items-center gap-2 flex-wrap">
+    {options.map((opt) => (
+      <button
+        key={opt.value}
+        onClick={() => onChange(opt.value)}
+        className={`px-3 py-1 rounded-full text-xs font-medium transition-colors ${
+          value === opt.value
+            ? "bg-sigap-primary text-white"
+            : "bg-sigap-surface text-sigap-textSecondary hover:bg-sigap-border"
+        }`}
+      >
+        {opt.label}
+      </button>
+    ))}
+  </div>
+);
+
+// ─── Pagination ───────────────────────────────────────────────────────────────
+
+const Pagination = ({
+  page,
+  totalPages,
+  onPageChange,
+}: {
+  page: number;
+  totalPages: number;
+  onPageChange: (page: number) => void;
+}) => {
+  const getPageNumbers = () => {
+    const pages: (number | "...")[] = [];
+    if (totalPages <= 7) {
+      for (let i = 1; i <= totalPages; i++) pages.push(i);
+    } else {
+      pages.push(1);
+      if (page > 3) pages.push("...");
+      for (let i = Math.max(2, page - 1); i <= Math.min(totalPages - 1, page + 1); i++) {
+        pages.push(i);
+      }
+      if (page < totalPages - 2) pages.push("...");
+      pages.push(totalPages);
+    }
+    return pages;
+  };
+
+  return (
+    <div
+      className="flex items-center justify-between px-4 py-3 border-t border-sigap-border"
+      style={{ borderTopColor: colors.border }}
+    >
+      <div className="text-sm text-sigap-textTertiary">
+        Halaman {page} dari {totalPages}
+      </div>
+      <div className="flex items-center gap-1">
+        <button
+          type="button"
+          onClick={() => onPageChange(page - 1)}
+          disabled={page === 1}
+          className="px-3 py-1.5 text-sm font-medium text-sigap-textSecondary border border-sigap-border rounded hover:bg-sigap-surface disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+          style={{ borderColor: colors.border }}
+        >
+          Prev
+        </button>
+        {getPageNumbers().map((p, idx) =>
+          p === "..." ? (
+            <span key={`ellipsis-${idx}`} className="px-2 py-1.5 text-sm text-sigap-textTertiary">
+              ...
+            </span>
+          ) : (
+            <button
+              key={p}
+              type="button"
+              onClick={() => onPageChange(p as number)}
+              className={`px-3 py-1.5 text-sm font-medium rounded transition-colors ${
+                p === page
+                  ? "bg-sigap-primary text-white"
+                  : "text-sigap-textSecondary hover:bg-sigap-surface"
+              }`}
+            >
+              {p}
+            </button>
+          )
+        )}
+        <button
+          type="button"
+          onClick={() => onPageChange(page + 1)}
+          disabled={page >= totalPages}
+          className="px-3 py-1.5 text-sm font-medium text-sigap-textSecondary border border-sigap-border rounded hover:bg-sigap-surface disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+          style={{ borderColor: colors.border }}
+        >
+          Next
+        </button>
+      </div>
+    </div>
+  );
+};
+
+// ─── Export Button ────────────────────────────────────────────────────────────
+
+const ExportButton = ({
+  onClick,
+  disabled,
+  label = "Export CSV",
+}: {
+  onClick: () => void;
+  disabled: boolean;
+  label?: string;
+}) => (
+  <button
+    type="button"
+    onClick={onClick}
+    disabled={disabled}
+    className="inline-flex items-center gap-2 px-4 py-1.5 rounded-lg border border-sigap-border text-sigap-textSecondary text-sm font-medium hover:bg-sigap-surface disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+    style={{ borderColor: colors.border }}
+  >
+    <svg
+      width="16"
+      height="16"
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="2"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+    >
+      <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
+      <polyline points="7 10 12 15 17 10" />
+      <line x1="12" y1="15" x2="12" y2="3" />
+    </svg>
+    {label}
+  </button>
+);
+
+// ─── Main Component ────────────────────────────────────────────────────────────
 
 export const AuditLog = () => {
   const [entries, setEntries] = useState<AuditLogEntry[]>([]);
@@ -190,18 +591,23 @@ export const AuditLog = () => {
     to: "",
     wilayah: "",
     objectId: "",
+    status: "",
   });
   const [actorOptions, setActorOptions] = useState<SelectOption[]>([]);
   const [actionOptions, setActionOptions] = useState<SelectOption[]>([]);
   const [wilayahOptions, setWilayahOptions] = useState<SelectOption[]>([]);
   const [selectedEntry, setSelectedEntry] = useState<AuditLogEntry | null>(null);
   const [exporting, setExporting] = useState(false);
+  const [searchQuery, setSearchQuery] = useState("");
   const user = useAuthStore((s) => s.user);
 
   const fetchWilayahOptions = useCallback(async () => {
     try {
       const result = await api.wilayah();
-      const flattenWilayah = (nodes: typeof result.wilayah, level = 0): SelectOption[] => {
+      const flattenWilayah = (
+        nodes: typeof result.wilayah,
+        level = 0
+      ): SelectOption[] => {
         const options: SelectOption[] = [];
         for (const node of nodes) {
           options.push({ value: node.id, label: "  ".repeat(level) + node.name });
@@ -220,7 +626,11 @@ export const AuditLog = () => {
   const fetchFilterOptions = useCallback(async () => {
     try {
       const result = await api.auditSearch({ limit: 500 });
-      const uniqueActors = [...new Set(result.entries.map((e) => e.actor).filter(Boolean) as string[])];
+      const uniqueActors = [
+        ...new Set(
+          result.entries.map((e) => e.actor).filter(Boolean) as string[]
+        ),
+      ];
       const uniqueActions = [...new Set(result.entries.map((e) => e.action))];
       setActorOptions(uniqueActors.map((a) => ({ value: a, label: a })));
       setActionOptions(uniqueActions.map((a) => ({ value: a, label: a })));
@@ -258,7 +668,10 @@ export const AuditLog = () => {
         setEntries(data.entries);
         setTotal(data.total);
       })
-      .catch((err) => { logger.error("Failed to fetch audit log", { error: err }); setError(err instanceof Error ? err.message : "Gagal memuat audit log"); })
+      .catch((err) => {
+        logger.error("Failed to fetch audit log", { error: err });
+        setError(err instanceof Error ? err.message : "Gagal memuat audit log");
+      })
       .finally(() => setLoading(false));
   }, [page, filters]);
 
@@ -272,18 +685,34 @@ export const AuditLog = () => {
     setSelectedEntry(null);
   };
 
+  const handleStatusFilter = (status: string) => {
+    setFilters((f) => ({ ...f, action: status }));
+    setPage(1);
+    setSelectedEntry(null);
+  };
+
   const handleExportCsv = async () => {
     if (exporting) return;
     setExporting(true);
     try {
-      const exportFilters: { actor_id?: string; action?: string; from?: string; to?: string; report_id?: string } = {};
+      const exportFilters: {
+        actor_id?: string;
+        action?: string;
+        from?: string;
+        to?: string;
+        report_id?: string;
+      } = {};
       if (filters.actor) exportFilters.actor_id = filters.actor;
       if (filters.action) exportFilters.action = filters.action;
       if (filters.from) exportFilters.from = filters.from;
       if (filters.to) exportFilters.to = filters.to;
       if (filters.objectId) exportFilters.report_id = filters.objectId;
       const csv = await api.exportAuditCsv(exportFilters);
-      downloadBlob("\uFEFF" + csv, `audit-log-${new Date().toISOString().slice(0, 10)}.csv`, "text/csv;charset=utf-8");
+      downloadBlob(
+        "\uFEFF" + csv,
+        `audit-log-${new Date().toISOString().slice(0, 10)}.csv`,
+        "text/csv;charset=utf-8"
+      );
     } catch (err) {
       logger.error("Failed to export audit log", { error: err });
       setError(err instanceof Error ? err.message : "Gagal mengekspor data");
@@ -293,233 +722,318 @@ export const AuditLog = () => {
   };
 
   const totalPages = Math.ceil(total / limit);
+  const hasActiveFilters =
+    filters.actor ||
+    filters.action ||
+    filters.from ||
+    filters.to ||
+    filters.objectId ||
+    filters.wilayah ||
+    filters.status;
+
+  // Filter entries client-side by search query
+  const filteredEntries = searchQuery
+    ? entries.filter(
+        (e) =>
+          (e.actor?.toLowerCase() ?? "").includes(searchQuery.toLowerCase()) ||
+          e.action.toLowerCase().includes(searchQuery.toLowerCase()) ||
+          (e.object_type?.toLowerCase() ?? "").includes(searchQuery.toLowerCase()) ||
+          (e.object_id?.toLowerCase() ?? "").includes(searchQuery.toLowerCase())
+      )
+    : entries;
 
   return (
-    <div className="min-h-screen bg-sigap-background">
-      <header className="bg-sigap-surface px-6 py-4 border-b border-sigap-border">
-        <div className="flex items-center justify-between">
-          <div className="flex items-center gap-3">
+    <div style={{ display: "flex", minHeight: "100vh" }}>
+      {/* W-02 Dark Sidebar */}
+      <Sidebar activePath="/auditor/audit-log" />
+
+      {/* Main content */}
+      <div style={{ flex: 1, display: "flex", flexDirection: "column" }}>
+        {/* Header */}
+        <header
+          style={{
+            height: 58,
+            borderBottom: `1px solid ${colors.border}`,
+            display: "flex",
+            alignItems: "center",
+            padding: "0 24px",
+            backgroundColor: "white",
+            gap: 16,
+          }}
+        >
+          <div className="flex-1 max-w-md">
+            <input
+              type="text"
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              placeholder="Cari actor, action, object..."
+              className="w-full px-3 py-1.5 rounded-lg border border-sigap-border bg-sigap-surface text-sm text-sigap-textPrimary placeholder:text-sigap-textMuted focus:outline-none focus:border-sigap-primary focus:ring-1 focus:ring-sigap-primary transition-colors"
+              style={{
+                borderColor: colors.border,
+                backgroundColor: "#F9FAF8",
+              }}
+            />
+          </div>
+
+          <div className="flex items-center gap-3 ml-auto">
+            <span className="text-xs text-sigap-textMuted">
+              {user?.name ?? ""} ({user?.role ?? ""})
+            </span>
             <div
-              className="w-9 h-9 rounded-lg flex items-center justify-center text-white font-bold"
-              style={{ backgroundColor: colors.primary }}
+              style={{
+                width: 36,
+                height: 36,
+                borderRadius: "50%",
+                backgroundColor: colors.primary,
+                color: "white",
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+                fontWeight: 600,
+                fontSize: 13,
+              }}
             >
-              A
-            </div>
-            <div>
-              <h1 className="text-xl font-bold tracking-tight">Audit Log</h1>
-              <p className="text-xs text-sigap-textMuted">
-                {user?.name ?? ""} ({user?.role ?? ""})
-              </p>
+              {(user?.name ?? "A").charAt(0).toUpperCase()}
             </div>
           </div>
-          <div className="flex items-center gap-3">
-            <Link
-              to="/auditor"
-              className="text-sm font-medium text-sigap-primary hover:underline"
-            >
-              Dashboard
-            </Link>
-            <button
-              onClick={() => useAuthStore.getState().clear()}
-              className="text-sm text-sigap-perluTindakan hover:underline"
-            >
-              Keluar
-            </button>
-          </div>
-        </div>
-      </header>
+        </header>
 
-      <main className="p-6 max-w-7xl mx-auto">
-        <div className="flex items-center justify-between mb-6">
-          <div className="flex items-center gap-3">
-            <h2 className="text-lg font-semibold">Log Aktivitas Sistem</h2>
-            <p className="text-sm text-sigap-textMuted">{total} total</p>
+        {/* Page content */}
+        <main
+          style={{
+            flex: 1,
+            padding: 24,
+            backgroundColor: "#F9FAF8",
+            maxWidth: 1400,
+          }}
+        >
+          {/* Title row */}
+          <div className="flex items-center justify-between mb-4">
+            <div className="flex items-center gap-3">
+              <h2
+                className="text-lg font-semibold text-sigap-textPrimary"
+                style={{ letterSpacing: "-0.01em" }}
+              >
+                Log Aktivitas Sistem
+              </h2>
+              <span className="px-2 py-0.5 rounded-full bg-sigap-surface text-xs text-sigap-textTertiary">
+                {total.toLocaleString()} total
+              </span>
+            </div>
+            <ExportButton
+              onClick={handleExportCsv}
+              disabled={exporting}
+              label={exporting ? "Mengekspor..." : "Export CSV"}
+            />
           </div>
-          <button
-            onClick={handleExportCsv}
-            disabled={exporting}
-            className="flex items-center gap-2 px-4 py-1.5 rounded border border-sigap-border bg-sigap-surface text-sm font-medium hover:bg-sigap-background transition-colors disabled:opacity-50"
+
+          {/* Status filter chips */}
+          <div className="bg-white rounded-lg border border-sigap-border p-3 mb-4">
+            <div className="flex items-center gap-2 mb-2">
+              <span className="text-xs font-medium text-sigap-textSecondary">Action:</span>
+            </div>
+            <ChipFilter
+              options={STATUS_CHIPS}
+              value={filters.action}
+              onChange={handleStatusFilter}
+            />
+          </div>
+
+          {/* Advanced filters */}
+          <div
+            className="bg-white rounded-lg border border-sigap-border p-4 mb-4"
+            style={{ borderColor: colors.border }}
           >
-            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
-            </svg>
-            {exporting ? "Mengekspor..." : "Export CSV"}
-          </button>
-        </div>
-
-        <div className="bg-sigap-surface rounded-lg border border-sigap-border p-4 mb-4 space-y-3">
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
-            <div>
-              <label className="block text-xs font-medium mb-1">Actor</label>
-              <select
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
+              <FilterSelect
+                label="Actor"
                 value={filters.actor}
-                onChange={(e) => handleFilterChange("actor", e.target.value)}
-                className="w-full px-3 py-1.5 rounded border border-sigap-border bg-sigap-background text-sm focus:outline-none focus:ring-2 focus:ring-sigap-primary"
-              >
-                <option value="">Semua Actor</option>
-                {actorOptions.map((opt) => (
-                  <option key={opt.value} value={opt.value}>{opt.label}</option>
-                ))}
-              </select>
-            </div>
-            <div>
-              <label className="block text-xs font-medium mb-1">Action</label>
-              <select
+                onChange={(v) => handleFilterChange("actor", v)}
+                options={actorOptions}
+                placeholder="Semua Actor"
+              />
+              <FilterSelect
+                label="Action"
                 value={filters.action}
-                onChange={(e) => handleFilterChange("action", e.target.value)}
-                className="w-full px-3 py-1.5 rounded border border-sigap-border bg-sigap-background text-sm focus:outline-none focus:ring-2 focus:ring-sigap-primary"
-              >
-                <option value="">Semua Action</option>
-                {actionOptions.map((opt) => (
-                  <option key={opt.value} value={opt.value}>{opt.label}</option>
-                ))}
-              </select>
-            </div>
-            <div>
-              <label className="block text-xs font-medium mb-1">Wilayah</label>
-              <select
+                onChange={(v) => handleFilterChange("action", v)}
+                options={actionOptions}
+                placeholder="Semua Action"
+              />
+              <FilterSelect
+                label="Wilayah"
                 value={filters.wilayah}
-                onChange={(e) => handleFilterChange("wilayah", e.target.value)}
-                className="w-full px-3 py-1.5 rounded border border-sigap-border bg-sigap-background text-sm focus:outline-none focus:ring-2 focus:ring-sigap-primary"
-              >
-                <option value="">Semua Wilayah</option>
-                {wilayahOptions.map((opt) => (
-                  <option key={opt.value} value={opt.value}>{opt.label}</option>
-                ))}
-              </select>
-            </div>
-            <div>
-              <label className="block text-xs font-medium mb-1">Object ID</label>
-              <input
-                type="text"
+                onChange={(v) => handleFilterChange("wilayah", v)}
+                options={wilayahOptions}
+                placeholder="Semua Wilayah"
+              />
+              <FilterInput
+                label="Object ID"
                 value={filters.objectId}
-                onChange={(e) => handleFilterChange("objectId", e.target.value)}
+                onChange={(v) => handleFilterChange("objectId", v)}
                 placeholder="Filter object ID..."
-                className="w-full px-3 py-1.5 rounded border border-sigap-border bg-sigap-background text-sm focus:outline-none focus:ring-2 focus:ring-sigap-primary"
               />
-            </div>
-            <div>
-              <label className="block text-xs font-medium mb-1">Dari Tanggal</label>
-              <input
-                type="date"
+              <FilterInput
+                label="Dari Tanggal"
                 value={filters.from}
-                onChange={(e) => handleFilterChange("from", e.target.value)}
-                className="w-full px-3 py-1.5 rounded border border-sigap-border bg-sigap-background text-sm focus:outline-none focus:ring-2 focus:ring-sigap-primary"
-              />
-            </div>
-            <div>
-              <label className="block text-xs font-medium mb-1">Sampai Tanggal</label>
-              <input
+                onChange={(v) => handleFilterChange("from", v)}
                 type="date"
+              />
+              <FilterInput
+                label="Sampai Tanggal"
                 value={filters.to}
-                onChange={(e) => handleFilterChange("to", e.target.value)}
-                className="w-full px-3 py-1.5 rounded border border-sigap-border bg-sigap-background text-sm focus:outline-none focus:ring-2 focus:ring-sigap-primary"
+                onChange={(v) => handleFilterChange("to", v)}
+                type="date"
               />
             </div>
-          </div>
-          {(filters.actor || filters.action || filters.from || filters.to || filters.objectId || filters.wilayah) && (
-            <button
-              onClick={() => setFilters({ actor: "", action: "", from: "", to: "", wilayah: "", objectId: "" })}
-              className="text-xs text-sigap-primary hover:underline"
-            >
-              Reset Filter
-            </button>
-          )}
-        </div>
-
-        {selectedEntry && (
-          <div className="bg-sigap-surface rounded-lg border border-sigap-border p-4 mb-4">
-            <div className="flex items-center justify-between mb-3">
-              <h3 className="text-sm font-semibold">Detail: {selectedEntry.action}</h3>
-              <button
-                onClick={() => setSelectedEntry(null)}
-                className="text-xs text-sigap-textMuted hover:text-sigap-textSecondary"
+            {hasActiveFilters && (
+              <div
+                className="mt-3 pt-3 border-t border-sigap-border"
+                style={{ borderTopColor: colors.border }}
               >
-                Tutup
-              </button>
-            </div>
-            <div className="grid grid-cols-2 gap-4 text-xs">
-              <div>
-                <span className="font-medium text-sigap-textMuted">Sebelum:</span>
-                <div className="mt-1">
-                  <JsonView data={selectedEntry.before} />
-                </div>
-              </div>
-              <div>
-                <span className="font-medium text-sigap-textMuted">Sesudah:</span>
-                <div className="mt-1">
-                  <JsonView data={selectedEntry.after} />
-                </div>
-              </div>
-            </div>
-            <div className="mt-3 pt-3 border-t border-sigap-border">
-              <span className="text-xs font-semibold text-sigap-textSecondary mb-2 block">Diff:</span>
-              <SideBySideDiff before={selectedEntry.before} after={selectedEntry.after} />
-            </div>
-          </div>
-        )}
-
-        {loading ? (
-          <p className="text-sigap-textMuted py-8 text-center">Memuat...</p>
-        ) : error ? (
-          <div className="p-4 rounded bg-red-50 border border-red-200 text-sm text-red-700">
-            {error}
-          </div>
-        ) : entries.length === 0 ? (
-          <p className="text-center text-sigap-textMuted py-8">
-            Tidak ada entri audit.
-          </p>
-        ) : (
-          <>
-            <div className="bg-sigap-surface rounded-lg border border-sigap-border overflow-x-auto">
-              <table className="w-full text-sm min-w-[800px]">
-                <thead>
-                  <tr className="bg-sigap-background border-b border-sigap-border">
-                    <th className="text-left px-3 py-2 font-medium text-sigap-textMuted">Timestamp</th>
-                    <th className="text-left px-3 py-2 font-medium text-sigap-textMuted">Actor</th>
-                    <th className="text-left px-3 py-2 font-medium text-sigap-textMuted">Action</th>
-                    <th className="text-left px-3 py-2 font-medium text-sigap-textMuted">Object Type</th>
-                    <th className="text-left px-3 py-2 font-medium text-sigap-textMuted">Object ID</th>
-                    <th className="text-left px-3 py-2 font-medium text-sigap-textMuted">Detail</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {entries.map((entry) => (
-                    <EntryRow
-                      key={entry.id}
-                      entry={entry}
-                      onSelect={setSelectedEntry}
-                      isSelected={selectedEntry?.id === entry.id}
-                    />
-                  ))}
-                </tbody>
-              </table>
-            </div>
-
-            {totalPages > 1 && (
-              <div className="flex items-center justify-center gap-2 mt-4">
                 <button
-                  onClick={() => setPage((p) => Math.max(1, p - 1))}
-                  disabled={page === 1}
-                  className="px-3 py-1.5 rounded border border-sigap-border text-sm disabled:opacity-50 hover:bg-sigap-surface"
+                  onClick={() =>
+                    setFilters({
+                      actor: "",
+                      action: "",
+                      from: "",
+                      to: "",
+                      wilayah: "",
+                      objectId: "",
+                      status: "",
+                    })
+                  }
+                  className="text-xs text-sigap-primary hover:text-sigap-primaryHover font-medium"
                 >
-                  Prev
-                </button>
-                <span className="text-sm text-sigap-textMuted">
-                  Halaman {page} dari {totalPages}
-                </span>
-                <button
-                  onClick={() => setPage((p) => p + 1)}
-                  disabled={page >= totalPages}
-                  className="px-3 py-1.5 rounded border border-sigap-border text-sm disabled:opacity-50 hover:bg-sigap-surface"
-                >
-                  Next
+                  Reset Filter
                 </button>
               </div>
             )}
-          </>
-        )}
-      </main>
+          </div>
+
+          {/* Selected entry detail */}
+          {selectedEntry && (
+            <div
+              className="bg-white rounded-lg border border-sigap-border p-4 mb-4"
+              style={{ borderColor: colors.border }}
+            >
+              <div className="flex items-center justify-between mb-3">
+                <h3 className="text-sm font-semibold text-sigap-textPrimary">
+                  Detail: {selectedEntry.action}
+                </h3>
+                <button
+                  onClick={() => setSelectedEntry(null)}
+                  className="text-xs text-sigap-textTertiary hover:text-sigap-textSecondary"
+                >
+                  Tutup
+                </button>
+              </div>
+              <div className="grid grid-cols-2 gap-4 text-xs">
+                <div>
+                  <span className="font-medium text-sigap-textSecondary">Sebelum:</span>
+                  <div className="mt-1">
+                    <JsonView data={selectedEntry.before} />
+                  </div>
+                </div>
+                <div>
+                  <span className="font-medium text-sigap-textSecondary">Sesudah:</span>
+                  <div className="mt-1">
+                    <JsonView data={selectedEntry.after} />
+                  </div>
+                </div>
+              </div>
+              <div
+                className="mt-3 pt-3 border-t border-sigap-border"
+                style={{ borderTopColor: colors.border }}
+              >
+                <span className="text-xs font-semibold text-sigap-textSecondary mb-2 block">
+                  Diff:
+                </span>
+                <SideBySideDiff before={selectedEntry.before} after={selectedEntry.after} />
+              </div>
+            </div>
+          )}
+
+          {/* Data table */}
+          {loading ? (
+            <div
+              className="bg-white rounded-lg border border-sigap-border overflow-hidden"
+              style={{ borderColor: colors.border }}
+            >
+              <div className="p-8 text-center">
+                <div
+                  className="inline-block w-6 h-6 border-2 border-sigap-primary border-t-transparent rounded-full animate-spin"
+                  style={{ borderColor: colors.primary, borderTopColor: "transparent" }}
+                />
+                <p className="mt-3 text-sm text-sigap-textTertiary">Memuat...</p>
+              </div>
+            </div>
+          ) : error ? (
+            <div
+              className="bg-white rounded-lg border border-sigap-border p-4"
+              style={{ borderColor: colors.border }}
+            >
+              <p className="text-sm text-red-600">{error}</p>
+            </div>
+          ) : filteredEntries.length === 0 ? (
+            <div
+              className="bg-white rounded-lg border border-sigap-border overflow-hidden"
+              style={{ borderColor: colors.border }}
+            >
+              <div className="p-8 text-center">
+                <p className="text-sigap-textSecondary">Tidak ada entri audit.</p>
+              </div>
+            </div>
+          ) : (
+            <div
+              className="bg-white rounded-lg border border-sigap-border overflow-hidden"
+              style={{ borderColor: colors.border }}
+            >
+              <div className="overflow-x-auto">
+                <table className="w-full text-sm min-w-[800px]">
+                  <thead>
+                    <tr
+                      className="border-b border-sigap-border"
+                      style={{ borderBottomColor: colors.border }}
+                    >
+                      <th className="text-left p-3 text-xs font-semibold text-sigap-textTertiary uppercase tracking-wide">
+                        Timestamp
+                      </th>
+                      <th className="text-left p-3 text-xs font-semibold text-sigap-textTertiary uppercase tracking-wide">
+                        Actor
+                      </th>
+                      <th className="text-left p-3 text-xs font-semibold text-sigap-textTertiary uppercase tracking-wide">
+                        Action
+                      </th>
+                      <th className="text-left p-3 text-xs font-semibold text-sigap-textTertiary uppercase tracking-wide">
+                        Object Type
+                      </th>
+                      <th className="text-left p-3 text-xs font-semibold text-sigap-textTertiary uppercase tracking-wide">
+                        Object ID
+                      </th>
+                      <th className="text-left p-3 text-xs font-semibold text-sigap-textTertiary uppercase tracking-wide">
+                        Detail
+                      </th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {filteredEntries.map((entry) => (
+                      <EntryRow
+                        key={entry.id}
+                        entry={entry}
+                        onSelect={setSelectedEntry}
+                        isSelected={selectedEntry?.id === entry.id}
+                      />
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+              {totalPages > 1 && (
+                <Pagination page={page} totalPages={totalPages} onPageChange={setPage} />
+              )}
+            </div>
+          )}
+        </main>
+      </div>
     </div>
   );
 };

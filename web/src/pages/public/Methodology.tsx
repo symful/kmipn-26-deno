@@ -1,28 +1,11 @@
 import { Link } from "react-router-dom";
-import { colors } from "../../theme/tokens";
+import { PublicLayout } from "../../components/design-system/PublicLayout";
 
 export const Methodology = () => {
   return (
-    <div className="min-h-screen bg-sigap-background">
-      <header className="bg-sigap-surface px-6 py-4 border-b border-sigap-border">
-        <div className="flex items-center gap-3">
-          <div
-            className="w-9 h-9 rounded-lg flex items-center justify-center text-white font-bold"
-            style={{ backgroundColor: colors.primary }}
-          >
-            S
-          </div>
-          <div>
-            <h1 className="text-xl font-bold tracking-tight">Metodologi SIGAP</h1>
-            <p className="text-sm text-sigap-textTertiary">
-              Platform pemetaan & monitoring pembangunan desa
-            </p>
-          </div>
-        </div>
-      </header>
-
-      <main className="p-6 max-w-4xl mx-auto">
-        <div className="bg-white rounded-lg border border-sigap-border p-8 mb-6">
+    <PublicLayout>
+      <div className="max-w-4xl mx-auto">
+        <div className="bg-white rounded-xl border border-neutral-200 p-8 mb-6">
           <h2 className="text-2xl font-bold text-sigap-textPrimary mb-4">
             Bagaimana SIGAP Bekerja
           </h2>
@@ -70,7 +53,7 @@ export const Methodology = () => {
           </ol>
         </div>
 
-        <div className="bg-white rounded-lg border border-sigap-border p-8 mb-6">
+        <div className="bg-white rounded-xl border border-neutral-200 p-8 mb-6">
           <h2 className="text-2xl font-bold text-sigap-textPrimary mb-4">
             Penilaian Severitas
           </h2>
@@ -85,7 +68,7 @@ export const Methodology = () => {
             </li>
             <li>
               <strong className="text-sigap-textPrimary">Jumlah Warga Terdampak</strong> —{" "}
-              Berapa banyak warga yang merasakan dampak dari masalah tersebut.
+              Berapa banyak warga yang terdampak oleh masalah tersebut.
             </li>
             <li>
               <strong className="text-sigap-textPrimary">Kebutuhan Mendesak</strong> — Apakah
@@ -100,7 +83,7 @@ export const Methodology = () => {
           </ul>
         </div>
 
-        <div className="bg-white rounded-lg border border-sigap-border p-8 mb-6">
+        <div className="bg-white rounded-xl border border-neutral-200 p-8 mb-6">
           <h2 className="text-2xl font-bold text-sigap-textPrimary mb-4">
             Algoritma Skor Prioritas
           </h2>
@@ -108,7 +91,7 @@ export const Methodology = () => {
             Setiap laporan mendapatkan skor prioritas yang dihitung menggunakan
             formula berikut:
           </p>
-          <div className="bg-sigap-background rounded-lg p-6 mb-4">
+          <div className="bg-neutral-100 rounded-lg p-6 mb-4">
             <code className="text-sm font-mono text-sigap-textPrimary">
               Skor Prioritas = (Severity × 0.4) + (Affected Residents × 0.25) +
               (Region Vulnerability × 0.2) + (SLA Pressure × 0.15)
@@ -135,7 +118,7 @@ export const Methodology = () => {
           </ul>
         </div>
 
-        <div className="bg-white rounded-lg border border-sigap-border p-8 mb-6">
+        <div className="bg-white rounded-xl border border-neutral-200 p-8 mb-6">
           <h2 className="text-2xl font-bold text-sigap-textPrimary mb-4">
             Alur Integrasi Pemerintah
           </h2>
@@ -171,7 +154,7 @@ export const Methodology = () => {
           </ol>
         </div>
 
-        <div className="bg-white rounded-lg border border-sigap-border p-8 mb-6">
+        <div className="bg-white rounded-xl border border-neutral-200 p-8 mb-6">
           <h2 className="text-2xl font-bold text-sigap-textPrimary mb-4">
             Cakupan Layanan
           </h2>
@@ -203,7 +186,7 @@ export const Methodology = () => {
           </ul>
         </div>
 
-        <div className="bg-white rounded-lg border border-sigap-border p-8 mb-6">
+        <div className="bg-white rounded-xl border border-neutral-200 p-8 mb-6">
           <h2 className="text-2xl font-bold text-sigap-textPrimary mb-4">
             Tata Kelola Data
           </h2>
@@ -235,7 +218,7 @@ export const Methodology = () => {
           </ul>
         </div>
 
-        <div className="bg-white rounded-lg border border-sigap-border p-8 mb-6">
+        <div className="bg-white rounded-xl border border-neutral-200 p-8 mb-6">
           <h2 className="text-2xl font-bold text-sigap-textPrimary mb-4">
             Kebijakan Privasi
           </h2>
@@ -280,7 +263,7 @@ export const Methodology = () => {
             ← Kembali ke Beranda
           </Link>
         </div>
-      </main>
-    </div>
+      </div>
+    </PublicLayout>
   );
 };

@@ -6,6 +6,7 @@ import { withClient, type PgClient } from "@/lib/db";
 import { checkRateLimit } from "@/lib/ratelimit";
 import { logger } from "@/lib/logger";
 import { runAssessment } from "@/lib/agent/orchestrator";
+import { redactText } from "@/lib/agent/redaction";
 
 const PUBLIC_RATE_LIMIT = { limit: 60, windowMs: 60 * 1000 };
 
@@ -14,8 +15,9 @@ export const publicReportsRoute = new Hono<{ Bindings: Env }>();
 /**
  * GET /api/public/reports - List public reports with privacy redaction
  *
- * Returns only: id, category_id, general_wilayah (kabupaten level), status,
- * last_updated, public_progress, moderated_photo_url, share_token
+ * Returns: id, category {id, short_code, name, icon}, wilayah {kecamatan, desa},
+ * general_wilayah (kabupaten level), status, last_updated, public_progress,
+ * moderated_photo_url, share_token, generalized_location, supporting_count
  *
  * NO: reporter_id (device_id), exact location, internal assessments, audit
  */
@@ -24,6 +26,8 @@ publicReportsRoute.get(
   safeHandler(async (c) => {
     const statusParam = c.req.query("status");
     const categoryId = c.req.query("category_id");
+    const bboxParam = c.req.query("bbox");
+    const monthParam = c.req.query("month");
     const page = Math.max(1, parseInt(c.req.query("page") ?? "1", 10));
     const limit = Math.min(100, Math.max(1, parseInt(c.req.query("limit") ?? "20", 10)));
     const offset = (page - 1) * limit;
@@ -48,22 +52,56 @@ publicReportsRoute.get(
         params.push(categoryId);
       }
 
+      // bbox filter: minLng,minLat,maxLng,maxLat
+      if (bboxParam) {
+        const coords = bboxParam.split(",").map((c) => parseFloat(c.trim()));
+        if (coords.length === 4 && coords.every((v) => !isNaN(v))) {
+          filters.push(`ST_Contains(ST_MakeEnvelope($${i++}, $${i++}, $${i++}, $${i++}, 4326), r.geom::geometry)`);
+          params.push(coords[0], coords[1], coords[2], coords[3]);
+        }
+      }
+
+      // month filter: YYYY-MM
+      if (monthParam) {
+        const monthRegex = /^\d{4}-\d{2}$/;
+        if (monthRegex.test(monthParam)) {
+          filters.push(`date_trunc('month', r.reported_at) = date_trunc('month', $${i++}::date)`);
+          params.push(monthParam);
+        }
+      }
+
       const where = filters.length ? `WHERE ${filters.join(" AND ")}` : "";
 
       const listSql = `
         SELECT
           r.id,
           r.category_id,
+          c.id AS cat_id,
+          c.short_code AS category_short_code,
+          c.name AS category_name,
+          c.icon AS category_icon,
           r.status,
           r.created_at as last_updated,
           r.photo_urls,
           COALESCE(kab.name, 'Unknown') AS general_wilayah,
           COALESCE(ST_X(ST_Centroid(kab.geom)), r.lng) AS kabupaten_lng,
-          COALESCE(ST_Y(ST_Centroid(kab.geom)), r.lat) AS kabupaten_lat
+          COALESCE(ST_Y(ST_Centroid(kab.geom)), r.lat) AS kabupaten_lat,
+          COALESCE(w.name, 'Unknown') AS village_name,
+          COALESCE(kec.name, 'Unknown') AS kecamatan_name,
+          COALESCE(supporting.cnt, 0) AS supporting_count
         FROM reports r
+        LEFT JOIN categories c ON c.id = r.category_id
         LEFT JOIN wilayah kab ON kab.level = 'KABUPATEN'
           AND kab.geom IS NOT NULL
           AND ST_Contains(kab.geom, r.geom::geometry)
+        LEFT JOIN wilayah w ON w.id = r.wilayah_id
+        LEFT JOIN wilayah kec ON kec.id = w.parent_id AND kec.level = 'KECAMATAN'
+        LEFT JOIN (
+          SELECT facility_card_id, COUNT(*) AS cnt
+          FROM reports
+          WHERE facility_card_id IS NOT NULL
+          GROUP BY facility_card_id
+        ) supporting ON supporting.facility_card_id = r.facility_card_id
         ${where}
         ORDER BY r.created_at DESC
         LIMIT $${i++} OFFSET $${i++}
@@ -111,7 +149,16 @@ publicReportsRoute.get(
 
         return {
           id: row.id,
-          category_id: row.category_id,
+          category: {
+            id: row.cat_id,
+            short_code: row.category_short_code ?? null,
+            name: row.category_name ?? null,
+            icon: row.category_icon ?? null,
+          },
+          wilayah: {
+            kecamatan: row.kecamatan_name ?? null,
+            desa: row.village_name,
+          },
           general_wilayah: row.general_wilayah,
           status: row.status,
           last_updated: row.last_updated,
@@ -119,6 +166,7 @@ publicReportsRoute.get(
           moderated_photo_url: moderatedPhotoUrl,
           share_token: shareTokens[row.id] ?? null,
           generalized_location: generalizedLocation,
+          supporting_count: Number(row.supporting_count) ?? 0,
         };
       });
 
@@ -190,9 +238,8 @@ publicReportsRoute.get(
       moderated_photo_url: moderatedPhotoUrl,
       share_token: shareToken,
       generalized_location: generalizedLocation,
-      title: result.title,
-      // Description is truncated to prevent PII leakage
-      description: String(result.description ?? "").slice(0, 200),
+      title: redactText(result.title),
+      description: redactText(result.description),
     });
   }),
 );
@@ -281,11 +328,8 @@ function generalizeLocation(
   if (!lat || !lng || isNaN(lat) || isNaN(lng)) {
     return { lat: 0, lng: 0 };
   }
-  const maxOffsetKm = 5;
-  const latOffset = (Math.random() - 0.5) * 2 * (maxOffsetKm / 111);
-  const lngOffset = (Math.random() - 0.5) * 2 * (maxOffsetKm / (111 * Math.cos((lat * Math.PI) / 180)));
   return {
-    lat: Math.round((lat + latOffset) * 1000000) / 1000000,
-    lng: Math.round((lng + lngOffset) * 1000000) / 1000000,
+    lat: Math.round(lat * 1000) / 1000,
+    lng: Math.round(lng * 1000) / 1000,
   };
 }

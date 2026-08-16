@@ -31,7 +31,7 @@ export const Footer = () => {
                 </Link>
               </li>
               <li>
-                <Link to="/case-list" className="text-sm text-white/70 hover:text-white transition-colors">
+                <Link to="/peta" className="text-sm text-white/70 hover:text-white transition-colors">
                   Daftar Kasus
                 </Link>
               </li>

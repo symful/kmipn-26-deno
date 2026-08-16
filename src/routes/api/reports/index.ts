@@ -115,6 +115,7 @@ reportsIndexRoute.get(
     const user = c.get("user");
     const status = c.req.query("status");
     const categoryId = c.req.query("category_id");
+    const creatorId = c.req.query("creator_id");
     const page = parseInt(c.req.query("page") ?? "1", 10);
     const limit = Math.min(parseInt(c.req.query("limit") ?? "20", 10), 100);
     const offset = (page - 1) * limit;
@@ -125,6 +126,11 @@ reportsIndexRoute.get(
       let i = 1;
       if (status) { filters.push(`status = $${i++}`); params.push(status); }
       if (categoryId) { filters.push(`category_id = $${i++}`); params.push(categoryId); }
+      if (creatorId) {
+        const actualCreatorId = creatorId === "me" ? user.sub : creatorId;
+        filters.push(`reporter_id = $${i++}`);
+        params.push(actualCreatorId);
+      }
       const where = filters.length ? `WHERE ${filters.join(" AND ")}` : "";
       const baseSql = `SELECT id, idempotency_key, category_id, description, lng, lat,
                 photo_urls, status, severity, assigned_to, created_at, updated_at, reported_at, title

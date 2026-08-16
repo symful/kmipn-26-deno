@@ -2,6 +2,9 @@ import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import { MapView } from "../../components/MapView";
 import { ShareLinkButton } from "../../components/ShareLinkButton";
+import { FilterBar } from "../../components/public/FilterBar";
+import { CaseListRail } from "../../components/public/CaseListRail";
+import { MapLegend } from "../../components/public/MapLegend";
 import { colors, statusColor, statusLabel } from "../../theme/tokens";
 import { api } from "../../api/client";
 import { logger } from "@/lib/logger";
@@ -22,24 +25,41 @@ export const PublicHome = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [mapError, setMapError] = useState<string | null>(null);
+  const [selectedWilayah, setSelectedWilayah] = useState("");
+  const [selectedKategori, setSelectedKategori] = useState("");
+  const [viewMode, setViewMode] = useState<"peta" | "daftar">("peta");
+  const [wilayahOptions, setWilayahOptions] = useState<{ value: string; label: string }[]>([]);
+  const [kategoriOptions, setKategoriOptions] = useState<{ value: string; label: string }[]>([]);
 
   useEffect(() => {
-    api.geojson()
-      .then((data) =>
+    api.wilayah().then((result) => setWilayahOptions(result.wilayah.map((w) => ({ value: w.id, label: w.name })))).catch((e: Error) => {
+      logger.error("Failed to fetch wilayah", { error: e });
+    });
+  }, []);
+
+  useEffect(() => {
+    api.categories().then((result) => setKategoriOptions(result.categories.map((c) => ({ value: c.id, label: c.name })))).catch((e: Error) => {
+      logger.error("Failed to fetch categories", { error: e });
+    });
+  }, []);
+
+  useEffect(() => {
+    api.publicReportsCluster()
+      .then(({ clusters }) =>
         setFeatures(
-          data.features.map((f) => ({
-            id: f.properties.id,
-            status: f.properties.status,
-            severity: f.properties.severity,
-            category: f.properties.category_id,
-            coordinates: f.geometry.coordinates,
-            created_at: f.properties.created_at,
-            description: f.properties.description ?? "",
+          clusters.map((c, i) => ({
+            id: `cluster-${i}`,
+            status: c.dominant_status ?? "verified",
+            severity: c.count,
+            category: c.dominant_category ?? "unknown",
+            coordinates: [c.lng, c.lat] as [number, number],
+            created_at: new Date().toISOString(),
+            description: `${c.count} kasus`,
           })),
         ),
       )
       .catch((e: Error) => {
-        logger.error("Failed to fetch geojson", { error: e });
+        logger.error("Failed to fetch cluster data", { error: e });
         setError(e.message || "Gagal memuat data");
       })
       .finally(() => setLoading(false));
@@ -74,6 +94,18 @@ export const PublicHome = () => {
         </div>
       </header>
 
+      <FilterBar
+        wilayahOptions={wilayahOptions}
+        kategoriOptions={kategoriOptions}
+        selectedWilayah={selectedWilayah}
+        selectedKategori={selectedKategori}
+        viewMode={viewMode}
+        onWilayahChange={setSelectedWilayah}
+        onKategoriChange={setSelectedKategori}
+        onViewModeChange={setViewMode}
+        totalCount={features.length}
+      />
+
       <main className="p-6 max-w-7xl mx-auto">
         <div className="grid grid-cols-3 gap-3 mb-6">
           <StatCard label="Total Kasus" value={stats.total} />
@@ -95,82 +127,103 @@ export const PublicHome = () => {
           </div>
         )}
 
-        <div
-          className="bg-white rounded-xl border border-neutral-200 overflow-hidden"
-          style={{ height: 600 }}
-        >
-          {loading ? (
-            <div className="flex items-center justify-center h-full">
-              <p className="text-sigap-textMuted">Memuat peta...</p>
-            </div>
-          ) : mapError ? (
-            <div className="flex items-center justify-center h-full">
-              <div className="text-center p-4">
-                <p className="text-sigap-textMuted mb-2">Peta tidak dapat dimuat</p>
-                <p className="text-xs text-sigap-textTertiary">{mapError}</p>
+        <div className="flex gap-4" style={{ height: 600 }}>
+          <div className="flex-1 bg-white rounded-xl border border-neutral-200 overflow-hidden relative">
+            {loading ? (
+              <div className="flex items-center justify-center h-full">
+                <p className="text-sigap-textMuted">Memuat peta...</p>
               </div>
-            </div>
-          ) : (
-            <MapView
-              reports={features.map((f) => ({
-                id: f.id,
-                status: f.status as import("../../types").ReportStatus,
-                lat: f.coordinates[1],
-                lng: f.coordinates[0],
-                category_id: f.category,
-                category: {
-                  id: "",
-                  slug: f.category,
-                  name: f.category,
-                  icon: null,
-                  description: null,
-                  parent_id: null,
-                  created_at: "",
-                },
-                geom: { type: "Point" as const, coordinates: f.coordinates as [number, number] },
-                description: f.description,
-                idempotency_key: "",
-                photo_urls: [],
-                exif_data: null,
-                device_id: null,
-                assigned_to: null,
-                assignee: null,
-                severity: f.severity,
-                created_at: f.created_at,
-                updated_at: f.created_at,
-              }))}
-              height="600px"
-              renderPopup={(report) => (
-                <div className="min-w-[200px]">
-                  <p className="font-semibold text-sm text-sigap-textPrimary line-clamp-2 mb-2">
-                    {(report.description || report.category?.name) ?? ("Kasus #" + report.id.slice(0, 8))}
-                  </p>
-                  <div className="flex items-center gap-2 mb-2">
-                    <span
-                      className="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium"
-                      style={{
-                        backgroundColor: statusColor(report.status) + "20",
-                        color: statusColor(report.status),
-                      }}
-                    >
-                      {statusLabel(report.status)}
-                    </span>
-                  </div>
-                  <p className="text-xs text-sigap-textTertiary mb-2">
-                    Update: {new Date(report.updated_at).toLocaleDateString("id-ID", {
-                      day: "2-digit",
-                      month: "short",
-                      year: "numeric",
-                    })}
-                  </p>
-                  <Link
-                    to={`/case/${report.id}`}
-                    className="block w-full text-center px-3 py-1.5 bg-sigap-primary text-white text-xs font-medium rounded hover:bg-sigap-primary/90 transition-colors"
-                  >
-                    Lihat Detail
-                  </Link>
+            ) : mapError ? (
+              <div className="flex items-center justify-center h-full">
+                <div className="text-center p-4">
+                  <p className="text-sigap-textMuted mb-2">Peta tidak dapat dimuat</p>
+                  <p className="text-xs text-sigap-textTertiary">{mapError}</p>
                 </div>
-              )}
+              </div>
+            ) : (
+              <>
+                <MapView
+                  reports={features.map((f) => ({
+                    id: f.id,
+                    status: f.status as import("../../types").ReportStatus,
+                    lat: f.coordinates[1],
+                    lng: f.coordinates[0],
+                    category_id: f.category,
+                    category: {
+                      id: "",
+                      slug: f.category,
+                      name: f.category,
+                      icon: null,
+                      description: null,
+                      parent_id: null,
+                      created_at: "",
+                    },
+                    geom: { type: "Point" as const, coordinates: f.coordinates as [number, number] },
+                    description: f.description,
+                    idempotency_key: "",
+                    photo_urls: [],
+                    exif_data: null,
+                    device_id: null,
+                    assigned_to: null,
+                    assignee: null,
+                    severity: f.severity,
+                    created_at: f.created_at,
+                    updated_at: f.created_at,
+                  }))}
+                  height="600px"
+                  renderPopup={(report) => (
+                    <div className="min-w-[200px]">
+                      <p className="font-semibold text-sm text-sigap-textPrimary line-clamp-2 mb-2">
+                        {(report.description || report.category?.name) ?? ("Kasus #" + report.id.slice(0, 8))}
+                      </p>
+                      <div className="flex items-center gap-2 mb-2">
+                        <span
+                          className="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium"
+                          style={{
+                            backgroundColor: statusColor(report.status) + "20",
+                            color: statusColor(report.status),
+                          }}
+                        >
+                          {statusLabel(report.status)}
+                        </span>
+                      </div>
+                      <p className="text-xs text-sigap-textTertiary mb-2">
+                        Update: {new Date(report.updated_at).toLocaleDateString("id-ID", {
+                          day: "2-digit",
+                          month: "short",
+                          year: "numeric",
+                        })}
+                      </p>
+                      <Link
+                        to={`/case/${report.id}`}
+                        className="block w-full text-center px-3 py-1.5 bg-sigap-primary text-white text-xs font-medium rounded hover:bg-sigap-primary/90 transition-colors"
+                      >
+                        Lihat Detail
+                      </Link>
+                    </div>
+                  )}
+                />
+                <div className="absolute bottom-4 left-4 z-10">
+                  <MapLegend />
+                </div>
+              </>
+            )}
+          </div>
+
+          {viewMode === "daftar" && (
+            <CaseListRail
+              items={features.map((f) => ({
+                id: f.id,
+                title: f.description,
+                village: f.category,
+                timeAgo: new Date(f.created_at).toLocaleDateString("id-ID"),
+                status: "menunggu" as const,
+                reportCount: f.severity ?? 1,
+                priorityDot: "teal" as const,
+              }))}
+              onCaseClick={(id) => {
+                console.log("Case clicked:", id);
+              }}
             />
           )}
         </div>

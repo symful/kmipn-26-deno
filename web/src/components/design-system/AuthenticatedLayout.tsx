@@ -99,7 +99,6 @@ export function AuthenticatedLayout() {
       </aside>
       
       <div style={{ flex: 1, display: 'flex', flexDirection: 'column' }}>
-      <div style={{ flex: 1, display: 'flex', flexDirection: 'column' }}>
         <header style={{
           height: 58,
           borderBottom: '1px solid #E4E7E2',

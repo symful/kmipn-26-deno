@@ -70,7 +70,16 @@ rtRwVerifyRoute.post("/", safeHandler(async (c) => {
   const verdict = body.verdict;
   const reason = body.reason;
 
-  if (!verificationToken || !reportId || !["confirmed", "rejected"].includes(verdict)) {
+  const VALID_RT_RW_VERDICTS = [
+    "valid",
+    "needs_completion",
+    "needs_survey",
+    "out_of_scope",
+    "duplicate",
+    "rejected",
+  ];
+
+  if (!verificationToken || !reportId || !VALID_RT_RW_VERDICTS.includes(verdict)) {
     return c.json({ error: { code: "VALIDATION_ERROR", message: "Invalid request data" } }, 400);
   }
 

@@ -1,16 +1,20 @@
 import { Hono } from "hono";
 import type { Env } from "@/types/bindings";
-import { PhotoUploadRequestSchema } from "@/lib/schemas";
+import { PhotoUploadRequestSchema, PhotoBatchUploadRequestSchema } from "@/lib/schemas";
 import { requireAuth } from "@/lib/auth";
 import { safeHandler } from "@/lib/safeHandler";
-import { generatePhotoKey, publicPhotoUrl, uploadToR2 } from "@/lib/r2";
+import { generatePhotoKey, publicPhotoUrl, uploadToR2, createSignedUploadUrl } from "@/lib/r2";
 import { withClient } from "@/lib/db";
 import { appendAudit } from "@/lib/audit";
 import { logger } from "@/lib/logger";
 
 export const photosUploadUrlRoute = new Hono<{ Bindings: Env }>();
 
-// POST: Generate upload URL and key (returns key, upload_url for signed PUT)
+const BATCH_EXPIRATION_SECONDS = 3600;
+
+// POST: Generate upload URL(s) - supports single or batch
+// Single: {content_type: "image/jpeg"} returns {key, public_url, upload_url, method}
+// Batch: {photos: ["image/jpeg"]} returns {urls: [{url, expires_at}]}
 photosUploadUrlRoute.post(
   "/",
   requireAuth,
@@ -18,7 +22,6 @@ photosUploadUrlRoute.post(
     const reportId = c.req.param("id");
     if (!reportId) return c.json({ error: { code: "INVALID_REPORT_ID", message: "Invalid report ID" } }, 400);
 
-    // Ensure R2 binding is present before attempting any photo operations
     if (!c.env.R2) {
       logger.error({
         route: c.req.path,
@@ -32,10 +35,44 @@ photosUploadUrlRoute.post(
     }
 
     const body = await c.req.json().catch(() => ({}));
-    const parsed = PhotoUploadRequestSchema.safeParse(body);
-    if (!parsed.success) return c.json({ error: { code: "VALIDATION_ERROR", message: "Invalid request data" } }, 400);
 
-    const fileExt = parsed.data.content_type === "image/png" ? "png" : "jpg";
+    const batchParsed = PhotoBatchUploadRequestSchema.safeParse(body);
+    if (batchParsed.success) {
+      const reportCheck = await withClient(c.env, async (client) => {
+        const r = await client.query<{ id: string }>("SELECT id FROM reports WHERE id = $1", [reportId]);
+        return r.rows[0] !== undefined;
+      });
+      if (!reportCheck) return c.json({ error: { code: "NOT_FOUND", message: "Report not found" } }, 404);
+
+      const urls = [];
+      for (const contentType of batchParsed.data.photos) {
+        const fileExt = contentType === "image/png" ? "png" : "jpg";
+        const key = generatePhotoKey(reportId, fileExt);
+        try {
+          const { url, expiresAt } = await createSignedUploadUrl(c.env, key, contentType, BATCH_EXPIRATION_SECONDS);
+          urls.push({ url, expires_at: expiresAt.toISOString() });
+        } catch (err) {
+          logger.error({
+            route: c.req.path,
+            method: c.req.method,
+            error: err as Error,
+            context: "r2_signed_url_failed",
+          });
+          return c.json(
+            { error: { code: "STORAGE_ERROR", message: "Failed to generate upload URL" } },
+            500,
+          );
+        }
+      }
+      return c.json({ urls });
+    }
+
+    const singleParsed = PhotoUploadRequestSchema.safeParse(body);
+    if (!singleParsed.success) {
+      return c.json({ error: { code: "VALIDATION_ERROR", message: "Invalid request data" } }, 400);
+    }
+
+    const fileExt = singleParsed.data.content_type === "image/png" ? "png" : "jpg";
     const key = generatePhotoKey(reportId, fileExt);
 
     let publicUrl: string;
@@ -54,14 +91,12 @@ photosUploadUrlRoute.post(
       );
     }
 
-    // Check report exists before returning upload URL
     const reportCheck = await withClient(c.env, async (client) => {
       const r = await client.query<{ id: string }>("SELECT id FROM reports WHERE id = $1", [reportId]);
       return r.rows[0] !== undefined;
     });
     if (!reportCheck) return c.json({ error: { code: "NOT_FOUND", message: "Report not found" } }, 404);
 
-    // Return signed URL for direct PUT upload
     return c.json({
       key,
       public_url: publicUrl,

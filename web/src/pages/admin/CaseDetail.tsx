@@ -3,13 +3,15 @@ import { useParams, Link } from "react-router-dom";
 import type { Report, AgentAssessment, PriorityResponse } from "../../types";
 import { StatusBadge } from "../../components/StatusBadge";
 import { AIAssessmentViewer } from "../../components/AIAssessmentViewer";
+import { TimelineRail, type TimelineEvent } from "../../components/case-detail/TimelineRail";
+import { SupportingGallery, SupportingGalleryLoadingState, SupportingGalleryEmptyState, SupportingGalleryErrorState } from "../../components/case-detail/SupportingGallery";
 import { api } from "../../api/client";
 import { useAuthStore } from "../../stores/auth";
 import { colors } from "../../theme/tokens";
 import { logger } from "@/lib/logger";
 
 type DecisionType = "valid" | "needs_completion" | "needs_survey" | "duplicate" | "out_of_scope" | "rejected";
-type TabType = "detail" | "history" | "ai_assessment";
+type TabType = "detail" | "history" | "ai_assessment" | "documents" | "activity";
 
 interface StatusTransition {
   label: string;
@@ -58,12 +60,58 @@ export const AdminCaseDetail = () => {
   const [actionLoading, setActionLoading] = useState(false);
   const [activeTab, setActiveTab] = useState<TabType>("detail");
   const user = useAuthStore((s) => s.user);
+  const [timelineLoading, setTimelineLoading] = useState(false);
+  const [timelineError, setTimelineError] = useState<string | null>(null);
+  const [timelineEvents, setTimelineEvents] = useState<TimelineEvent[]>([]);
+  const [supportingLoading, setSupportingLoading] = useState(false);
+  const [supportingError, setSupportingError] = useState<string | null>(null);
+  const [supportingReports, setSupportingReports] = useState<Array<{ id: string; photo_urls: string[]; created_at: string; status: string }>>([]);
 
-  // Mock timeline data - in production this would come from API
-  const timelineEvents = [
-    { status: "submitted", label: "Laporan diterima", date: report?.created_at, actor: "sistem" },
-    { status: "under_review", label: "Sedang diperiksa", date: report?.updated_at, actor: "verifikator" },
-  ];
+  const loadTimeline = async () => {
+    if (!id) return;
+    setTimelineLoading(true);
+    setTimelineError(null);
+    try {
+      const res = await api.reportTimeline(id);
+      // Transform API response to TimelineEvent format
+      const transformed: TimelineEvent[] = res.events.map((e) => {
+        let dotColor: "amber" | "teal" | "gray" = "gray";
+        if (e.status === "submitted" || e.status === "verified") dotColor = "teal";
+        else if (e.status === "under_review" || e.status === "needs_survey") dotColor = "amber";
+        return {
+          time: new Date(e.occurred_at).toLocaleDateString("id-ID", {
+            day: "2-digit",
+            month: "short",
+            hour: "2-digit",
+            minute: "2-digit",
+          }),
+          description: e.label,
+          dotColor,
+        };
+      });
+      setTimelineEvents(transformed);
+    } catch (e) {
+      logger.error("Failed to load timeline", { error: e });
+      setTimelineError("Gagal memuat timeline");
+    } finally {
+      setTimelineLoading(false);
+    }
+  };
+
+  const loadSupporting = async () => {
+    if (!id) return;
+    setSupportingLoading(true);
+    setSupportingError(null);
+    try {
+      const res = await api.reportSupporting(id);
+      setSupportingReports(res.reports);
+    } catch (e) {
+      logger.error("Failed to load supporting reports", { error: e });
+      setSupportingError("Gagal memuat laporan pendukung");
+    } finally {
+      setSupportingLoading(false);
+    }
+  };
 
   const load = async () => {
     if (!id) return;
@@ -108,6 +156,8 @@ export const AdminCaseDetail = () => {
     if (report) {
       loadAssessments();
       loadPriority();
+      loadTimeline();
+      loadSupporting();
     }
   }, [report]);
 
@@ -551,6 +601,8 @@ export const AdminCaseDetail = () => {
     { id: "detail" as TabType, label: "Ringkasan" },
     { id: "history" as TabType, label: "Riwayat Audit" },
     { id: "ai_assessment" as TabType, label: "AI Assessment" },
+    { id: "documents" as TabType, label: "Dokumen" },
+    { id: "activity" as TabType, label: "Aktivitas" },
   ];
 
   return (
@@ -603,6 +655,17 @@ export const AdminCaseDetail = () => {
                 <span className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md text-xs font-semibold ${getPriorityBgColor(priority.level)} ${getPriorityTextColor(priority.level)}`}>
                   <span className={`w-1.5 h-1.5 rounded-full ${priority.level === "Kritis" ? "bg-danger-500" : priority.level === "Tinggi" ? "bg-warning-500" : priority.level === "Sedang" ? "bg-info-500" : "bg-primary-500"}`}></span>
                   Prioritas {priority.level}
+                </span>
+              )}
+              {report.assignee ? (
+                <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md text-xs font-semibold bg-purple-100 text-purple-700">
+                  <span className="w-1.5 h-1.5 rounded-full bg-purple-500"></span>
+                  {report.assignee.name}
+                </span>
+              ) : (
+                <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md text-xs font-semibold bg-neutral-100 text-neutral-500">
+                  <span className="w-1.5 h-1.5 rounded-full bg-neutral-400"></span>
+                  Belum ditugaskan
                 </span>
               )}
             </div>
@@ -793,6 +856,15 @@ export const AdminCaseDetail = () => {
                   </div>
                 )}
 
+                {/* Supporting Gallery */}
+                <SupportingGallery
+                  photos={supportingReports.flatMap((r) => r.photo_urls)}
+                  totalCount={supportingReports.length}
+                  loading={supportingLoading}
+                  error={supportingError}
+                  onRetry={loadSupporting}
+                />
+
                 {/* AI Assessment Button */}
                 {report.photo_urls.length > 0 && (
                   <div className="bg-white rounded-xl border border-neutral-200 p-5">
@@ -875,77 +947,29 @@ export const AdminCaseDetail = () => {
                 )}
               </div>
             )}
+
+            {activeTab === "documents" && (
+              <div className="bg-white rounded-xl border border-neutral-200 p-8 text-center">
+                <p className="text-sm text-neutral-500">Tidak ada dokumen untuk laporan ini.</p>
+              </div>
+            )}
+
+            {activeTab === "activity" && (
+              <div className="bg-white rounded-xl border border-neutral-200 p-8 text-center">
+                <p className="text-sm text-neutral-500">Riwayat aktivitas akan ditampilkan di sini.</p>
+              </div>
+            )}
           </div>
 
           {/* Right Column - Timeline Sidebar */}
           <div className="space-y-6">
             {/* Timeline */}
-            <div className="bg-white rounded-xl border border-neutral-200 p-5">
-              <h4 className="text-xs font-bold text-neutral-500 uppercase tracking-wider mb-4">Timeline & Keputusan</h4>
-              <div className="space-y-0">
-                {/* Event 1 */}
-                <div className="flex gap-3">
-                  <div className="flex flex-col items-center">
-                    <span className="w-2.5 h-2.5 rounded-full bg-warning-500 mt-1.5"></span>
-                    <span className="w-0.5 h-6 bg-neutral-200"></span>
-                  </div>
-                  <div className="pb-4">
-                    <div className="text-xs font-semibold">Menunggu verifikasi</div>
-                    <div className="font-mono text-xs text-neutral-500">
-                      {new Date(report.updated_at).toLocaleDateString("id-ID", {
-                        day: "2-digit",
-                        month: "short",
-                        hour: "2-digit",
-                        minute: "2-digit",
-                      })} · sistem
-                    </div>
-                  </div>
-                </div>
-                {/* Event 2 */}
-                <div className="flex gap-3">
-                  <div className="flex flex-col items-center">
-                    <span className="w-2.5 h-2.5 rounded-full bg-primary-500 mt-1.5"></span>
-                    <span className="w-0.5 h-6 bg-neutral-200"></span>
-                  </div>
-                  <div className="pb-4">
-                    <div className="text-xs font-semibold">Laporan diterima</div>
-                    <div className="font-mono text-xs text-neutral-500">
-                      {new Date(report.created_at).toLocaleDateString("id-ID", {
-                        day: "2-digit",
-                        month: "short",
-                        hour: "2-digit",
-                        minute: "2-digit",
-                      })} · ID dibuat
-                    </div>
-                  </div>
-                </div>
-                {/* Event 3 */}
-                <div className="flex gap-3">
-                  <div className="flex flex-col items-center">
-                    <span className="w-2.5 h-2.5 rounded-full bg-neutral-400 mt-1.5"></span>
-                  </div>
-                  <div>
-                    <div className="text-xs font-semibold">Tersimpan di perangkat</div>
-                    <div className="font-mono text-xs text-neutral-500">
-                      {new Date(report.created_at).toLocaleDateString("id-ID", {
-                        day: "2-digit",
-                        month: "short",
-                        hour: "2-digit",
-                        minute: "2-digit",
-                      })} · offline
-                    </div>
-                  </div>
-                </div>
-              </div>
-
-              {/* Info Note */}
-              <div className="mt-4 p-3 bg-neutral-50 rounded-lg flex gap-2">
-                <span className="w-4 h-4 rounded-full border border-neutral-400 flex items-center justify-center text-xs text-neutral-500 flex-none">i</span>
-                <span className="text-xs text-neutral-600 leading-relaxed">
-                  Identitas pelapor & metadata EXIF berada di disclosure terpisah, hanya untuk peran berwenang.
-                </span>
-              </div>
-            </div>
+            <TimelineRail
+              events={timelineEvents}
+              loading={timelineLoading}
+              error={timelineError}
+              onRetry={loadTimeline}
+            />
 
             {/* RT/RW Verification */}
             <div className="bg-white rounded-xl border border-neutral-200 p-5">
@@ -961,6 +985,15 @@ export const AdminCaseDetail = () => {
           </div>
         </div>
       </main>
+
+      {/* Sticky Action Bar */}
+      <div className="sticky bottom-0 z-50 bg-white border-t border-gray-200 flex gap-2 p-4">
+        <button className="flex-1 bg-blue-600 text-white rounded-lg py-2 px-4 text-sm font-medium">Gabungkan</button>
+        <button className="flex-1 bg-green-600 text-white rounded-lg py-2 px-4 text-sm font-medium">Verifikasi</button>
+        <button className="flex-1 bg-gray-600 text-white rounded-lg py-2 px-4 text-sm font-medium">Tutup</button>
+        <button className="flex-1 bg-orange-500 text-white rounded-lg py-2 px-4 text-sm font-medium">Buka Kembali</button>
+        <button className="flex-1 bg-gray-400 text-white rounded-lg py-2 px-4 text-sm font-medium">Lainnya</button>
+      </div>
 
       {/* Modals - Same as original */}
       {showDecideModal && (

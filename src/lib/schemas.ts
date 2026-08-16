@@ -58,6 +58,10 @@ export const PhotoUploadRequestSchema = z.object({
   file: z.string().min(1).optional(),
 });
 
+export const PhotoBatchUploadRequestSchema = z.object({
+  photos: z.array(z.enum(["image/jpeg", "image/png"])).min(1).max(20),
+});
+
 export const SyncBatchSchema = z.object({
   reports: z.array(ReportCreateSchema).min(1).max(50),
 });

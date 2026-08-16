@@ -364,6 +364,40 @@ ALTER TABLE categories ADD COLUMN IF NOT EXISTS parent_id UUID REFERENCES catego
 CREATE INDEX IF NOT EXISTS idx_categories_parent ON categories(parent_id);
 
 -- ============================================================
+-- COLUMNS: categories.code, short_code, color_class (for UI rendering)
+-- ============================================================
+
+DO $$
+BEGIN
+  IF NOT EXISTS (
+    SELECT 1 FROM information_schema.columns
+    WHERE table_name = 'categories' AND column_name = 'code'
+  ) THEN
+    ALTER TABLE categories ADD COLUMN code TEXT;
+  END IF;
+END $$;
+
+DO $$
+BEGIN
+  IF NOT EXISTS (
+    SELECT 1 FROM information_schema.columns
+    WHERE table_name = 'categories' AND column_name = 'short_code'
+  ) THEN
+    ALTER TABLE categories ADD COLUMN short_code TEXT;
+  END IF;
+END $$;
+
+DO $$
+BEGIN
+  IF NOT EXISTS (
+    SELECT 1 FROM information_schema.columns
+    WHERE table_name = 'categories' AND column_name = 'color_class'
+  ) THEN
+    ALTER TABLE categories ADD COLUMN color_class TEXT;
+  END IF;
+END $$;
+
+-- ============================================================
 -- TABLES: report_shares (from report_shares)
 -- ============================================================
 
@@ -656,6 +690,36 @@ ALTER TABLE reports ALTER COLUMN wilayah_id SET NOT NULL;
 
 UPDATE reports SET location = ST_SetSRID(ST_MakePoint(lng, lat), 4326)::geography
 WHERE location IS NULL AND lng IS NOT NULL;
+
+-- ============================================================
+-- TABLES: report_status_history (for timeline - Wave 3)
+-- ============================================================
+
+CREATE TABLE IF NOT EXISTS report_status_history (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  report_id UUID NOT NULL REFERENCES reports(id) ON DELETE CASCADE,
+  status TEXT NOT NULL,
+  label TEXT NOT NULL,
+  actor UUID,
+  occurred_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+  created_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
+);
+CREATE INDEX IF NOT EXISTS idx_report_status_history_report ON report_status_history(report_id);
+CREATE INDEX IF NOT EXISTS idx_report_status_history_occurred ON report_status_history(occurred_at);
+
+-- ============================================================
+-- TABLES: surveyor_task_downloads (for batch download tracking - Wave 3)
+-- ============================================================
+
+CREATE TABLE IF NOT EXISTS surveyor_task_downloads (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  task_id UUID NOT NULL REFERENCES surveyor_tasks(id) ON DELETE CASCADE,
+  downloaded_by UUID NOT NULL REFERENCES users(id),
+  downloaded_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+  device_info JSONB DEFAULT '{}',
+  UNIQUE(task_id, downloaded_by)
+);
+CREATE INDEX IF NOT EXISTS idx_surveyor_task_downloads_task ON surveyor_task_downloads(task_id);
 
 -- ============================================================
 -- SEED: 9 categories (from initial_schema)

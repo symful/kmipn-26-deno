@@ -3,7 +3,7 @@ import { ErrorBoundary } from "./components/ErrorBoundary";
 import { ToastContainer } from "./components/Toast";
 import { PublicHome } from "./pages/public/Home";
 import { PublicCaseDetail } from "./pages/public/CaseDetail";
-import { Methodology } from "./pages/methodology";
+import { Methodology } from "./pages/public/Methodology";
 import { PublicCaseList } from "./pages/public/CaseList";
 import { PublicStatistics } from "./pages/public/Statistics";
 import { AdminLogin } from "./pages/admin/Login";
@@ -50,7 +50,7 @@ export const App = () => {
         <Route path="/" element={<PublicHome />} />
         <Route path="/methodology" element={<Methodology />} />
         <Route path="/case/:id" element={<PublicCaseDetail />} />
-          <Route path="/case-list" element={<PublicCaseList />} />
+          <Route path="/peta" element={<PublicCaseList />} />
           <Route path="/statistics" element={<PublicStatistics />} />
           <Route path="/admin/login" element={<AdminLogin />} />
           <Route

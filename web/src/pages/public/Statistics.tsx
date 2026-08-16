@@ -17,6 +17,23 @@ const STATUS_ORDER = [
   "duplicate_merged",
 ];
 
+const TIME_PERIOD_OPTIONS = [
+  { value: "7d", label: "7 Hari Terakhir" },
+  { value: "30d", label: "30 Hari Terakhir" },
+  { value: "90d", label: "90 Hari Terakhir" },
+  { value: "1y", label: "1 Tahun Terakhir" },
+  { value: "all", label: "Semua Waktu" },
+];
+
+const WILAYAH_OPTIONS = [
+  { value: "", label: "Semua Wilayah" },
+  { value: "cisarua", label: "Kec. Cisarua" },
+  { value: "ciburuy", label: "Desa Ciburuy" },
+  { value: "kaler", label: "Desa Kaler" },
+  { value: "girang", label: "Desa Girang" },
+  { value: "wetan", label: "Desa Wetan" },
+];
+
 export const PublicStatistics = () => {
   const [stats, setStats] = useState<DashboardStats | null>(null);
   const [geojsonStats, setGeojsonStats] = useState<{
@@ -25,6 +42,8 @@ export const PublicStatistics = () => {
   } | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [selectedWilayah, setSelectedWilayah] = useState("");
+  const [selectedPeriod, setSelectedPeriod] = useState("30d");
 
   useEffect(() => {
     Promise.all([api.publicStats(), api.geojson()])
@@ -62,26 +81,59 @@ export const PublicStatistics = () => {
   const maxCategoryCount = Math.max(...byCategory.map((c) => c.count), 1);
 
   return (
-    <div className="min-h-screen bg-sigap-background">
-      <header className="bg-sigap-surface px-6 py-4 border-b border-sigap-border">
+    <div className="min-h-screen bg-neutral-100">
+      {/* P-02 White Header */}
+      <header className="bg-white border-b border-neutral-200 px-7 py-[15px]">
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-3">
-            <div
-              className="w-9 h-9 rounded-lg flex items-center justify-center text-white font-bold"
-              style={{ backgroundColor: colors.primary }}
-            >
-              S
+            <div className="w-7 h-7 rounded-[7px] bg-sigap-primary flex items-center justify-center text-white font-bold text-sm">
+              P
             </div>
-            <div>
-              <h1 className="text-xl font-bold tracking-tight">Statistik</h1>
-              <p className="text-sm text-sigap-textTertiary">
-                SIGAP - Platform pemetaan & monitoring
-              </p>
-            </div>
+            <span className="text-base font-bold tracking-tight text-sigap-textPrimary">PantauDesa</span>
+            <span className="text-xs text-sigap-textTertiary bg-neutral-100 rounded px-2 py-0.5 ml-1">Portal Publik</span>
           </div>
-          <ShareLinkButton filters={{}} label="Bagikan" />
+          <div className="flex items-center gap-3">
+            <ShareLinkButton filters={{}} label="Bagikan" />
+          </div>
+        </div>
+        <div className="flex gap-6 text-sm text-sigap-textTertiary mt-3 ml-10">
+          <Link to="/" className="hover:text-sigap-primary transition-colors">Ringkasan</Link>
+          <Link to="/public/cases" className="hover:text-sigap-primary transition-colors">Peta &amp; Daftar</Link>
+          <Link to="/public/statistics" className="text-sigap-primary font-semibold">Statistik</Link>
+          <Link to="/methodology" className="hover:text-sigap-primary transition-colors">Metodologi</Link>
         </div>
       </header>
+
+      {/* Filter Bar */}
+      <div className="bg-neutral-50 border-b border-neutral-200 px-7 py-[13px] flex items-center gap-2.5">
+        <select
+          value={selectedWilayah}
+          onChange={(e) => setSelectedWilayah(e.target.value)}
+          className="bg-white border border-neutral-200 rounded-lg px-3 py-2 text-sm text-sigap-textPrimary font-medium focus:outline-none focus:border-sigap-primary"
+        >
+          {WILAYAH_OPTIONS.map((opt) => (
+            <option key={opt.value} value={opt.value}>{opt.label}</option>
+          ))}
+        </select>
+
+        <select
+          value={selectedPeriod}
+          onChange={(e) => setSelectedPeriod(e.target.value)}
+          className="bg-white border border-neutral-200 rounded-lg px-3 py-2 text-sm text-sigap-textPrimary focus:outline-none focus:border-sigap-primary"
+        >
+          {TIME_PERIOD_OPTIONS.map((opt) => (
+            <option key={opt.value} value={opt.value}>{opt.label}</option>
+          ))}
+        </select>
+
+        <div className="ml-auto flex items-center gap-3">
+          <span className="text-sm text-sigap-textTertiary">
+            Periode: <span className="font-bold text-sigap-textPrimary">
+              {TIME_PERIOD_OPTIONS.find(p => p.value === selectedPeriod)?.label}
+            </span>
+          </span>
+        </div>
+      </div>
 
       <main className="p-6 max-w-7xl mx-auto">
         {error && (
@@ -98,6 +150,7 @@ export const PublicStatistics = () => {
 
         {!loading && !error && (
           <>
+            {/* Summary Stats Cards */}
             <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
               <StatCard
                 label="Total Laporan"
@@ -125,8 +178,10 @@ export const PublicStatistics = () => {
               />
             </div>
 
+            {/* Charts Row */}
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
-              <div className="bg-white rounded-lg p-6 border border-sigap-border">
+              {/* Status Distribution */}
+              <div className="bg-white rounded-xl p-6 border border-neutral-200">
                 <h2 className="text-lg font-semibold text-sigap-textPrimary mb-4">
                   Distribusi Status
                 </h2>
@@ -145,7 +200,7 @@ export const PublicStatistics = () => {
                             {count}
                           </span>
                         </div>
-                        <div className="h-3 bg-sigap-background rounded-full overflow-hidden">
+                        <div className="h-2.5 bg-neutral-100 rounded-full overflow-hidden">
                           <div
                             className="h-full rounded-full transition-all"
                             style={{
@@ -160,7 +215,8 @@ export const PublicStatistics = () => {
                 </div>
               </div>
 
-              <div className="bg-white rounded-lg p-6 border border-sigap-border">
+              {/* Category Distribution */}
+              <div className="bg-white rounded-xl p-6 border border-neutral-200">
                 <h2 className="text-lg font-semibold text-sigap-textPrimary mb-4">
                   Distribusi Kategori
                 </h2>
@@ -182,7 +238,7 @@ export const PublicStatistics = () => {
                               {cat.count}
                             </span>
                           </div>
-                          <div className="h-3 bg-sigap-background rounded-full overflow-hidden">
+                          <div className="h-2.5 bg-neutral-100 rounded-full overflow-hidden">
                             <div
                               className="h-full rounded-full transition-all"
                               style={{
@@ -199,7 +255,8 @@ export const PublicStatistics = () => {
               </div>
             </div>
 
-            <div className="bg-white rounded-lg p-6 border border-sigap-border">
+            {/* SLA Compliance */}
+            <div className="bg-white rounded-xl p-6 border border-neutral-200">
               <h2 className="text-lg font-semibold text-sigap-textPrimary mb-4">
                 Kepatuhan SLA
               </h2>
@@ -278,7 +335,7 @@ const StatCard = ({
   value: number;
   color: string;
 }) => (
-  <div className="bg-white rounded-lg p-4 border border-sigap-border">
+  <div className="bg-white rounded-xl p-4 border border-neutral-200">
     <div className="text-3xl font-bold tracking-tight" style={{ color }}>
       {value}
     </div>

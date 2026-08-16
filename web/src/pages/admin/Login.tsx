@@ -87,20 +87,21 @@ export const AdminLogin = () => {
     <div className="min-h-screen flex items-center justify-center bg-sigap-background">
       <form
         onSubmit={handleSubmit}
-        className="bg-white p-8 rounded-lg shadow-lg w-full max-w-md border border-sigap-border"
+        className="bg-white p-8 rounded-xl shadow-card w-full max-w-md border border-sigap-border"
       >
-        <div className="flex items-center gap-3 mb-6">
-          <div
-            className="w-10 h-10 rounded-lg flex items-center justify-center text-white font-bold"
-            style={{ backgroundColor: colors.primary }}
-          >
-            S
+        <div className="flex items-center gap-3 mb-8">
+          <div className="w-10 h-10 rounded-lg bg-sigap-primary flex items-center justify-center text-white font-bold text-base shadow-btn-primary">
+            P
           </div>
-          <h1 className="text-2xl font-bold tracking-tight">SIGAP Admin</h1>
-        </div>
-        <div className="space-y-4">
           <div>
-            <label className="block text-sm font-semibold mb-1 text-sigap-textSecondary">
+            <h1 className="text-xl font-bold tracking-tight text-sigap-textPrimary">PantauDesa</h1>
+            <p className="text-xs text-sigap-textMuted">Portal Admin</p>
+          </div>
+        </div>
+
+        <div className="space-y-5">
+          <div>
+            <label className="block text-sm font-semibold mb-1.5 text-sigap-textPrimary">
               Email
             </label>
             <input
@@ -108,11 +109,12 @@ export const AdminLogin = () => {
               required
               value={email}
               onChange={(e) => setEmail(e.target.value)}
-              className="w-full px-3 py-2 border border-sigap-border rounded focus:outline-none focus:border-sigap-primary bg-sigap-surface"
+              className="w-full px-3 py-2.5 border border-sigap-border rounded-lg text-sm bg-white text-sigap-textPrimary focus:outline-none focus:ring-2 focus:ring-sigap-primary focus:border-sigap-primary transition-colors"
+              placeholder="email@contoh.com"
             />
           </div>
           <div>
-            <label className="block text-sm font-semibold mb-1 text-sigap-textSecondary">
+            <label className="block text-sm font-semibold mb-1.5 text-sigap-textPrimary">
               Password
             </label>
             <input
@@ -120,23 +122,22 @@ export const AdminLogin = () => {
               required
               value={password}
               onChange={(e) => setPassword(e.target.value)}
-              className="w-full px-3 py-2 border border-sigap-border rounded focus:outline-none focus:border-sigap-primary bg-sigap-surface"
+              className="w-full px-3 py-2.5 border border-sigap-border rounded-lg text-sm bg-white text-sigap-textPrimary focus:outline-none focus:ring-2 focus:ring-sigap-primary focus:border-sigap-primary transition-colors"
+              placeholder="••••••••"
             />
           </div>
           {error && (
-            <div className="text-sm text-red-600 bg-red-50 p-2 rounded">
+            <div className="text-sm text-danger-600 bg-danger-100 p-3 rounded-lg border border-danger-500/20">
               {error}
             </div>
           )}
           <button
             type="submit"
             disabled={loading}
-            className="w-full text-white py-2 rounded font-semibold transition-opacity disabled:opacity-50"
-            style={{ backgroundColor: colors.primary }}
+            className="w-full text-white py-2.5 px-4 rounded-lg font-semibold text-sm bg-sigap-primary hover:bg-sigap-primaryHover transition-colors disabled:opacity-50 disabled:cursor-not-allowed shadow-btn-primary"
           >
             {loading ? "Memproses..." : "Masuk"}
           </button>
-
         </div>
       </form>
     </div>

@@ -38,7 +38,17 @@ syncBatchRoute.post(
               [r.idempotency_key, r.category_id, r.description, r.lng, r.lat, r.photo_urls ?? [], reportedAt, r.title ?? null]
             );
             if (!inserted.rows[0]) throw new Error("Insert failed: no row returned");
-            out.push({ idempotency_key: r.idempotency_key, id: inserted.rows[0].id, status: "created" });
+            const newReportId = inserted.rows[0].id;
+            out.push({ idempotency_key: r.idempotency_key, id: newReportId, status: "created" });
+            try {
+              await client.query(
+                `INSERT INTO outbox (event_type, target_system, payload, related_report_id, next_retry_at)
+                 VALUES ($1, 'internal', $2, $3, NOW())`,
+                ["report_created", JSON.stringify({ report_id: newReportId, action: "report_created", idempotency_key: r.idempotency_key }), newReportId]
+              );
+            } catch (e) {
+              logger.error({ route: c.req.path, method: c.req.method, report_id: newReportId, idempotency_key: r.idempotency_key, error: e as Error, context: "outbox_insert_failed" });
+            }
           } catch (e) {
             logger.error({ route: c.req.path, method: c.req.method, report_id: r.idempotency_key, idempotency_key: r.idempotency_key, error: e as Error, context: "sync_batch_insert_failed" });
             out.push({ idempotency_key: r.idempotency_key, id: "", status: "failed", error: (e as Error).message });

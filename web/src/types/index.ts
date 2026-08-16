@@ -358,3 +358,20 @@ export interface PriorityResponse {
   level: "Rendah" | "Sedang" | "Tinggi" | "Kritis";
   breakdown: PriorityBreakdown;
 }
+
+export interface FacilityCluster {
+  lng: number;
+  lat: number;
+  count: number;
+  dominant_status: string;
+  dominant_category: string;
+  color: string;
+}
+
+export interface QueueCounts {
+  new_reports: number;
+  needs_verification: number;
+  sla_breached: number;
+  high_priority: number;
+  needs_completion: number;
+}

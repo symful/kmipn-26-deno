@@ -14,6 +14,14 @@ export interface Env {
   HOME: string;
   /** Public URL prefix for R2 photo reads, e.g. https://media.sigap.live */
   R2_PUBLIC_URL?: string;
+  /** R2 bucket name for S3-compatible API */
+  R2_BUCKET_NAME?: string;
+  /** R2 S3-compatible API access key ID */
+  R2_ACCESS_KEY_ID?: string;
+  /** R2 S3-compatible API secret access key */
+  R2_SECRET_ACCESS_KEY?: string;
+  /** R2 account ID for S3-compatible endpoint */
+  R2_ACCOUNT_ID?: string;
   /** JSON map of target_system -> delivery URL, e.g. {"satu_data":"https://..."} */
   OUTBOUND_TARGETS?: string;
   /** Set to "true" to skip audit append on login/refresh/logout */

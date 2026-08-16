@@ -82,3 +82,20 @@ export const statusLabel = (status: string): string => {
   };
   return labels[status] ?? status;
 };
+
+// W-02 CaseStatusBadge colors
+export const caseStatusColors: Record<string, string> = {
+  menunggu: "#FBBF24",     // amber
+  dalam_proses: "#3B82F6", // blue
+  perlu_tindakan: "#EF4444", // red
+  diterima: "#22C55E",     // green
+  ditolak: "#6B7280",      // gray
+};
+
+export const caseStatusLabels: Record<string, string> = {
+  menunggu: "Menunggu",
+  dalam_proses: "Dalam Proses",
+  perlu_tindakan: "Perlu Tindakan",
+  diterima: "Diterima",
+  ditolak: "Ditolak",
+};

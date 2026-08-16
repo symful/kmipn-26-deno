@@ -23,6 +23,8 @@ import type {
   PriorityResponse,
   Category,
   PaginatedUsers,
+  FacilityCluster,
+  QueueCounts,
 } from "../types";
 import { API_BASE } from "../types";
 import { useAuthStore } from "../stores/auth";
@@ -490,7 +492,7 @@ export const api = {
   rtRwVerifyGet: (token: string) =>
     request<{ id: string; [key: string]: unknown }>(`/rt-rw/verify?token=${token}`),
 
-  rtRwVerifyPost: (body: { verification_token: string; report_id: string; verdict: "confirmed" | "rejected"; reason?: string }) =>
+  rtRwVerifyPost: (body: { verification_token: string; report_id: string; verdict: "confirmed" | "needs_clarification" | "outdated" | "not_my_area" | "duplicate" | "rejected"; reason?: string }) =>
     request<{ status: string }>(`/rt-rw/verify`, {
       method: "POST",
       body: JSON.stringify(body),
@@ -855,4 +857,56 @@ export const api = {
       body: JSON.stringify(params),
       token: true,
     }),
+
+  reportTimeline: (id: string) =>
+    request<{
+      events: Array<{
+        status: string;
+        label: string;
+        actor: string | null;
+        actor_name: string | null;
+        occurred_at: string;
+      }>;
+    }>(`/reports/${id}/timeline`, { token: true }),
+
+  reportSupporting: (id: string) =>
+    request<{
+      reports: Array<{
+        id: string;
+        photo_urls: string[];
+        created_at: string;
+        status: string;
+      }>;
+    }>(`/reports/${id}/supporting`, { token: true }),
+
+  operatorBacklog: (days?: number) =>
+    request<{ buckets: Array<{ day: string; laporan_count: number; kasus_count: number }> }>(
+      `/operator/backlog${days ? `?days=${days}` : ""}`,
+      { token: true }
+    ),
+
+  queueCounts: () =>
+    request<QueueCounts>("/operator/queue-counts", { token: true }),
+
+  facilitiesCluster: (params?: { bbox?: string; zoom?: number }) => {
+    const qs = new URLSearchParams();
+    if (params?.bbox) qs.set("bbox", params.bbox);
+    if (params?.zoom !== undefined) qs.set("zoom", String(params.zoom));
+    const query = qs.toString();
+    return request<{ clusters: FacilityCluster[] }>(
+      `/facilities/cluster${query ? `?${query}` : ""}`,
+      { token: true }
+    );
+  },
+
+  publicReportsCluster: (params?: { bbox?: string; month?: string; zoom?: number }) => {
+    const qs = new URLSearchParams();
+    if (params?.bbox) qs.set("bbox", params.bbox);
+    if (params?.month) qs.set("month", params.month);
+    if (params?.zoom !== undefined) qs.set("zoom", String(params.zoom));
+    const query = qs.toString();
+    return request<{ clusters: FacilityCluster[] }>(
+      `/public/reports/cluster${query ? `?${query}` : ""}`
+    );
+  },
 };

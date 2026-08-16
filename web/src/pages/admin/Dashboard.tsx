@@ -4,6 +4,7 @@ import type { DashboardStats, Report } from "../../types";
 import { StatusBadge } from "../../components/StatusBadge";
 import { api } from "../../api/client";
 import { logger } from "@/lib/logger";
+import { MiniMapCluster } from "../../components/MiniMapCluster";
 
 const navItems = [
   { icon: "grid", label: "Ringkasan", path: "/admin", active: true },
@@ -118,18 +119,16 @@ export const AdminDashboard = () => {
   const slaBreached = stats?.sla_breached ?? 0;
   const inProgress = (stats?.by_status.in_progress ?? 0) + (stats?.by_status.verified ?? 0) + (stats?.by_status.assigned ?? 0);
 
-  const trendData = [
-    { week: "M1", reports: 40, cases: 24 },
-    { week: "M2", reports: 52, cases: 30 },
-    { week: "M3", reports: 46, cases: 34 },
-    { week: "M4", reports: 64, cases: 40 },
-    { week: "M5", reports: 58, cases: 46 },
-    { week: "M6", reports: 72, cases: 50 },
-    { week: "M7", reports: 66, cases: 44 },
-    { week: "M8", reports: 80, cases: 56 },
-  ];
+  const [backlog, setBacklog] = useState<Array<{ day: string; laporan_count: number; kasus_count: number }>>([]);
 
-  const maxTrendValue = Math.max(...trendData.map(d => Math.max(d.reports, d.cases)));
+  useEffect(() => {
+    api
+      .operatorBacklog()
+      .then(({ buckets }) => setBacklog(buckets))
+      .catch((e) => { logger.error("Failed to fetch backlog", { error: e }); setBacklog([]); });
+  }, []);
+
+  const maxTrendValue = backlog.length > 0 ? Math.max(...backlog.flatMap(d => [d.laporan_count, d.kasus_count])) : 1;
 
   return (
     <div className="flex min-h-[100dvh] bg-[#f9faf8]">
@@ -232,16 +231,16 @@ export const AdminDashboard = () => {
                   <span className="text-xs text-[#616770]">30 hari · <b className="text-[#17191c]">laporan</b> vs <b className="text-[#17191c]">kasus</b></span>
                 </div>
                 <div className="flex items-end gap-1.5 h-28">
-                  {trendData.map((d, i) => (
+                  {backlog.map((d, i) => (
                     <div key={i} className="flex-1 flex flex-col justify-end gap-0.5">
                       <div className="flex flex-col gap-0.5 justify-end" style={{ height: "110px" }}>
                         <div
                           className="w-full bg-[#c7d7fb] rounded-t-sm"
-                          style={{ height: `${(d.reports / maxTrendValue) * 100}%` }}
+                          style={{ height: `${maxTrendValue > 0 ? (d.laporan_count / maxTrendValue) * 100 : 0}%` }}
                         />
                         <div
                           className="w-full bg-[#0f7a6b] rounded-t-sm"
-                          style={{ height: `${(d.cases / maxTrendValue) * 100}%` }}
+                          style={{ height: `${maxTrendValue > 0 ? (d.kasus_count / maxTrendValue) * 100 : 0}%` }}
                         />
                       </div>
                     </div>
@@ -254,26 +253,8 @@ export const AdminDashboard = () => {
                   <span className="text-sm font-bold">Peta ringkas kasus</span>
                   <Link to="/admin/cases?view=map" className="text-xs text-[#0f7a6b] font-semibold">Buka Peta & Kasus →</Link>
                 </div>
-                <div className="flex-1 rounded-lg relative overflow-hidden bg-[#eaeee9] min-h-[150px]">
-                  <div
-                    className="absolute inset-0"
-                    style={{
-                      backgroundImage: "linear-gradient(#dfe4de 1px, transparent 1px), linear-gradient(90deg, #dfe4de 1px, transparent 1px)",
-                      backgroundSize: "34px 34px"
-                    }}
-                  />
-                  <span className="absolute left-[22%] top-[34%] -translate-x-1/2 -translate-y-1/2 w-7 h-7 rounded-full bg-[#c0392b] text-white flex items-center justify-center text-xs font-bold border-2 border-white">
-                    6
-                  </span>
-                  <span className="absolute left-[52%] top-[56%] -translate-x-1/2 -translate-y-1/2 w-8 h-8 rounded-full bg-[#b8730a] text-white flex items-center justify-center text-xs font-bold border-2 border-white">
-                    14
-                  </span>
-                  <span className="absolute left-[74%] top-[30%] -translate-x-1/2 -translate-y-1/2 w-6 h-6 rounded-full bg-[#0f7a6b] text-white flex items-center justify-center text-xs font-bold border-2 border-white">
-                    9
-                  </span>
-                  <span className="absolute left-[68%] top-[72%] -translate-x-1/2 -translate-y-1/2 w-5 h-5 rounded-full bg-[#2563eb] text-white flex items-center justify-center text-[10px] font-bold border-2 border-white">
-                    4
-                  </span>
+                <div className="flex-1 rounded-lg min-h-[150px]">
+                  <MiniMapCluster className="w-full h-full min-h-[150px]" />
                 </div>
               </div>
             </div>

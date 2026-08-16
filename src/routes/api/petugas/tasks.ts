@@ -20,6 +20,8 @@ petugasTasksRoute.get("/", requireAuth, requireRole("PETUGAS", "ADMIN"), safeHan
     const r = await client.query(
       `SELECT st.id, st.report_id, st.status, st.deadline, st.progress_percent,
               st.created_at, st.updated_at, st.instructions,
+              'TGS-' || UPPER(LEFT(replace(st.id::text, '-', ''), 8)) AS code,
+              EXTRACT(EPOCH FROM (st.deadline - NOW()))/3600 AS sla_hours_remaining,
               r.description AS report_description, r.lng, r.lat, r.photo_urls,
               r.severity, r.address AS report_address, r.category_id,
               c.name AS category_name, c.slug AS category_slug,

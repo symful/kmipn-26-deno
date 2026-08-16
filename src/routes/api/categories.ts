@@ -14,6 +14,9 @@ const CategoryCreateSchema = z.object({
   icon: z.string().max(255).optional(),
   description: z.string().max(500).optional(),
   parent_id: z.string().uuid().optional().nullable(),
+  code: z.string().max(10).optional(),
+  short_code: z.string().max(5).optional(),
+  color_class: z.string().max(20).optional(),
 });
 
 const CategoryUpdateSchema = z.object({
@@ -22,6 +25,9 @@ const CategoryUpdateSchema = z.object({
   icon: z.string().max(255).optional(),
   description: z.string().max(500).optional(),
   parent_id: z.string().uuid().optional().nullable(),
+  code: z.string().max(10).optional(),
+  short_code: z.string().max(5).optional(),
+  color_class: z.string().max(20).optional(),
 });
 
 export const categoriesRoute = new Hono<{ Bindings: Env; Variables: AuthVariables }>();
@@ -30,7 +36,7 @@ categoriesRoute.get(
   "/",
   safeHandler(async (c) => {
     const rows = await withClient(c.env, async (client: PgClient) => {
-      const r = await client.query("SELECT id, slug, name, icon, description, parent_id, created_at FROM categories WHERE deleted_at IS NULL ORDER BY name");
+      const r = await client.query("SELECT id, slug, name, icon, description, parent_id, code, short_code, color_class, created_at FROM categories WHERE deleted_at IS NULL ORDER BY name");
       return r.rows;
     });
     return c.json({ categories: rows });
@@ -59,10 +65,10 @@ categoriesRoute.post(
 
     const result = await withClient(c.env, async (client: PgClient) => {
       const r = await client.query(
-        `INSERT INTO categories (name, slug, icon, description, parent_id, created_at, updated_at)
-         VALUES ($1, $2, $3, $4, $5, NOW(), NOW())
-         RETURNING id, slug, name, icon, description, parent_id, created_at`,
-        [parsed.data.name, parsed.data.slug, parsed.data.icon ?? null, parsed.data.description ?? null, parsed.data.parent_id ?? null]
+        `INSERT INTO categories (name, slug, icon, description, parent_id, code, short_code, color_class, created_at, updated_at)
+         VALUES ($1, $2, $3, $4, $5, $6, $7, $8, NOW(), NOW())
+         RETURNING id, slug, name, icon, description, parent_id, code, short_code, color_class, created_at`,
+        [parsed.data.name, parsed.data.slug, parsed.data.icon ?? null, parsed.data.description ?? null, parsed.data.parent_id ?? null, parsed.data.code ?? null, parsed.data.short_code ?? null, parsed.data.color_class ?? null]
       );
       return r.rows[0];
     });
@@ -74,7 +80,7 @@ categoriesRoute.post(
       objectType: "category",
       objectId: result.id,
       before: null,
-      after: { name: result.name, slug: result.slug, icon: result.icon, description: result.description, parent_id: result.parent_id },
+      after: { name: result.name, slug: result.slug, icon: result.icon, description: result.description, parent_id: result.parent_id, code: result.code, short_code: result.short_code, color_class: result.color_class },
     }).catch((e) => logger.error({ route: "/api/categories", method: "POST", context: "audit_write_failed", action: "category_create", error: e as Error }));
 
     return c.json(result, 201);
@@ -119,6 +125,18 @@ categoriesRoute.patch(
       updates.push(`parent_id = $${i++}`);
       values.push(parsed.data.parent_id);
     }
+    if (parsed.data.code !== undefined) {
+      updates.push(`code = $${i++}`);
+      values.push(parsed.data.code);
+    }
+    if (parsed.data.short_code !== undefined) {
+      updates.push(`short_code = $${i++}`);
+      values.push(parsed.data.short_code);
+    }
+    if (parsed.data.color_class !== undefined) {
+      updates.push(`color_class = $${i++}`);
+      values.push(parsed.data.color_class);
+    }
 
     if (updates.length === 0) {
       return c.json({ error: { code: "VALIDATION_ERROR", message: "No fields to update" } }, 400);
@@ -131,7 +149,7 @@ categoriesRoute.patch(
 
     const result = await withClient(c.env, async (client: PgClient) => {
       const beforeResult = await client.query(
-        "SELECT id, slug, name, icon, description, parent_id, created_at FROM categories WHERE id = $1 AND deleted_at IS NULL",
+        "SELECT id, slug, name, icon, description, parent_id, code, short_code, color_class, created_at FROM categories WHERE id = $1 AND deleted_at IS NULL",
         [id]
       );
       const before = beforeResult.rows[0];
@@ -139,7 +157,7 @@ categoriesRoute.patch(
       if (!before) return null;
 
       const r = await client.query(
-        `UPDATE categories SET ${updates.join(", ")} WHERE id = $${i} AND deleted_at IS NULL RETURNING id, slug, name, icon, description, parent_id, created_at`,
+        `UPDATE categories SET ${updates.join(", ")} WHERE id = $${i} AND deleted_at IS NULL RETURNING id, slug, name, icon, description, parent_id, code, short_code, color_class, created_at`,
         values
       );
       const after = r.rows[0];
@@ -149,8 +167,8 @@ categoriesRoute.patch(
         action: "category_update",
         objectType: "category",
         objectId: id,
-        before: { name: before.name, slug: before.slug, icon: before.icon, description: before.description, parent_id: before.parent_id },
-        after: { name: after.name, slug: after.slug, icon: after.icon, description: after.description, parent_id: after.parent_id },
+        before: { name: before.name, slug: before.slug, icon: before.icon, description: before.description, parent_id: before.parent_id, code: before.code, short_code: before.short_code, color_class: before.color_class },
+        after: { name: after.name, slug: after.slug, icon: after.icon, description: after.description, parent_id: after.parent_id, code: after.code, short_code: after.short_code, color_class: after.color_class },
       }).catch((e) => logger.error({ route: "/api/categories", method: "PATCH", context: "audit_write_failed", action: "category_update", error: e as Error }));
 
       return after;
@@ -174,7 +192,7 @@ categoriesRoute.delete(
 
     const result = await withClient(c.env, async (client: PgClient) => {
       const beforeResult = await client.query(
-        "SELECT id, slug, name, icon, description, parent_id, created_at FROM categories WHERE id = $1 AND deleted_at IS NULL",
+        "SELECT id, slug, name, icon, description, parent_id, code, short_code, color_class, created_at FROM categories WHERE id = $1 AND deleted_at IS NULL",
         [id]
       );
       const before = beforeResult.rows[0];
@@ -193,7 +211,7 @@ categoriesRoute.delete(
           action: "category_delete",
           objectType: "category",
           objectId: id,
-          before: { name: before.name, slug: before.slug, icon: before.icon, description: before.description, parent_id: before.parent_id },
+          before: { name: before.name, slug: before.slug, icon: before.icon, description: before.description, parent_id: before.parent_id, code: before.code, short_code: before.short_code, color_class: before.color_class },
           after: null,
         }).catch((e) => logger.error({ route: "/api/categories", method: "DELETE", context: "audit_write_failed", action: "category_delete", error: e as Error }));
       }

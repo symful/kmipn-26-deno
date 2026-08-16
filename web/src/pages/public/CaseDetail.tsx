@@ -107,7 +107,7 @@ export const PublicCaseDetail = () => {
 
               <div className="pt-4 border-t border-sigap-border">
                 <a
-                  href="/case-list"
+                  href="/peta"
                   className="text-sm text-sigap-primary hover:underline flex items-center gap-1"
                 >
                   ← Kembali ke Daftar Kasus

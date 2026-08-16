@@ -3,7 +3,11 @@ import { Outlet } from 'react-router-dom';
 
 const navItems = ['Ringkasan', 'Peta & Daftar', 'Statistik', 'Metodologi'];
 
-export function PublicLayout() {
+interface PublicLayoutProps {
+  children?: React.ReactNode;
+}
+
+export function PublicLayout({ children }: PublicLayoutProps) {
   return (
     <div style={{ minHeight: '100vh', backgroundColor: '#F9FAF8' }}>
       <header style={{
@@ -39,7 +43,7 @@ export function PublicLayout() {
             Portal Publik
           </span>
         </div>
-        
+
         <nav style={{
           display: 'flex',
           gap: 24,
@@ -61,9 +65,9 @@ export function PublicLayout() {
             </span>
           ))}
         </nav>
-        
+
         <div style={{ flex: 1 }} />
-        
+
         <button style={{
           padding: '8px 16px',
           border: '1px solid #E4E7E2',
@@ -89,11 +93,11 @@ export function PublicLayout() {
           Buat laporan
         </button>
       </header>
-      
+
       <main style={{ padding: 24 }}>
-        <Outlet />
+        {children ?? <Outlet />}
       </main>
-      
+
       <footer style={{
         padding: '16px 24px',
         borderTop: '1px solid #E4E7E2',

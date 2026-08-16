@@ -2,6 +2,8 @@ import { Hono } from "hono";
 import type { Env } from "@/types/bindings";
 import { safeHandler } from "@/lib/safeHandler";
 import { withClient, type PgClient } from "@/lib/db";
+import { redactText } from "@/lib/agent/redaction";
+import { generalizeLocation } from "@/lib/geo";
 
 export const publicCasesRoute = new Hono<{ Bindings: Env }>();
 
@@ -57,8 +59,8 @@ publicCasesRoute.get(
       moderated_photo_url: moderatedPhotoUrl,
       share_token: shareToken,
       generalized_location: generalizedLocation,
-      title: result.title,
-      description: String(result.description ?? "").slice(0, 200),
+      title: redactText(result.title),
+      description: redactText(String(result.description ?? "")).slice(0, 200),
     });
   }),
 );
@@ -80,18 +82,4 @@ function getPublicProgress(status: string): number {
   return progressMap[status] ?? 0;
 }
 
-function generalizeLocation(
-  lat: number,
-  lng: number
-): { lat: number; lng: number } {
-  if (!lat || !lng || isNaN(lat) || isNaN(lng)) {
-    return { lat: 0, lng: 0 };
-  }
-  const maxOffsetKm = 5;
-  const latOffset = (Math.random() - 0.5) * 2 * (maxOffsetKm / 111);
-  const lngOffset = (Math.random() - 0.5) * 2 * (maxOffsetKm / (111 * Math.cos((lat * Math.PI) / 180)));
-  return {
-    lat: Math.round((lat + latOffset) * 1000000) / 1000000,
-    lng: Math.round((lng + lngOffset) * 1000000) / 1000000,
-  };
-}
+

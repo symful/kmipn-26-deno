@@ -2,50 +2,49 @@ import { Hono } from "hono";
 import type { Env } from "@/types/bindings";
 import { requireAuth } from "@/lib/auth";
 import { requireRole } from "@/middleware/roles";
-import { withClient } from "@/lib/db";
 import { safeHandler } from "@/lib/safeHandler";
+import { withClient } from "@/lib/db";
 
 export const surveyorChecklistTemplateRoute = new Hono<{ Bindings: Env }>();
 
-surveyorChecklistTemplateRoute.get("/", requireAuth, requireRole("SURVEYOR", "PETUGAS", "ADMIN"), safeHandler(async (c) => {
-  const userId = c.get("user").sub;
+surveyorChecklistTemplateRoute.get("/", requireAuth, requireRole("SURVEYOR", "PETUGAS"), safeHandler(async (c) => {
   const taskId = c.req.param("id");
-  if (!taskId) return c.json({ error: { code: "MISSING_TASK_ID", message: "Task ID is required" } }, 400);
 
-  const result = await withClient(c.env, async (client) => {
-    const taskRow = await client.query(
+  const template = await withClient(c.env, async (client) => {
+    // Get category_id from task
+    const taskR = await client.query(
       `SELECT r.category_id FROM surveyor_tasks st
        JOIN reports r ON r.id = st.report_id
-       WHERE st.id = $1 AND st.surveyor_id = $2`,
-      [taskId, userId]
+       WHERE st.id = $1`,
+      [taskId]
     );
 
-    if (!taskRow.rows[0]) {
-      return { error: "NOT_FOUND" };
+    if (!taskR.rows[0]) {
+      return null;
     }
 
-    const { category_id } = taskRow.rows[0] as { category_id: string };
+    const categoryId = taskR.rows[0].category_id;
 
-    const templateRow = await client.query(
-      `SELECT items FROM surveyor_checklist_templates
-       WHERE category_id = $1 ORDER BY version DESC LIMIT 1`,
-      [category_id]
+    // Get checklist items - the items JSONB has {item, required} structure
+    const r = await client.query(
+      `SELECT id, item, required, is_required
+       FROM surveyor_checklist_templates
+       WHERE category_id = $1 AND is_active = true
+       ORDER BY id`,
+      [categoryId]
     );
 
-    if (!templateRow.rows[0]) {
-      return { error: "TEMPLATE_NOT_FOUND" };
-    }
-
-    return { checklist: templateRow.rows[0].items };
+    return r.rows.map((row: any) => ({
+      id: row.id,
+      item: row.item,
+      required: row.required ?? row.is_required ?? true,
+      is_required: row.is_required ?? row.required ?? true,
+    }));
   });
 
-  if (result && (result as { error?: string }).error === "NOT_FOUND") {
-    return c.json({ error: { code: "NOT_FOUND", message: "Task not found or not assigned to you" } }, 404);
+  if (!template) {
+    return c.json({ error: { code: "NOT_FOUND", message: "Task not found" } }, 404);
   }
 
-  if (result && (result as { error?: string }).error === "TEMPLATE_NOT_FOUND") {
-    return c.json({ error: { code: "TEMPLATE_NOT_FOUND", message: "No checklist template found for this category" } }, 404);
-  }
-
-  return c.json(result);
+  return c.json({ items: template });
 }));
