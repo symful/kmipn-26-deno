@@ -76,8 +76,8 @@ export const AdminCaseList = () => {
     api
       .reports(params)
       .then((data) => {
-        setReports(data.reports);
-        setTotal(data.total);
+        setReports(data.items);
+        setTotal(data.pagination.total);
       })
       .catch((e) => { logger.error("Failed to fetch reports", { error: e }); setReports([]); })
       .finally(() => setLoading(false));
@@ -103,18 +103,6 @@ export const AdminCaseList = () => {
     } catch (err) {
       logger.error("CSV export failed: " + (err instanceof Error ? err.message : String(err)), { error: err });
       alert("Gagal mengekspor CSV");
-    }
-  };
-
-  const handleExportPdf = async () => {
-    try {
-      const params: { status?: string } = {};
-      if (statusFilter) params.status = statusFilter;
-      const blob = await api.exportPdf(params);
-      downloadBlob(blob, `reports-export-${new Date().toISOString().slice(0, 10)}.pdf`);
-    } catch (err) {
-      logger.error("PDF export failed: " + (err instanceof Error ? err.message : String(err)), { error: err });
-      alert("Gagal mengekspor PDF");
     }
   };
 
@@ -224,7 +212,7 @@ export const AdminCaseList = () => {
 
   return (
     <div className="min-h-screen bg-neutral-100">
-      <header className="bg-gradient-to-r from-surface-sidebar to-[#1e3d37] px-6 py-5 shadow-lg">
+      <header className="bg-gradient-to-r from-surface-sidebar to-[#1E3D37] px-6 py-5 shadow-lg">
         <div className="flex items-center justify-between max-w-7xl mx-auto">
           <div className="flex items-center gap-4">
             <div
@@ -254,7 +242,7 @@ export const AdminCaseList = () => {
               Export CSV
             </button>
             <button
-              onClick={handleExportPdf}
+              onClick={handleExportCsv}
               className="text-sm font-medium px-3 py-1.5 rounded-lg border border-white/20 bg-white/10 hover:bg-white/20 text-white transition-colors"
             >
               Export PDF

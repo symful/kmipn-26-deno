@@ -58,7 +58,7 @@ auditSearchRoute.get(
       i = params.length + 1;
       const listParams = [...params, limit, offset];
       const entriesR = await client.query(
-        `SELECT id, actor, action, object_type, object_id, before_data, after_data, reason, prev_hash, entry_hash, created_at
+        `SELECT id, actor, action, object_type, object_id, before_data, after_data, reason, created_at
          FROM audit_log ${where}
          ORDER BY created_at DESC
          LIMIT $${i++} OFFSET $${i++}`,
@@ -74,8 +74,6 @@ auditSearchRoute.get(
           before: row.before_data,
           after: row.after_data,
           reason: row.reason,
-          prev_hash: row.prev_hash,
-          entry_hash: row.entry_hash,
           created_at: row.created_at,
         })),
         total,

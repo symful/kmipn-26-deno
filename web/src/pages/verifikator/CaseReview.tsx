@@ -5,6 +5,7 @@ import { useAuthStore } from "../../stores/auth";
 import type { PriorityResponse } from "../../types";
 import { DuplicateComparisonCards } from "../../components/DuplicateComparisonCards";
 import { logger } from "@/lib/logger";
+import { colors } from "../../theme/tokens";
 
 type Decision = "valid" | "needs_completion" | "needs_survey" | "duplicate" | "out_of_scope" | "rejected";
 
@@ -46,21 +47,21 @@ const DECISION_LABELS: Record<Decision, string> = {
 };
 
 const DECISION_COLORS: Record<Decision, string> = {
-  valid: "bg-green-600 hover:bg-green-700",
-  needs_completion: "bg-yellow-600 hover:bg-yellow-700",
-  needs_survey: "bg-blue-600 hover:bg-blue-700",
-  duplicate: "bg-purple-600 hover:bg-purple-700",
-  out_of_scope: "bg-orange-600 hover:bg-orange-700",
-  rejected: "bg-red-600 hover:bg-red-700",
+  valid: "bg-selesai hover:bg-selesai",
+  needs_completion: "bg-warning-500 hover:bg-warning-600",
+  needs_survey: "bg-primary-500 hover:bg-primary-600",
+  duplicate: "bg-primary-500 hover:bg-primary-600",
+  out_of_scope: "bg-warning-500 hover:bg-warning-600",
+  rejected: "bg-danger-500 hover:bg-danger-600",
 };
 
 const REASON_MANDATORY: Decision[] = ["out_of_scope", "rejected", "duplicate"];
 
 const LEVEL_COLORS: Record<string, string> = {
-  Rendah: "#16a34a",
-  Sedang: "#eab308",
-  Tinggi: "#ea580c",
-  Kritis: "#dc2626",
+  Rendah: colors.selesai,
+  Sedang: colors.warning,
+  Tinggi: colors.warning,
+  Kritis: colors.perluTindakan,
 };
 
 const APPEALABLE_STATUSES = ["rejected", "out_of_scope", "needs_completion"];
@@ -324,15 +325,15 @@ export default function CaseReview() {
 
       <div className="mb-4">
         <span className={`text-xs font-semibold px-3 py-1 rounded-full ${
-          reportStatus === "verified" ? "bg-green-100 text-green-800" :
-          reportStatus === "under_review" ? "bg-blue-100 text-blue-800" :
-          reportStatus === "needs_completion" ? "bg-yellow-100 text-yellow-800" :
-          reportStatus === "needs_survey" ? "bg-indigo-100 text-indigo-800" :
-          reportStatus === "duplicate_merged" ? "bg-purple-100 text-purple-800" :
-          reportStatus === "out_of_scope" ? "bg-orange-100 text-orange-800" :
-          reportStatus === "rejected" ? "bg-red-100 text-red-800" :
-          reportStatus === "resolved" ? "bg-green-100 text-green-800" :
-          "bg-gray-100 text-gray-800"
+          reportStatus === "verified" ? "bg-primary-50 text-primary-600" :
+          reportStatus === "under_review" ? "bg-info-100 text-info-600" :
+          reportStatus === "needs_completion" ? "bg-warning-100 text-warning-600" :
+          reportStatus === "needs_survey" ? "bg-primary-50 text-primary-600" :
+          reportStatus === "duplicate_merged" ? "bg-primary-50 text-primary-600" :
+          reportStatus === "out_of_scope" ? "bg-warning-100 text-warning-600" :
+          reportStatus === "rejected" ? "bg-danger-100 text-danger-600" :
+          reportStatus === "resolved" ? "bg-primary-50 text-primary-600" :
+          "bg-neutral-100 text-neutral-700"
         }`}>
           {reportStatus.replace(/_/g, " ")}
         </span>
@@ -359,8 +360,8 @@ export default function CaseReview() {
       </div>
 
       {error && (
-        <div className="mb-4 p-3 bg-red-50 border border-red-200 rounded-lg">
-          <p className="text-sm text-red-700">{error}</p>
+        <div className="mb-4 p-3 bg-danger-100 border border-danger-100 rounded-lg">
+          <p className="text-sm text-danger-500">{error}</p>
         </div>
       )}
 
@@ -457,7 +458,7 @@ export default function CaseReview() {
                     className={`px-3 py-2 rounded text-sm font-medium text-white transition-colors ${
                       decision === key
                         ? DECISION_COLORS[key]
-                        : "bg-gray-200 text-gray-700 hover:bg-gray-300"
+                        : "bg-neutral-200 text-neutral-700 hover:bg-neutral-300"
                     }`}
                   >
                     {label}
@@ -574,13 +575,13 @@ export default function CaseReview() {
                 type="button"
                 onClick={submitDecision}
                 disabled={!canSubmitDecision}
-                className="w-full mt-4 px-4 py-2 bg-blue-600 text-white rounded font-medium disabled:opacity-50 hover:bg-blue-700 transition-colors"
+                className="w-full mt-4 px-4 py-2 bg-primary-500 text-white rounded font-medium disabled:opacity-50 hover:bg-primary-600 transition-colors"
               >
                 {submitting ? "Memproses..." : "Kirim Keputusan"}
               </button>
             </div>
           ) : (
-            <div className="bg-gray-50 rounded-lg p-4 border border-sigap-border text-center">
+            <div className="bg-neutral-50 rounded-lg p-4 border border-sigap-border text-center">
               <p className="text-sm text-sigap-textMuted">
                 Kasus sudah dalam status "{reportStatus.replace(/_/g, " ")}" — keputusan sudahfinal.
               </p>
@@ -590,7 +591,7 @@ export default function CaseReview() {
           <button
             type="button"
             onClick={() => navigate("/verifikator/queue")}
-            className="w-full px-4 py-2 bg-white text-sigap-textSecondary border border-sigap-border rounded font-medium hover:bg-gray-50 transition-colors"
+            className="w-full px-4 py-2 bg-neutral-0 text-sigap-textSecondary border border-sigap-border rounded font-medium hover:bg-neutral-50 transition-colors"
           >
             Kembali ke Antrian
           </button>
@@ -605,7 +606,7 @@ export default function CaseReview() {
               <span className="text-xs text-sigap-textMuted">v{priority.version}</span>
             </div>
 
-            <div className="mb-4 p-3 bg-gray-50 rounded-lg">
+            <div className="mb-4 p-3 bg-neutral-50 rounded-lg">
               <div className="flex items-center justify-between mb-2">
                 <span className="text-sm font-medium">
                   Skor: {priority.score}
@@ -620,23 +621,23 @@ export default function CaseReview() {
                   {priority.level}
                 </span>
               </div>
-              <div className="h-3 bg-gray-200 rounded-full overflow-hidden">
+              <div className="h-3 bg-neutral-200 rounded-full overflow-hidden">
                 <div
                   className="h-full rounded-full transition-all duration-300"
                   style={{
                     width: `${priority.score}%`,
-                    backgroundColor: LEVEL_COLORS[priority.level] ?? "#6b7280",
+                    backgroundColor: LEVEL_COLORS[priority.level] ?? colors.textMuted,
                   }}
                 />
               </div>
             </div>
 
             <div className="space-y-2">
-              <PriorityBar label="Severity" value={priority.breakdown.severity} color="#c0392b" />
-              <PriorityBar label="Residents Terdampak" value={priority.breakdown.affected_residents} color="#7c3aed" />
-              <PriorityBar label="Kerentanan Wilayah" value={priority.breakdown.region_vulnerability} color="#0891b2" />
-              <PriorityBar label="Tekanan SLA" value={priority.breakdown.sla_pressure} color="#ea580c" />
-              <PriorityBar label="Faktor Lain" value={priority.breakdown.other_factors} color="#2563eb" />
+              <PriorityBar label="Severity" value={priority.breakdown.severity} color={colors.perluTindakan} />
+              <PriorityBar label="Residents Terdampak" value={priority.breakdown.affected_residents} color={colors.primary} />
+              <PriorityBar label="Kerentanan Wilayah" value={priority.breakdown.region_vulnerability} color={colors.diproses} />
+              <PriorityBar label="Tekanan SLA" value={priority.breakdown.sla_pressure} color={colors.warning} />
+              <PriorityBar label="Faktor Lain" value={priority.breakdown.other_factors} color={colors.diproses} />
             </div>
           </div>
 
@@ -676,7 +677,7 @@ export default function CaseReview() {
                 type="button"
                 onClick={submitPriorityAdjust}
                 disabled={overrideReason.trim().length < 10 || adjustingPriority}
-                className="w-full px-4 py-2 bg-indigo-600 text-white rounded font-medium disabled:opacity-50 hover:bg-indigo-700 transition-colors"
+                className="w-full px-4 py-2 bg-primary-500 text-white rounded font-medium disabled:opacity-50 hover:bg-primary-600 transition-colors"
               >
                 {adjustingPriority ? "Menyimpan..." : "Simpan Penyesuaian"}
               </button>
@@ -687,11 +688,11 @@ export default function CaseReview() {
 
       {activeTab === "completion" && (
         <div className="space-y-4">
-          <div className="bg-white rounded-lg p-4 border border-sigap-border">
+          <div className="bg-neutral-0 rounded-lg p-4 border border-sigap-border">
             <p className="font-semibold mb-3">Bukti Penyelesaian</p>
             {completionProof ? (
               <div className="space-y-3">
-                <div className="p-3 bg-gray-50 rounded-lg">
+                <div className="p-3 bg-neutral-50 rounded-lg">
                   <p className="text-sm font-medium mb-1">Ringkasan Petugas</p>
                   <p className="text-sm text-sigap-textSecondary whitespace-pre-wrap">
                     {completionProof.summary || "—"}
@@ -728,8 +729,8 @@ export default function CaseReview() {
                     onClick={() => setVerifyDecision("approved")}
                     className={`flex-1 px-3 py-2 rounded text-sm font-medium transition-colors ${
                       verifyDecision === "approved"
-                        ? "bg-green-600 text-white"
-                        : "bg-gray-100 text-gray-700 hover:bg-gray-200"
+                        ? "bg-selesai text-white"
+                        : "bg-neutral-100 text-neutral-700 hover:bg-neutral-200"
                     }`}
                   >
                     Setuju / Approved
@@ -739,8 +740,8 @@ export default function CaseReview() {
                     onClick={() => setVerifyDecision("rejected")}
                     className={`flex-1 px-3 py-2 rounded text-sm font-medium transition-colors ${
                       verifyDecision === "rejected"
-                        ? "bg-red-600 text-white"
-                        : "bg-gray-100 text-gray-700 hover:bg-gray-200"
+                        ? "bg-danger-500 text-white"
+                        : "bg-neutral-100 text-neutral-700 hover:bg-neutral-200"
                     }`}
                   >
                     Tolak / Rejected
@@ -775,7 +776,7 @@ export default function CaseReview() {
                 type="button"
                 onClick={submitVerifyCompletion}
                 disabled={!verifyDecision || (verifyDecision === "rejected" && verifyReason.trim().length < 10) || verifying}
-                className="w-full px-4 py-2 bg-blue-600 text-white rounded font-medium disabled:opacity-50 hover:bg-blue-700 transition-colors"
+                className="w-full px-4 py-2 bg-primary-500 text-white rounded font-medium disabled:opacity-50 hover:bg-primary-600 transition-colors"
               >
                 {verifying ? "Memproses..." : "Kirim Verifikasi"}
               </button>
@@ -786,12 +787,12 @@ export default function CaseReview() {
 
       {activeTab === "sanggahan" && (
         <div className="space-y-4">
-          <div className="bg-white rounded-lg p-4 border border-sigap-border">
+          <div className="bg-neutral-0 rounded-lg p-4 border border-sigap-border">
             <p className="font-semibold mb-3">Sanggahan / Obyeksi</p>
             {sanggahan ? (
-              <div className="p-3 bg-yellow-50 border border-yellow-200 rounded-lg">
-                <p className="text-sm font-medium text-yellow-800 mb-1">Sanggahan telah diajukan</p>
-                <p className="text-xs text-yellow-700">
+              <div className="p-3 bg-warning-100 border border-warning-100 rounded-lg">
+                <p className="text-sm font-medium text-warning-600 mb-1">Sanggahan telah diajukan</p>
+                <p className="text-xs text-warning-500">
                   Diajukan: {sanggahan.filed_at ? new Date(sanggahan.filed_at).toLocaleString("id-ID") : "?"}
                   {sanggahan.filed_by && ` oleh ${sanggahan.filed_by}`}
                 </p>
@@ -816,8 +817,8 @@ export default function CaseReview() {
                     onClick={() => setSanggahanDecision("accepted")}
                     className={`flex-1 px-3 py-2 rounded text-sm font-medium transition-colors ${
                       sanggahanDecision === "accepted"
-                        ? "bg-green-600 text-white"
-                        : "bg-gray-100 text-gray-700 hover:bg-gray-200"
+                        ? "bg-selesai text-white"
+                        : "bg-neutral-100 text-neutral-700 hover:bg-neutral-200"
                     }`}
                   >
                     Terima Sanggahan
@@ -827,8 +828,8 @@ export default function CaseReview() {
                     onClick={() => setSanggahanDecision("rejected")}
                     className={`flex-1 px-3 py-2 rounded text-sm font-medium transition-colors ${
                       sanggahanDecision === "rejected"
-                        ? "bg-red-600 text-white"
-                        : "bg-gray-100 text-gray-700 hover:bg-gray-200"
+                        ? "bg-danger-500 text-white"
+                        : "bg-neutral-100 text-neutral-700 hover:bg-neutral-200"
                     }`}
                   >
                     Tolak Sanggahan
@@ -859,7 +860,7 @@ export default function CaseReview() {
                   (sanggahanDecision === "rejected" && sanggahanReason.trim().length < 10) ||
                   reviewingSanggahan
                 }
-                className="w-full px-4 py-2 bg-blue-600 text-white rounded font-medium disabled:opacity-50 hover:bg-blue-700 transition-colors"
+                className="w-full px-4 py-2 bg-primary-500 text-white rounded font-medium disabled:opacity-50 hover:bg-primary-600 transition-colors"
               >
                 {reviewingSanggahan ? "Memproses..." : "Kirim Tinjauan Sanggahan"}
               </button>
@@ -882,7 +883,7 @@ function PriorityBar({ label, value, color }: PriorityBarProps) {
   return (
     <div className="flex items-center gap-3">
       <span className="text-sm text-sigap-textSecondary w-36 flex-shrink-0">{label}</span>
-      <div className="flex-1 h-2 bg-gray-100 rounded-full overflow-hidden">
+      <div className="flex-1 h-2 bg-neutral-100 rounded-full overflow-hidden">
         <div
           className="h-full rounded-full transition-all duration-300"
           style={{ width: `${percent}%`, backgroundColor: color }}

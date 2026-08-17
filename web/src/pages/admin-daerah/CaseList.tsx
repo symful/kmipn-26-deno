@@ -60,8 +60,8 @@ export const AdminDaerahCaseList = () => {
     api
       .reports(params)
       .then((data) => {
-        setReports(data.reports);
-        setTotal(data.total);
+        setReports(data.items);
+        setTotal(data.pagination.total);
       })
       .catch((e) => { logger.error("Failed to fetch reports", { error: e }); setReports([]); })
       .finally(() => setLoading(false));
@@ -81,22 +81,6 @@ export const AdminDaerahCaseList = () => {
       URL.revokeObjectURL(url);
     } catch (e) {
       logger.error("Failed to export CSV", { error: e });
-    }
-  };
-
-  const handleExportPdf = async () => {
-    try {
-      const params: { status?: string; wilayah_id: string } = { wilayah_id: user?.wilayah_id ?? "" };
-      if (statusFilter) params.status = statusFilter;
-      const blob = await api.exportPdf(params);
-      const url = URL.createObjectURL(blob);
-      const a = document.createElement("a");
-      a.href = url;
-      a.download = `reports-export-${new Date().toISOString().slice(0, 10)}.pdf`;
-      a.click();
-      URL.revokeObjectURL(url);
-    } catch (e) {
-      logger.error("Failed to export PDF", { error: e });
     }
   };
 
@@ -224,12 +208,6 @@ export const AdminDaerahCaseList = () => {
               Export CSV
             </button>
             <button
-              onClick={handleExportPdf}
-              className="text-sm font-medium px-3 py-1.5 rounded border border-sigap-border bg-sigap-surface hover:bg-sigap-border transition-colors"
-            >
-              Export PDF
-            </button>
-            <button
               onClick={() => useAuthStore.getState().clear()}
               className="text-sm text-sigap-perluTindakan hover:underline"
             >
@@ -240,8 +218,8 @@ export const AdminDaerahCaseList = () => {
       </header>
 
       {/* Wilayah Banner */}
-      <div className="bg-blue-50 border-b border-blue-200 px-6 py-3">
-        <p className="text-sm font-medium text-blue-800">
+      <div className="bg-info-100 border-b border-info-200 px-6 py-3">
+        <p className="text-sm font-medium text-info-600">
           Wilayah Anda: {user?.wilayah_id ?? "—"}
         </p>
       </div>
@@ -424,7 +402,7 @@ export const AdminDaerahCaseList = () => {
             </div>
 
             {actionError && (
-              <p className="mt-2 text-sm text-red-600">{actionError}</p>
+              <p className="mt-2 text-sm text-danger-500">{actionError}</p>
             )}
 
             <div className="mt-6 flex items-center justify-end gap-3">

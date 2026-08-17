@@ -157,5 +157,5 @@ async function getSignature(
 }
 
 function encoder(data: string): ArrayBuffer {
-  return new TextEncoder().encode(data);
+  return new TextEncoder().encode(data).buffer as ArrayBuffer;
 }

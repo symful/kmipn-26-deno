@@ -273,13 +273,16 @@ export const WargaCreateReport = () => {
           </p>
 
           {success && (
-            <div className="mb-4 p-4 bg-green-50 border border-green-200 rounded-lg text-green-800 text-sm">
+            <div
+              className="mb-4 p-4 rounded-lg text-sm"
+              style={{ backgroundColor: colors.selesai + "20", borderColor: colors.selesai + "40", color: colors.selesai }}
+            >
               {success}
             </div>
           )}
 
           {error && (
-            <div className="mb-4 p-4 bg-red-50 border border-red-200 rounded-lg text-red-800 text-sm">
+            <div className="mb-4 p-4 bg-danger-100 rounded-lg text-danger-600 text-sm">
               {error}
             </div>
           )}
@@ -290,7 +293,7 @@ export const WargaCreateReport = () => {
             <form onSubmit={handleSubmit} className="space-y-4">
               <div>
                 <label className="block text-sm font-medium text-sigap-textPrimary mb-1">
-                  Kategori <span className="text-red-500">*</span>
+                  Kategori <span className="text-danger-500">*</span>
                 </label>
                 <select
                   required
@@ -309,7 +312,7 @@ export const WargaCreateReport = () => {
 
               <div>
                 <label className="block text-sm font-medium text-sigap-textPrimary mb-1">
-                  Deskripsi <span className="text-red-500">*</span>
+                  Deskripsi <span className="text-danger-500">*</span>
                 </label>
                 <textarea
                   required
@@ -349,14 +352,14 @@ export const WargaCreateReport = () => {
                       <div key={index} className="relative aspect-square rounded-lg overflow-hidden border border-sigap-border">
                         <img src={photo.preview} alt={`Preview ${index + 1}`} className="w-full h-full object-cover" />
                         {photo.exifGps && (
-                          <div className="absolute bottom-1 left-1 bg-green-500/80 text-white text-xs px-1 rounded">
+                          <div className="absolute bottom-1 left-1 text-white text-xs px-1 rounded" style={{ backgroundColor: colors.selesai + "CC" }}>
                             GPS
                           </div>
                         )}
                         <button
                           type="button"
                           onClick={() => removePhoto(index)}
-                          className="absolute top-1 right-1 w-5 h-5 bg-red-500 text-white rounded-full text-xs flex items-center justify-center hover:bg-red-600"
+                          className="absolute top-1 right-1 w-5 h-5 bg-danger-500 text-white rounded-full text-xs flex items-center justify-center hover:bg-danger-600"
                         >
                           x
                         </button>
@@ -369,7 +372,7 @@ export const WargaCreateReport = () => {
 
               <div>
                 <label className="block text-sm font-medium text-sigap-textPrimary mb-1">
-                  Lokasi <span className="text-red-500">*</span>
+                  Lokasi <span className="text-danger-500">*</span>
                 </label>
                 <div className="grid grid-cols-2 gap-4">
                   <div>
@@ -421,10 +424,10 @@ export const WargaCreateReport = () => {
                     )}
                   </button>
                   {gps.error && (
-                    <span className="text-xs text-red-600">{gps.error}</span>
+                    <span className="text-xs text-danger-600">{gps.error}</span>
                   )}
                   {gps.permissionDenied && (
-                    <span className="text-xs text-amber-600">
+                    <span className="text-xs text-warning-600">
                       GPS tidak diizinkan. Silakan aktifkan izin lokasi di pengaturan browser.
                     </span>
                   )}

@@ -63,9 +63,11 @@ verifikatorQueueRoute.get("/", requireAuth, requireRole("VERIFIKATOR", "ADMIN"),
   const totalPages = Math.ceil(items.total / limit);
   return c.json({
     items: items.rows,
-    total: items.total,
-    page,
-    limit,
-    total_pages: totalPages,
+    pagination: {
+      page,
+      limit,
+      total: items.total,
+      total_pages: totalPages,
+    },
   });
 }));

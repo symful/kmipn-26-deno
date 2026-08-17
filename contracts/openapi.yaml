@@ -9,6 +9,67 @@ servers:
     description: Production
 
 paths:
+  # ==================== HEALTH ====================
+  /health:
+    get:
+      operationId: healthCheck
+      tags: [health]
+      security: []
+      responses:
+        "200":
+          description: Health status
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                    enum: [ok, degraded]
+                  db:
+                    type: boolean
+                  llm:
+                    type: boolean
+                  r2:
+                    type: boolean
+                  kv:
+                    type: boolean
+
+  # ==================== CLIENT ERRORS ====================
+  /client-errors:
+    post:
+      operationId: reportClientError
+      tags: [client-errors]
+      security: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [level, message, timestamp]
+              properties:
+                level:
+                  type: string
+                  enum: [error]
+                message:
+                  type: string
+                timestamp:
+                  type: string
+                context:
+                  type: object
+      responses:
+        "200":
+          description: Error logged
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  ok:
+                    type: boolean
+
+  # ==================== AUTH ====================
   /auth/login:
     post:
       operationId: login
@@ -44,18 +105,14 @@ paths:
         content:
           application/json:
             schema:
-              type: object
-              required: [refresh_token]
-              properties:
-                refresh_token:
-                  type: string
+              $ref: "#/components/schemas/RefreshTokenRequest"
       responses:
         "200":
           description: Token refreshed
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/LoginResponse"
+                $ref: "#/components/schemas/TokenResponse"
         "401":
           description: Invalid or expired refresh token
           content:
@@ -63,6 +120,88 @@ paths:
               schema:
                 $ref: "#/components/schemas/ErrorResponse"
 
+  /auth/logout:
+    post:
+      operationId: logout
+      tags: [auth]
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/RefreshTokenRequest"
+      responses:
+        "200":
+          description: Logout successful
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+        "400":
+          description: Invalid refresh_token
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "401":
+          description: Invalid token
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+
+  /auth/register-verifikator:
+    post:
+      operationId: registerVerifikator
+      tags: [auth]
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/RegisterVerifikatorRequest"
+      responses:
+        "201":
+          description: Verifikator registered
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  id:
+                    type: string
+                    format: uuid
+                  email:
+                    type: string
+                  role:
+                    type: string
+        "400":
+          description: Validation error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "401":
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "409":
+          description: Email already exists
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+
+  # ==================== CATEGORIES ====================
   /categories:
     get:
       operationId: listCategories
@@ -80,7 +219,277 @@ paths:
                     type: array
                     items:
                       $ref: "#/components/schemas/Category"
+    post:
+      operationId: createCategory
+      tags: [categories]
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CategoryCreateRequest"
+      responses:
+        "201":
+          description: Category created
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Category"
+        "400":
+          description: Validation error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "401":
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
 
+  /categories/{id}:
+    patch:
+      operationId: updateCategory
+      tags: [categories]
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CategoryUpdateRequest"
+      responses:
+        "200":
+          description: Category updated
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Category"
+        "400":
+          description: Validation error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "401":
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "404":
+          description: Not found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+    delete:
+      operationId: deleteCategory
+      tags: [categories]
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        "200":
+          description: Category deleted
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+        "401":
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "404":
+          description: Not found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+
+  # ==================== WILAYAH ====================
+  /wilayah:
+    get:
+      operationId: listWilayah
+      tags: [wilayah]
+      security: []
+      parameters:
+        - name: parent_id
+          in: query
+          schema:
+            type: string
+            format: uuid
+      responses:
+        "200":
+          description: List of wilayah
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  wilayah:
+                    type: array
+                    items:
+                      $ref: "#/components/schemas/Wilayah"
+    post:
+      operationId: createWilayah
+      tags: [wilayah]
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/WilayahCreateRequest"
+      responses:
+        "201":
+          description: Wilayah created
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Wilayah"
+        "400":
+          description: Validation error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "401":
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+
+  /wilayah/{id}:
+    patch:
+      operationId: updateWilayah
+      tags: [wilayah]
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/WilayahUpdateRequest"
+      responses:
+        "200":
+          description: Wilayah updated
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Wilayah"
+        "400":
+          description: Validation error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "401":
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "404":
+          description: Not found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+    delete:
+      operationId: deleteWilayah
+      tags: [wilayah]
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        "200":
+          description: Wilayah deleted
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+        "401":
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "404":
+          description: Not found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+
+  /wilayah/{id}/boundary:
+    get:
+      operationId: getWilayahBoundary
+      tags: [wilayah]
+      security: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        "200":
+          description: Wilayah boundary GeoJSON
+          content:
+            application/json:
+              schema:
+                type: object
+        "404":
+          description: Not found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+
+  # ==================== REPORTS ====================
   /reports:
     get:
       operationId: listReports
@@ -91,12 +500,16 @@ paths:
         - name: status
           in: query
           schema:
-            $ref: "#/components/schemas/ReportStatus"
+            type: string
         - name: category_id
           in: query
           schema:
             type: string
             format: uuid
+        - name: creator_id
+          in: query
+          schema:
+            type: string
         - name: page
           in: query
           schema:
@@ -116,21 +529,18 @@ paths:
               schema:
                 type: object
                 properties:
-                  reports:
+                  items:
                     type: array
                     items:
                       $ref: "#/components/schemas/Report"
-                  total:
-                    type: integer
-                  page:
-                    type: integer
+                  pagination:
+                    $ref: "#/components/schemas/Pagination"
         "401":
           description: Unauthorized
           content:
             application/json:
               schema:
                 $ref: "#/components/schemas/ErrorResponse"
-
     post:
       operationId: createReport
       tags: [reports]
@@ -141,16 +551,304 @@ paths:
         content:
           application/json:
             schema:
-              $ref: "#/components/schemas/CreateReportRequest"
+              $ref: "#/components/schemas/ReportCreateRequest"
       responses:
         "201":
           description: Report created
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/Report"
+                type: object
+                properties:
+                  id:
+                    type: string
+                    format: uuid
+                  duplicate:
+                    type: boolean
+        "200":
+          description: Report duplicate (idempotency)
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  id:
+                    type: string
+                    format: uuid
+                  duplicate:
+                    type: boolean
         "400":
           description: Validation error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "401":
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+
+  /reports/stats:
+    get:
+      operationId: getReportsStats
+      tags: [reports]
+      security:
+        - bearerAuth: []
+      responses:
+        "200":
+          description: Report statistics
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ReportsStats"
+        "401":
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+
+  /reports/heatmap:
+    get:
+      operationId: getReportsHeatmap
+      tags: [reports]
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: status
+          in: query
+          schema:
+            type: string
+        - name: category_id
+          in: query
+          schema:
+            type: string
+            format: uuid
+      responses:
+        "200":
+          description: Heatmap clusters
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  clusters:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        lat:
+                          type: number
+                        lng:
+                          type: number
+                        count:
+                          type: integer
+                        severity_avg:
+                          type: number
+        "401":
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+
+  /reports/share-filter:
+    get:
+      operationId: getSharedFilter
+      tags: [reports]
+      security:
+        - bearerAuth: []
+      responses:
+        "200":
+          description: Shared filter list
+          content:
+            application/json:
+              schema:
+                type: object
+        "401":
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+    post:
+      operationId: createSharedFilter
+      tags: [reports]
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [filter]
+              properties:
+                filter:
+                  type: object
+                expires_at:
+                  type: string
+                  format: date-time
+      responses:
+        "200":
+          description: Shared filter created
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  url:
+                    type: string
+                  expires_at:
+                    type: string
+                    format: date-time
+        "400":
+          description: Validation error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "401":
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+
+  /reports/nearby:
+    get:
+      operationId: getNearbyReports
+      tags: [reports]
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: lat
+          in: query
+          required: true
+          schema:
+            type: number
+        - name: lng
+          in: query
+          required: true
+          schema:
+            type: number
+        - name: radius
+          in: query
+          schema:
+            type: number
+            default: 1000
+        - name: limit
+          in: query
+          schema:
+            type: integer
+            default: 20
+            maximum: 100
+      responses:
+        "200":
+          description: Nearby reports
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  reports:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        id:
+                          type: string
+                          format: uuid
+                        category_id:
+                          type: string
+                          format: uuid
+                        category_name:
+                          type: string
+                        status:
+                          type: string
+                        distance_m:
+                          type: number
+                        lat:
+                          type: number
+                        lng:
+                          type: number
+                        photo_url:
+                          type: string
+                          nullable: true
+        "400":
+          description: Validation error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "401":
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+
+  /reports/duplicates:
+    get:
+      operationId: findDuplicateReports
+      tags: [reports]
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: report_id
+          in: query
+          required: true
+          schema:
+            type: string
+            format: uuid
+        - name: radius
+          in: query
+          schema:
+            type: number
+            default: 500
+        - name: limit
+          in: query
+          schema:
+            type: integer
+            default: 10
+            maximum: 50
+      responses:
+        "200":
+          description: Duplicate candidates
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  candidates:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        report_id:
+                          type: string
+                          format: uuid
+                        distance_m:
+                          type: number
+                        similarity_score:
+                          type: number
+                        description:
+                          type: string
+                        status:
+                          type: string
+                        photo_url:
+                          type: string
+                          nullable: true
+        "400":
+          description: Validation error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "404":
+          description: Report not found
           content:
             application/json:
               schema:
@@ -188,7 +886,12 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/ErrorResponse"
-
+        "401":
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
     patch:
       operationId: updateReport
       tags: [reports]
@@ -206,7 +909,7 @@ paths:
         content:
           application/json:
             schema:
-              $ref: "#/components/schemas/UpdateReportRequest"
+              $ref: "#/components/schemas/ReportUpdateRequest"
       responses:
         "200":
           description: Report updated
@@ -214,15 +917,28 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/Report"
+        "400":
+          description: Validation error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
         "404":
           description: Not found
           content:
             application/json:
               schema:
                 $ref: "#/components/schemas/ErrorResponse"
+        "401":
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
 
-    delete:
-      operationId: deleteReport
+  /reports/{id}/priority:
+    get:
+      operationId: getReportPriority
       tags: [reports]
       security:
         - bearerAuth: []
@@ -234,62 +950,883 @@ paths:
             type: string
             format: uuid
       responses:
-        "204":
-          description: Report deleted
+        "200":
+          description: Priority score
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  total:
+                    type: number
+                  confidence:
+                    type: string
+                  model_version:
+                    type: string
+                  factors:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        name:
+                          type: string
+                        value:
+                          type: number
+                        max:
+                          type: number
         "404":
           description: Not found
           content:
             application/json:
               schema:
                 $ref: "#/components/schemas/ErrorResponse"
+        "401":
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
 
-  /reports/sync:
+  /reports/{id}/photos/upload-url:
     post:
-      operationId: syncReports
+      operationId: generatePhotoUploadUrl
       tags: [reports]
       security:
         - bearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              oneOf:
+                - $ref: "#/components/schemas/PhotoUploadRequest"
+                - $ref: "#/components/schemas/PhotoBatchUploadRequest"
+      responses:
+        "200":
+          description: Upload URL(s) generated
+          content:
+            application/json:
+              schema:
+                oneOf:
+                  - type: object
+                    properties:
+                      key:
+                        type: string
+                      public_url:
+                        type: string
+                      upload_url:
+                        type: string
+                      method:
+                        type: string
+                  - type: object
+                    properties:
+                      urls:
+                        type: array
+                        items:
+                          type: object
+                          properties:
+                            url:
+                              type: string
+                            expires_at:
+                              type: string
+        "400":
+          description: Validation error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "404":
+          description: Report not found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "503":
+          description: Storage not configured
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+    put:
+      operationId: uploadPhotoDirect
+      tags: [reports]
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      requestBody:
+        required: true
+        content:
+          image/png:
+            schema:
+              type: string
+              format: binary
+          image/jpeg:
+            schema:
+              type: string
+              format: binary
+      responses:
+        "200":
+          description: Photo uploaded
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  key:
+                    type: string
+                  public_url:
+                    type: string
+        "400":
+          description: Validation error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "404":
+          description: Report not found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "500":
+          description: Storage error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "503":
+          description: Storage not configured
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+
+  /reports/{id}/close:
+    post:
+      operationId: closeReport
+      tags: [reports]
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        "200":
+          description: Report closed
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+        "404":
+          description: Not found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "409":
+          description: Invalid transition
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "401":
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+
+  /reports/{id}/share:
+    post:
+      operationId: shareReport
+      tags: [reports]
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        "200":
+          description: Share URL generated
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  share_url:
+                    type: string
+                  expires_at:
+                    type: string
+                    format: date-time
+        "404":
+          description: Not found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "401":
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+
+  /reports/{id}/escalate:
+    post:
+      operationId: escalateReport
+      tags: [reports]
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        "200":
+          description: Report escalated
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                  severity:
+                    type: number
+                  message:
+                    type: string
+                    nullable: true
+        "404":
+          description: Not found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "401":
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+
+  /reports/{id}/resolve:
+    post:
+      operationId: resolveReport
+      tags: [reports]
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        "200":
+          description: Report resolved
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+        "404":
+          description: Not found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "409":
+          description: Invalid transition
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "401":
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+
+  /reports/{id}/assign:
+    post:
+      operationId: assignReport
+      tags: [reports]
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
       requestBody:
         required: true
         content:
           application/json:
             schema:
               type: object
-              required: [reports]
+              required: [assigned_unit_id]
               properties:
-                reports:
-                  type: array
-                  items:
-                    $ref: "#/components/schemas/CreateReportRequest"
-                  maxItems: 50
+                assignee_type:
+                  type: string
+                  enum: [unit, user]
+                assigned_unit_id:
+                  type: string
+                  format: uuid
+                deadline:
+                  type: string
+                  format: date-time
+                wilayah_id:
+                  type: string
+                  format: uuid
       responses:
         "200":
-          description: Sync results
+          description: Report assigned
           content:
             application/json:
               schema:
                 type: object
                 properties:
-                  results:
+                  status:
+                    type: string
+                  assigned_to:
+                    type: string
+                    format: uuid
+                  deadline:
+                    type: string
+                    format: date-time
+                    nullable: true
+        "400":
+          description: Validation error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "404":
+          description: Not found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "409":
+          description: Invalid transition
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "401":
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+
+  /reports/{id}/timeline:
+    get:
+      operationId: getReportTimeline
+      tags: [reports]
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        "200":
+          description: Report timeline
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  events:
                     type: array
                     items:
                       type: object
                       properties:
-                        idempotency_key:
+                        status:
+                          type: string
+                        label:
+                          type: string
+                        actor:
                           type: string
                           format: uuid
-                        report:
-                          $ref: "#/components/schemas/Report"
-                        action:
+                        actor_name:
                           type: string
-                          enum: [created, updated, conflict]
-                        conflict_reason:
+                          nullable: true
+                        occurred_at:
                           type: string
-                notices:
-                  type: array
-                  items:
-                    type: string
+                          format: date-time
+        "400":
+          description: Missing report ID
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "401":
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
 
+  /reports/{id}/supporting:
+    get:
+      operationId: getSupportingReports
+      tags: [reports]
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+        - name: limit
+          in: query
+          schema:
+            type: integer
+            default: 4
+            maximum: 12
+      responses:
+        "200":
+          description: Supporting reports
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  reports:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        id:
+                          type: string
+                          format: uuid
+                        photo_urls:
+                          type: array
+                          items:
+                            type: string
+                        created_at:
+                          type: string
+                          format: date-time
+                        status:
+                          type: string
+        "400":
+          description: Missing report ID
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "401":
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+
+  /reports/{id}/impact:
+    get:
+      operationId: getReportImpact
+      tags: [reports]
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        "200":
+          description: Report impact assessment
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  bullets:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        severity:
+                          type: string
+                        text:
+                          type: string
+                  summary:
+                    type: string
+        "404":
+          description: Not found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "401":
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+
+  # ==================== SHARED ====================
+  /shared/{token}:
+    get:
+      operationId: getSharedFilterByToken
+      tags: [shared]
+      security: []
+      parameters:
+        - name: token
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Shared filter data
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  filter_data:
+                    type: object
+                  expires_at:
+                    type: string
+                    format: date-time
+        "404":
+          description: Not found or expired
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+
+  # ==================== EXPORT ====================
+  /export/geojson:
+    get:
+      operationId: exportReportsGeoJSON
+      tags: [export]
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: status
+          in: query
+          schema:
+            type: string
+        - name: category_id
+          in: query
+          schema:
+            type: string
+            format: uuid
+      responses:
+        "200":
+          description: GeoJSON FeatureCollection
+          content:
+            application/geo+json:
+              schema:
+                $ref: "#/components/schemas/GeoJSONFeatureCollection"
+        "401":
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+
+  /export/csv:
+    get:
+      operationId: exportReportsCSV
+      tags: [export]
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: status
+          in: query
+          schema:
+            type: string
+        - name: category_id
+          in: query
+          schema:
+            type: string
+            format: uuid
+      responses:
+        "200":
+          description: CSV file download
+          content:
+            text/csv:
+              schema:
+                type: string
+                format: binary
+        "401":
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+
+  # ==================== PUBLIC ====================
+  /public/geojson:
+    get:
+      operationId: getPublicGeoJSON
+      tags: [public]
+      security: []
+      responses:
+        "200":
+          description: GeoJSON FeatureCollection
+          content:
+            application/geo+json:
+              schema:
+                type: object
+
+  /public/reports.geojson:
+    get:
+      operationId: getPublicReportsGeoJSON
+      tags: [public]
+      security: []
+      responses:
+        "200":
+          description: GeoJSON FeatureCollection
+          content:
+            application/geo+json:
+              schema:
+                type: object
+
+  /public/reports:
+    get:
+      operationId: listPublicReports
+      tags: [public]
+      security: []
+      parameters:
+        - name: status
+          in: query
+          schema:
+            type: string
+        - name: category_id
+          in: query
+          schema:
+            type: string
+            format: uuid
+        - name: bbox
+          in: query
+          schema:
+            type: string
+        - name: month
+          in: query
+          schema:
+            type: string
+        - name: page
+          in: query
+          schema:
+            type: integer
+            default: 1
+        - name: limit
+          in: query
+          schema:
+            type: integer
+            default: 20
+            maximum: 100
+      responses:
+        "200":
+          description: Public reports list
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  reports:
+                    type: array
+                    items:
+                      type: object
+                  total:
+                    type: integer
+                  page:
+                    type: integer
+                  limit:
+                    type: integer
+    post:
+      operationId: createPublicReport
+      tags: [public]
+      security: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/PublicReportCreateRequest"
+      responses:
+        "200":
+          description: Report created
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  id:
+                    type: string
+                    format: uuid
+                  duplicate:
+                    type: boolean
+        "400":
+          description: Validation error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "429":
+          description: Rate limited
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+
+  /public/reports/cluster:
+    get:
+      operationId: getPublicReportsCluster
+      tags: [public]
+      security: []
+      responses:
+        "200":
+          description: Reports cluster
+          content:
+            application/json:
+              schema:
+                type: object
+
+  /public/cases:
+    get:
+      operationId: getPublicCases
+      tags: [public]
+      security: []
+      responses:
+        "200":
+          description: Public cases
+          content:
+            application/json:
+              schema:
+                type: object
+
+  /public/categories:
+    get:
+      operationId: getPublicCategories
+      tags: [public]
+      security: []
+      responses:
+        "200":
+          description: Public categories
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  categories:
+                    type: array
+                    items:
+                      $ref: "#/components/schemas/Category"
+
+  /public/stats:
+    get:
+      operationId: getPublicStats
+      tags: [public]
+      security: []
+      responses:
+        "200":
+          description: Public statistics
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  total:
+                    type: integer
+                  by_status:
+                    type: object
+                    additionalProperties:
+                      type: integer
+                  by_category:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        category_id:
+                          type: string
+                          format: uuid
+                        count:
+                          type: integer
+                  recent_reports_7d:
+                    type: integer
+                  resolution_rate_7d:
+                    type: number
+
+  /public/health:
+    get:
+      operationId: getPublicHealth
+      tags: [public]
+      security: []
+      responses:
+        "200":
+          description: Public health status
+          content:
+            application/json:
+              schema:
+                type: object
+
+  /public/sync-kpi:
+    post:
+      operationId: syncKPI
+      tags: [public]
+      security: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+      responses:
+        "200":
+          description: KPI synced
+          content:
+            application/json:
+              schema:
+                type: object
+
+  # ==================== AGENT ====================
   /agent/assess:
     post:
       operationId: assessReport
@@ -301,22 +1838,20 @@ paths:
         content:
           application/json:
             schema:
-              type: object
-              required: [report_id]
-              properties:
-                report_id:
-                  type: string
-                  format: uuid
-                assessment_kind:
-                  type: string
-                  default: initial
+              $ref: "#/components/schemas/AgentAssessRequest"
       responses:
         "200":
           description: Assessment complete
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/AgentAssessment"
+                type: object
+        "400":
+          description: Validation error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
         "404":
           description: Report not found
           content:
@@ -324,34 +1859,3424 @@ paths:
               schema:
                 $ref: "#/components/schemas/ErrorResponse"
 
-  /geojson/reports:
+  /agent/assessments:
     get:
-      operationId: exportReportsGeoJSON
-      tags: [geojson]
+      operationId: listAssessments
+      tags: [agent]
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: reportId
+          in: query
+          schema:
+            type: string
+            format: uuid
+        - name: model_version
+          in: query
+          schema:
+            type: string
+      responses:
+        "200":
+          description: List of assessments
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  assessments:
+                    type: array
+                    items:
+                      type: object
+        "400":
+          description: Validation error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "401":
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+
+  /agent/assessments/{reportId}:
+    get:
+      operationId: getReportAssessments
+      tags: [agent]
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: reportId
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+        - name: model_version
+          in: query
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Report assessments
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  assessments:
+                    type: array
+                    items:
+                      type: object
+        "400":
+          description: Validation error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "401":
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+
+  /agent/assessments/trace/{id}:
+    get:
+      operationId: getAssessmentTrace
+      tags: [agent]
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        "200":
+          description: Assessment trace
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  assessment:
+                    type: object
+        "400":
+          description: Validation error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "404":
+          description: Not found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "401":
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+
+  # ==================== SURVEYOR ====================
+  /surveyor/tasks:
+    get:
+      operationId: listSurveyorTasks
+      tags: [surveyor]
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: filter
+          in: query
+          schema:
+            type: string
+            enum: [today, overdue, not_downloaded]
+        - name: status
+          in: query
+          schema:
+            type: string
+        - name: sort
+          in: query
+          schema:
+            type: string
+            enum: [sla_asc, deadline_asc]
+      responses:
+        "200":
+          description: Surveyor tasks
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  tasks:
+                    type: array
+                    items:
+                      type: object
+        "401":
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+
+  /surveyor/tasks/{id}:
+    get:
+      operationId: getSurveyorTaskDetail
+      tags: [surveyor]
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        "200":
+          description: Task detail
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  task:
+                    type: object
+        "400":
+          description: Missing task ID
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "404":
+          description: Not found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "401":
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+
+  /surveyor/tasks/{id}/visit:
+    post:
+      operationId: submitSurveyorVisit
+      tags: [surveyor]
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                findings:
+                  type: string
+                checklist:
+                  type: array
+                  items:
+                    type: object
+                    properties:
+                      item:
+                        type: string
+                      checked:
+                        type: boolean
+                photo_urls:
+                  type: array
+                  items:
+                    type: string
+                condition_assessment:
+                  type: string
+                  enum: [ringan, berat, kritis]
+                recommendation:
+                  type: string
+                  enum: [valid_needs_followup, not_found]
+                gps:
+                  type: object
+                  properties:
+                    lat:
+                      type: number
+                    lng:
+                      type: number
+                    accuracy_m:
+                      type: number
+                notes:
+                  type: string
+      responses:
+        "200":
+          description: Visit submitted
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  visit_id:
+                    type: string
+                    format: uuid
+                  created_at:
+                    type: string
+                    format: date-time
+        "401":
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+
+  /surveyor/tasks/{id}/checklist-template:
+    get:
+      operationId: getSurveyorChecklistTemplate
+      tags: [surveyor]
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        "200":
+          description: Checklist template
+          content:
+            application/json:
+              schema:
+                type: object
+        "401":
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+
+  /surveyor/tasks/{id}/accept:
+    post:
+      operationId: acceptSurveyorTask
+      tags: [surveyor]
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        "200":
+          description: Task accepted
+          content:
+            application/json:
+              schema:
+                type: object
+        "401":
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+
+  /surveyor/tasks/{id}/start:
+    post:
+      operationId: startSurveyorTask
+      tags: [surveyor]
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        "200":
+          description: Task started
+          content:
+            application/json:
+              schema:
+                type: object
+        "401":
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+
+  # ==================== RT-RW ====================
+  /rt-rw/verify:
+    get:
+      operationId: verifyRtRwTokenGet
+      tags: [rt-rw]
       security: []
+      parameters:
+        - name: token
+          in: query
+          required: true
+          schema:
+            type: string
+        - name: case_id
+          in: query
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        "200":
+          description: Report data for verification
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  id:
+                    type: string
+                    format: uuid
+                  description:
+                    type: string
+                  location:
+                    type: object
+                  photos:
+                    type: array
+                    items:
+                      type: string
+                  current_status:
+                    type: string
+        "400":
+          description: Missing parameters
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "401":
+          description: Invalid token
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "429":
+          description: Rate limited
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+    post:
+      operationId: verifyRtRwTokenPost
+      tags: [rt-rw]
+      security: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [verdict]
+              properties:
+                verification_token:
+                  type: string
+                report_id:
+                  type: string
+                  format: uuid
+                verdict:
+                  type: string
+                  enum: [valid, needs_completion, needs_survey, out_of_scope, duplicate, rejected]
+                reason:
+                  type: string
+      responses:
+        "200":
+          description: Verification submitted
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                  report_id:
+                    type: string
+                    format: uuid
+                  verdict:
+                    type: string
+        "400":
+          description: Validation error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "401":
+          description: Invalid token
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "409":
+          description: Token already used
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+
+  # ==================== ADMIN ====================
+  /admin/generate-rt-rw-token:
+    post:
+      operationId: generateRtRwToken
+      tags: [admin]
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [report_id, rt_rw_user_id]
+              properties:
+                report_id:
+                  type: string
+                  format: uuid
+                rt_rw_user_id:
+                  type: string
+                  format: uuid
+      responses:
+        "200":
+          description: Token generated
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  verification_token:
+                    type: string
+                  expires_at:
+                    type: string
+                    format: date-time
+                  magic_link:
+                    type: string
+        "400":
+          description: Validation error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "404":
+          description: Invalid report or user
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "401":
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+
+  /admin/users:
+    get:
+      operationId: listUsers
+      tags: [admin]
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: page
+          in: query
+          schema:
+            type: integer
+            default: 1
+        - name: limit
+          in: query
+          schema:
+            type: integer
+            default: 20
+            maximum: 100
+        - name: role
+          in: query
+          schema:
+            type: string
+            enum: [ADMIN, VERIFIKATOR, SURVEYOR, OPERATOR, RT_RW, PETUGAS, ADMIN_DAERAH, AUDITOR, PENGAMBIL_KEPUTUSAN]
+        - name: search
+          in: query
+          schema:
+            type: string
+        - name: wilayah_id
+          in: query
+          schema:
+            type: string
+            format: uuid
+        - name: is_active
+          in: query
+          schema:
+            type: string
+            enum: [true, false]
+      responses:
+        "200":
+          description: List of users
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        id:
+                          type: string
+                          format: uuid
+                        email:
+                          type: string
+                        name:
+                          type: string
+                        role:
+                          type: string
+                        wilayah_id:
+                          type: string
+                          format: uuid
+                          nullable: true
+                        disabled:
+                          type: boolean
+                        created_at:
+                          type: string
+                          format: date-time
+                        updated_at:
+                          type: string
+                          format: date-time
+                  pagination:
+                    $ref: "#/components/schemas/Pagination"
+        "400":
+          description: Validation error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "401":
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+    post:
+      operationId: createUser
+      tags: [admin]
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/UserCreateRequest"
+      responses:
+        "201":
+          description: User created
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  id:
+                    type: string
+                    format: uuid
+                  email:
+                    type: string
+                  name:
+                    type: string
+                  role:
+                    type: string
+                  wilayah_id:
+                    type: string
+                    format: uuid
+                    nullable: true
+                  created_at:
+                    type: string
+                    format: date-time
+        "400":
+          description: Validation error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "401":
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "409":
+          description: Email already exists
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+
+  /admin/users/{id}:
+    patch:
+      operationId: updateUser
+      tags: [admin]
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/UserUpdateRequest"
+      responses:
+        "200":
+          description: User updated
+          content:
+            application/json:
+              schema:
+                type: object
+        "400":
+          description: Validation error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "401":
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "404":
+          description: Not found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+    delete:
+      operationId: deleteUser
+      tags: [admin]
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        "200":
+          description: User disabled
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+        "401":
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "404":
+          description: Not found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+
+  /admin/users/{id}/deactivate:
+    patch:
+      operationId: deactivateUser
+      tags: [admin]
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        "200":
+          description: User deactivated
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+        "401":
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "404":
+          description: Not found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+
+  /admin/users/{id}/reactivate:
+    patch:
+      operationId: reactivateUser
+      tags: [admin]
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        "200":
+          description: User reactivated
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+        "401":
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "404":
+          description: Not found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+
+  /admin/units:
+    get:
+      operationId: listUnits
+      tags: [admin]
+      security:
+        - bearerAuth: []
+      responses:
+        "200":
+          description: List of units
+          content:
+            application/json:
+              schema:
+                type: object
+        "401":
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+    post:
+      operationId: createUnit
+      tags: [admin]
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+      responses:
+        "201":
+          description: Unit created
+          content:
+            application/json:
+              schema:
+                type: object
+        "400":
+          description: Validation error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "401":
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+
+  /admin/checklist-templates:
+    get:
+      operationId: listChecklistTemplates
+      tags: [admin]
+      security:
+        - bearerAuth: []
+      responses:
+        "200":
+          description: List of checklist templates
+          content:
+            application/json:
+              schema:
+                type: object
+        "401":
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+    post:
+      operationId: createChecklistTemplate
+      tags: [admin]
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+      responses:
+        "201":
+          description: Checklist template created
+          content:
+            application/json:
+              schema:
+                type: object
+        "400":
+          description: Validation error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "401":
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+
+  /admin/priority-config:
+    get:
+      operationId: getPriorityConfig
+      tags: [admin]
+      security:
+        - bearerAuth: []
+      responses:
+        "200":
+          description: Priority configuration
+          content:
+            application/json:
+              schema:
+                type: object
+        "401":
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+    post:
+      operationId: updatePriorityConfig
+      tags: [admin]
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+      responses:
+        "200":
+          description: Priority config updated
+          content:
+            application/json:
+              schema:
+                type: object
+        "400":
+          description: Validation error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "401":
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+
+  /admin/outbox:
+    get:
+      operationId: listAdminOutbox
+      tags: [admin]
+      security:
+        - bearerAuth: []
+      responses:
+        "200":
+          description: Outbox entries
+          content:
+            application/json:
+              schema:
+                type: object
+        "401":
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+
+  /admin/failed-assessments:
+    get:
+      operationId: listFailedAssessments
+      tags: [admin]
+      security:
+        - bearerAuth: []
+      responses:
+        "200":
+          description: Failed assessments
+          content:
+            application/json:
+              schema:
+                type: object
+        "401":
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+
+  /admin/failed-assessments/retry-batch:
+    post:
+      operationId: retryFailedAssessments
+      tags: [admin]
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                assessment_ids:
+                  type: array
+                  items:
+                    type: string
+                    format: uuid
+      responses:
+        "200":
+          description: Retries scheduled
+          content:
+            application/json:
+              schema:
+                type: object
+        "400":
+          description: Validation error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "401":
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+
+  # ==================== VERIFIKATOR ====================
+  /verifikator/queue:
+    get:
+      operationId: getVerifikatorQueue
+      tags: [verifikator]
+      security:
+        - bearerAuth: []
       parameters:
         - name: status
           in: query
           schema:
-            $ref: "#/components/schemas/ReportStatus"
+            type: string
+        - name: page
+          in: query
+          schema:
+            type: integer
+            default: 1
+        - name: limit
+          in: query
+          schema:
+            type: integer
+            default: 20
+            maximum: 100
+        - name: kategori
+          in: query
+          schema:
+            type: string
+            format: uuid
+      responses:
+        "200":
+          description: Verifikator queue
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  items:
+                    type: array
+                    items:
+                      type: object
+                  pagination:
+                    $ref: "#/components/schemas/Pagination"
+        "401":
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+
+  /verifikator/cases/{id}:
+    get:
+      operationId: getVerifikatorCase
+      tags: [verifikator]
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        "200":
+          description: Case detail
+          content:
+            application/json:
+              schema:
+                type: object
+        "404":
+          description: Not found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "401":
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+
+  /verifikator/cases/{id}/accept:
+    post:
+      operationId: verifikatorAcceptCase
+      tags: [verifikator]
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      requestBody:
+        required: false
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                reason:
+                  type: string
+                assigned_unit_id:
+                  type: string
+                  format: uuid
+                deadline:
+                  type: string
+                  format: date-time
+                priority:
+                  type: number
+      responses:
+        "200":
+          description: Case accepted
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                  severity:
+                    type: number
+                    nullable: true
+                  assigned_to:
+                    type: string
+                    format: uuid
+                    nullable: true
+                  assessments:
+                    type: array
+                    items:
+                      type: object
+        "400":
+          description: Validation error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "404":
+          description: Not found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "409":
+          description: Invalid transition
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "401":
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+
+  /verifikator/cases/{id}/combine:
+    post:
+      operationId: combineCases
+      tags: [verifikator]
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/VerifikatorCombineRequest"
+      responses:
+        "200":
+          description: Cases combined
+          content:
+            application/json:
+              schema:
+                type: object
+        "400":
+          description: Validation error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "404":
+          description: Not found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "401":
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+
+  /verifikator/cases/{id}/separate:
+    post:
+      operationId: separateCases
+      tags: [verifikator]
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/VerifikatorSeparateRequest"
+      responses:
+        "200":
+          description: Cases separated
+          content:
+            application/json:
+              schema:
+                type: object
+        "400":
+          description: Validation error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "404":
+          description: Not found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "401":
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+
+  /verifikator/cases/{id}/reject:
+    post:
+      operationId: rejectCase
+      tags: [verifikator]
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/VerifikatorRejectRequest"
+      responses:
+        "200":
+          description: Case rejected
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+        "400":
+          description: Validation error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "404":
+          description: Not found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "401":
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+
+  /verifikator/cases/{id}/decide:
+    post:
+      operationId: decideCase
+      tags: [verifikator]
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/VerifikatorDecisionRequest"
+      responses:
+        "200":
+          description: Decision made
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                  decision:
+                    type: string
+                  reason:
+                    type: string
+                  primary_report_id:
+                    type: string
+                    format: uuid
+                    nullable: true
+                  surveyor_task_created:
+                    type: boolean
+                    nullable: true
+        "400":
+          description: Validation error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "404":
+          description: Not found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "409":
+          description: Invalid transition
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "401":
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+
+  /verifikator/cases/{id}/review-sanggahan:
+    post:
+      operationId: reviewSanggahan
+      tags: [verifikator]
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/VerifikatorReviewSanggahanRequest"
+      responses:
+        "200":
+          description: Sanggahan reviewed
+          content:
+            application/json:
+              schema:
+                type: object
+        "400":
+          description: Validation error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "404":
+          description: Not found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "401":
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+
+  /verifikator/cases/{id}/verify-completion:
+    post:
+      operationId: verifyCompletion
+      tags: [verifikator]
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/VerifikatorVerifyCompletionRequest"
+      responses:
+        "200":
+          description: Completion verified
+          content:
+            application/json:
+              schema:
+                type: object
+        "400":
+          description: Validation error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "404":
+          description: Not found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "401":
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+
+  # ==================== AUDIT ====================
+  /audit/search:
+    get:
+      operationId: searchAuditLog
+      tags: [audit]
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: actor_id
+          in: query
+          schema:
+            type: string
+            format: uuid
+        - name: action
+          in: query
+          schema:
+            type: string
+        - name: object_type
+          in: query
+          schema:
+            type: string
+        - name: object_id
+          in: query
+          schema:
+            type: string
+        - name: from
+          in: query
+          schema:
+            type: string
+            format: date-time
+        - name: to
+          in: query
+          schema:
+            type: string
+            format: date-time
+        - name: page
+          in: query
+          schema:
+            type: integer
+            default: 1
+        - name: limit
+          in: query
+          schema:
+            type: integer
+            default: 50
+            maximum: 200
+      responses:
+        "200":
+          description: Audit log entries
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  entries:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        id:
+                          type: string
+                          format: uuid
+                        actor:
+                          type: string
+                          format: uuid
+                        actor_role:
+                          type: string
+                        action:
+                          type: string
+                        object_type:
+                          type: string
+                        object_id:
+                          type: string
+                        before:
+                          type: object
+                          nullable: true
+                        after:
+                          type: object
+                          nullable: true
+                        reason:
+                          type: string
+                          nullable: true
+                        created_at:
+                          type: string
+                          format: date-time
+                  total:
+                    type: integer
+                  page:
+                    type: integer
+                  limit:
+                    type: integer
+        "401":
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+
+  /audit/export:
+    get:
+      operationId: exportAuditLog
+      tags: [audit]
+      security:
+        - bearerAuth: []
+      responses:
+        "200":
+          description: Audit log export
+          content:
+            application/json:
+              schema:
+                type: object
+        "401":
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+
+  # ==================== OUTBOX ====================
+  /outbox:
+    get:
+      operationId: listOutbox
+      tags: [outbox]
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: status
+          in: query
+          schema:
+            type: string
+        - name: target_system
+          in: query
+          schema:
+            type: string
+        - name: page
+          in: query
+          schema:
+            type: integer
+            default: 1
+        - name: limit
+          in: query
+          schema:
+            type: integer
+            default: 50
+            maximum: 200
+      responses:
+        "200":
+          description: Outbox entries
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  entries:
+                    type: array
+                    items:
+                      type: object
+                  total:
+                    type: integer
+                  page:
+                    type: integer
+                  limit:
+                    type: integer
+        "401":
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+
+  /outbox/dlq:
+    get:
+      operationId: listOutboxDLQ
+      tags: [outbox]
+      security:
+        - bearerAuth: []
+      responses:
+        "200":
+          description: Dead letter queue
+          content:
+            application/json:
+              schema:
+                type: object
+        "401":
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+
+  /outbox/process:
+    post:
+      operationId: processOutbox
+      tags: [outbox]
+      security:
+        - bearerAuth: []
+      responses:
+        "200":
+          description: Outbox processed
+          content:
+            application/json:
+              schema:
+                type: object
+        "401":
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+
+  /outbox/{id}/retry:
+    post:
+      operationId: retryOutboxEntry
+      tags: [outbox]
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        "200":
+          description: Retry scheduled
+          content:
+            application/json:
+              schema:
+                type: object
+        "404":
+          description: Not found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "401":
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+
+  # ==================== ME ====================
+  /me/data:
+    get:
+      operationId: getMeData
+      tags: [me]
+      security:
+        - bearerAuth: []
+      responses:
+        "200":
+          description: Current user data
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  user:
+                    type: object
+                    properties:
+                      id:
+                        type: string
+                        format: uuid
+                      name:
+                        type: string
+                      role:
+                        type: string
+                  default_wilayah:
+                    type: object
+                    nullable: true
+                    properties:
+                      id:
+                        type: string
+                        format: uuid
+                      name:
+                        type: string
+                      level:
+                        type: string
+                  accessible_wilayah:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        id:
+                          type: string
+                          format: uuid
+                        name:
+                          type: string
+                        level:
+                          type: string
+        "401":
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "404":
+          description: User not found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+    delete:
+      operationId: deleteMeData
+      tags: [me]
+      security:
+        - bearerAuth: []
+      responses:
+        "200":
+          description: Data deleted
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+        "401":
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+
+  # ==================== NOTIFICATIONS ====================
+  /notifications:
+    get:
+      operationId: listNotifications
+      tags: [notifications]
+      security:
+        - bearerAuth: []
+      responses:
+        "200":
+          description: Notifications list
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  entries:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        id:
+                          type: string
+                          format: uuid
+                        user_id:
+                          type: string
+                          format: uuid
+                          nullable: true
+                        kind:
+                          type: string
+                        title:
+                          type: string
+                          nullable: true
+                        body:
+                          type: string
+                        related_report_id:
+                          type: string
+                          format: uuid
+                          nullable: true
+                        read_at:
+                          type: string
+                          format: date-time
+                          nullable: true
+                        created_at:
+                          type: string
+                          format: date-time
+        "401":
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+
+  /notifications/mark-read:
+    post:
+      operationId: markNotificationRead
+      tags: [notifications]
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                id:
+                  type: string
+                  format: uuid
+                mark_all:
+                  type: boolean
+      responses:
+        "200":
+          description: Notification marked as read
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                  updated:
+                    type: integer
+        "400":
+          description: Validation error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "401":
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+
+  # ==================== WEBHOOKS ====================
+  /webhooks/inbound:
+    post:
+      operationId: handleInboundWebhook
+      tags: [webhooks]
+      security: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+      responses:
+        "200":
+          description: Webhook handled
+          content:
+            application/json:
+              schema:
+                type: object
+
+  # ==================== ADMIN-DAERAH ====================
+  /admin-daerah/dashboard:
+    get:
+      operationId: getAdminDaerahDashboard
+      tags: [admin-daerah]
+      security:
+        - bearerAuth: []
+      responses:
+        "200":
+          description: Dashboard stats
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  total:
+                    type: integer
+                  by_status:
+                    type: object
+                    additionalProperties:
+                      type: integer
+                  by_category:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        id:
+                          type: string
+                          format: uuid
+                        name:
+                          type: string
+                        slug:
+                          type: string
+                        icon:
+                          type: string
+                          nullable: true
+                        count:
+                          type: integer
+                  active_operators:
+                    type: integer
+                  active_petugas:
+                    type: integer
+                  sla_breached:
+                    type: integer
+                  sla_at_risk:
+                    type: integer
+                  avg_verification_days:
+                    type: number
+                    nullable: true
+                  recent_submissions:
+                    type: integer
+                  resolved_this_month:
+                    type: integer
+        "401":
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+
+  /admin-daerah/cases:
+    get:
+      operationId: listAdminDaerahCases
+      tags: [admin-daerah]
+      security:
+        - bearerAuth: []
+      responses:
+        "200":
+          description: Cases list
+          content:
+            application/json:
+              schema:
+                type: object
+        "401":
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+
+  /admin-daerah/operators:
+    get:
+      operationId: listAdminDaerahOperators
+      tags: [admin-daerah]
+      security:
+        - bearerAuth: []
+      responses:
+        "200":
+          description: Operators list
+          content:
+            application/json:
+              schema:
+                type: object
+        "401":
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+
+  /admin-daerah/petugas:
+    get:
+      operationId: listAdminDaerahPetugas
+      tags: [admin-daerah]
+      security:
+        - bearerAuth: []
+      responses:
+        "200":
+          description: Petugas list
+          content:
+            application/json:
+              schema:
+                type: object
+        "401":
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+
+  /admin-daerah/stats:
+    get:
+      operationId: getAdminDaerahStats
+      tags: [admin-daerah]
+      security:
+        - bearerAuth: []
+      responses:
+        "200":
+          description: Statistics
+          content:
+            application/json:
+              schema:
+                type: object
+        "401":
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+
+  /admin-daerah/sla:
+    get:
+      operationId: listAdminDaerahSLA
+      tags: [admin-daerah]
+      security:
+        - bearerAuth: []
+      responses:
+        "200":
+          description: SLA list
+          content:
+            application/json:
+              schema:
+                type: object
+        "401":
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+
+  /admin-daerah/sla/{id}:
+    get:
+      operationId: getAdminDaerahSLADetail
+      tags: [admin-daerah]
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        "200":
+          description: SLA detail
+          content:
+            application/json:
+              schema:
+                type: object
+        "404":
+          description: Not found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "401":
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+
+  /admin-daerah/units:
+    get:
+      operationId: listAdminDaerahUnits
+      tags: [admin-daerah]
+      security:
+        - bearerAuth: []
+      responses:
+        "200":
+          description: Units list
+          content:
+            application/json:
+              schema:
+                type: object
+        "401":
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+    post:
+      operationId: createAdminDaerahUnit
+      tags: [admin-daerah]
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+      responses:
+        "201":
+          description: Unit created
+          content:
+            application/json:
+              schema:
+                type: object
+        "400":
+          description: Validation error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "401":
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+
+  /admin-daerah/units/{id}:
+    get:
+      operationId: getAdminDaerahUnitDetail
+      tags: [admin-daerah]
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        "200":
+          description: Unit detail
+          content:
+            application/json:
+              schema:
+                type: object
+        "404":
+          description: Not found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "401":
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+    patch:
+      operationId: updateAdminDaerahUnit
+      tags: [admin-daerah]
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+      responses:
+        "200":
+          description: Unit updated
+          content:
+            application/json:
+              schema:
+                type: object
+        "400":
+          description: Validation error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "404":
+          description: Not found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "401":
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+
+  # ==================== OPERATOR ====================
+  /operator:
+    get:
+      operationId: listOperatorCases
+      tags: [operator]
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: page
+          in: query
+          schema:
+            type: integer
+            default: 1
+        - name: limit
+          in: query
+          schema:
+            type: integer
+            default: 20
+            maximum: 100
+        - name: status
+          in: query
+          schema:
+            type: string
+        - name: wilayah_id
+          in: query
+          schema:
+            type: string
+            format: uuid
         - name: category_id
           in: query
           schema:
             type: string
             format: uuid
-        - name: bbox
+        - name: search
           in: query
-          description: Bounding box as minLng,minLat,maxLng,maxLat
           schema:
             type: string
       responses:
         "200":
-          description: GeoJSON FeatureCollection
+          description: Operator cases
           content:
-            application/geo+json:
+            application/json:
               schema:
-                $ref: "#/components/schemas/GeoJSONFeatureCollection"
+                type: object
+                properties:
+                  items:
+                    type: array
+                    items:
+                      type: object
+                  pagination:
+                    $ref: "#/components/schemas/Pagination"
+        "401":
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
 
+  /operator/stats:
+    get:
+      operationId: getOperatorStats
+      tags: [operator]
+      security:
+        - bearerAuth: []
+      responses:
+        "200":
+          description: Operator statistics
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/OperatorStats"
+        "401":
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+
+  /operator/queue-counts:
+    get:
+      operationId: getOperatorQueueCounts
+      tags: [operator]
+      security:
+        - bearerAuth: []
+      responses:
+        "200":
+          description: Queue counts
+          content:
+            application/json:
+              schema:
+                type: object
+        "401":
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+
+  /operator/backlog:
+    get:
+      operationId: getOperatorBacklog
+      tags: [operator]
+      security:
+        - bearerAuth: []
+      responses:
+        "200":
+          description: Backlog
+          content:
+            application/json:
+              schema:
+                type: object
+        "401":
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+
+  /operator/cases/{id}/merge:
+    post:
+      operationId: mergeOperatorCases
+      tags: [operator]
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [target_case_ids]
+              properties:
+                target_case_ids:
+                  type: array
+                  items:
+                    type: string
+                    format: uuid
+                reason:
+                  type: string
+      responses:
+        "200":
+          description: Cases merged
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                  primary_case_id:
+                    type: string
+                    format: uuid
+                  merged_case_ids:
+                    type: array
+                    items:
+                      type: string
+                      format: uuid
+        "400":
+          description: Validation error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "404":
+          description: Not found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "409":
+          description: Invalid transition
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "401":
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+
+  /operator/cases/{id}/separate:
+    post:
+      operationId: separateOperatorCases
+      tags: [operator]
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+      responses:
+        "200":
+          description: Cases separated
+          content:
+            application/json:
+              schema:
+                type: object
+        "400":
+          description: Validation error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "404":
+          description: Not found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "401":
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+
+  /operator/cases/{id}/priority:
+    get:
+      operationId: getOperatorCasePriority
+      tags: [operator]
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        "200":
+          description: Priority info
+          content:
+            application/json:
+              schema:
+                type: object
+        "401":
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+
+  /operator/cases/{id}/assign:
+    post:
+      operationId: assignOperatorCase
+      tags: [operator]
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+      responses:
+        "200":
+          description: Case assigned
+          content:
+            application/json:
+              schema:
+                type: object
+        "400":
+          description: Validation error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "404":
+          description: Not found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "401":
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+
+  /operator/cases/{id}/escalate:
+    post:
+      operationId: escalateOperatorCase
+      tags: [operator]
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        "200":
+          description: Case escalated
+          content:
+            application/json:
+              schema:
+                type: object
+        "404":
+          description: Not found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "401":
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+
+  /operator/cases/{id}/sla:
+    get:
+      operationId: getOperatorCaseSLA
+      tags: [operator]
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        "200":
+          description: SLA info
+          content:
+            application/json:
+              schema:
+                type: object
+        "401":
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+
+  # ==================== PETUGAS ====================
+  /petugas/tasks:
+    get:
+      operationId: listPetugasTasks
+      tags: [petugas]
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: status
+          in: query
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Petugas tasks
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  tasks:
+                    type: array
+                    items:
+                      type: object
+        "401":
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+
+  /petugas/tasks/{id}:
+    get:
+      operationId: getPetugasTaskDetail
+      tags: [petugas]
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        "200":
+          description: Task detail
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  task:
+                    type: object
+                  clarifications:
+                    type: array
+                    items:
+                      type: object
+                  evidence:
+                    type: array
+                    items:
+                      type: object
+        "400":
+          description: Missing task ID
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "404":
+          description: Not found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "401":
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+
+  /petugas/tasks/{id}/accept:
+    post:
+      operationId: acceptPetugasTask
+      tags: [petugas]
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      requestBody:
+        required: false
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                accept:
+                  type: boolean
+                reason:
+                  type: string
+      responses:
+        "200":
+          description: Task accepted/rejected
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                  accepted:
+                    type: boolean
+        "400":
+          description: Missing task ID
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "404":
+          description: Not found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "409":
+          description: Invalid status
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "401":
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+
+  /petugas/tasks/{id}/progress:
+    post:
+      operationId: updatePetugasTaskProgress
+      tags: [petugas]
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+      responses:
+        "200":
+          description: Progress updated
+          content:
+            application/json:
+              schema:
+                type: object
+        "400":
+          description: Validation error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "401":
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+
+  /petugas/tasks/{id}/evidence:
+    post:
+      operationId: submitPetugasEvidence
+      tags: [petugas]
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      requestBody:
+        required: true
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              properties:
+                description:
+                  type: string
+                photo:
+                  type: string
+                  format: binary
+      responses:
+        "200":
+          description: Evidence submitted
+          content:
+            application/json:
+              schema:
+                type: object
+        "400":
+          description: Validation error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "401":
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+
+  /petugas/tasks/{id}/complete:
+    post:
+      operationId: completePetugasTask
+      tags: [petugas]
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+      responses:
+        "200":
+          description: Task completed
+          content:
+            application/json:
+              schema:
+                type: object
+        "400":
+          description: Validation error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "401":
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+
+  /petugas/tasks/{id}/clarification:
+    post:
+      operationId: requestPetugasClarification
+      tags: [petugas]
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+      responses:
+        "200":
+          description: Clarification requested
+          content:
+            application/json:
+              schema:
+                type: object
+        "400":
+          description: Validation error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "401":
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+
+  /petugas/tasks/{id}/reject:
+    post:
+      operationId: rejectPetugasTask
+      tags: [petugas]
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      requestBody:
+        required: false
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                reason:
+                  type: string
+      responses:
+        "200":
+          description: Task rejected
+          content:
+            application/json:
+              schema:
+                type: object
+        "401":
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+
+  # ==================== AUDITOR ====================
+  /auditor/audit-search:
+    get:
+      operationId: auditorSearchAudit
+      tags: [auditor]
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: actor_id
+          in: query
+          schema:
+            type: string
+            format: uuid
+        - name: action
+          in: query
+          schema:
+            type: string
+        - name: object_type
+          in: query
+          schema:
+            type: string
+        - name: object_id
+          in: query
+          schema:
+            type: string
+        - name: from
+          in: query
+          schema:
+            type: string
+            format: date-time
+        - name: to
+          in: query
+          schema:
+            type: string
+            format: date-time
+        - name: page
+          in: query
+          schema:
+            type: integer
+            default: 1
+        - name: limit
+          in: query
+          schema:
+            type: integer
+            default: 50
+            maximum: 200
+      responses:
+        "200":
+          description: Audit entries
+          content:
+            application/json:
+              schema:
+                type: object
+        "401":
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+
+  /auditor/audit-export:
+    get:
+      operationId: auditorExportAudit
+      tags: [auditor]
+      security:
+        - bearerAuth: []
+      responses:
+        "200":
+          description: Audit export
+          content:
+            application/json:
+              schema:
+                type: object
+        "401":
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+
+  /auditor/system-logs:
+    get:
+      operationId: auditorSystemLogs
+      tags: [auditor]
+      security:
+        - bearerAuth: []
+      responses:
+        "200":
+          description: System logs
+          content:
+            application/json:
+              schema:
+                type: object
+        "401":
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+
+  /auditor/stats:
+    get:
+      operationId: auditorStats
+      tags: [auditor]
+      security:
+        - bearerAuth: []
+      responses:
+        "200":
+          description: Auditor statistics
+          content:
+            application/json:
+              schema:
+                type: object
+        "401":
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+
+  # ==================== EXECUTIVE ====================
+  /executive/dashboard:
+    get:
+      operationId: getExecutiveDashboard
+      tags: [executive]
+      security:
+        - bearerAuth: []
+      responses:
+        "200":
+          description: Executive dashboard
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ExecutiveDashboard"
+        "401":
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+
+  /executive/regional-stats:
+    get:
+      operationId: getExecutiveRegionalStats
+      tags: [executive]
+      security:
+        - bearerAuth: []
+      responses:
+        "200":
+          description: Regional statistics
+          content:
+            application/json:
+              schema:
+                type: object
+        "401":
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+
+  /executive/trend-analysis:
+    get:
+      operationId: getExecutiveTrendAnalysis
+      tags: [executive]
+      security:
+        - bearerAuth: []
+      responses:
+        "200":
+          description: Trend analysis
+          content:
+            application/json:
+              schema:
+                type: object
+        "401":
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+
+  # ==================== WARGA ====================
+  /warga/sanggahan/{id}:
+    post:
+      operationId: submitSanggahan
+      tags: [warga]
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/SanggahanRequest"
+      responses:
+        "201":
+          description: Sanggahan submitted
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                  id:
+                    type: string
+                    format: uuid
+        "400":
+          description: Validation error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "403":
+          description: Forbidden
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "404":
+          description: Not found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "409":
+          description: Sanggahan already exists
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "401":
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+
+  /warga/reopen/{id}:
+    post:
+      operationId: requestReopen
+      tags: [warga]
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/ReopenRequest"
+      responses:
+        "201":
+          description: Reopen requested
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                  id:
+                    type: string
+                    format: uuid
+        "400":
+          description: Validation error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "403":
+          description: Forbidden
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "404":
+          description: Not found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "409":
+          description: Reopen request already exists
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "401":
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+
+  /warga/evidence/{id}:
+    post:
+      operationId: submitWargaEvidence
+      tags: [warga]
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      requestBody:
+        required: true
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              required: [description, photo]
+              properties:
+                description:
+                  type: string
+                photo:
+                  type: string
+                  format: binary
+      responses:
+        "201":
+          description: Evidence submitted
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                  evidence_id:
+                    type: string
+                    format: uuid
+        "400":
+          description: Validation error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "403":
+          description: Forbidden
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "404":
+          description: Not found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "500":
+          description: Storage error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "401":
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+
+  # ==================== GEOCODE ====================
+  /geocode:
+    get:
+      operationId: reverseGeocode
+      tags: [geocode]
+      security: []
+      parameters:
+        - name: lat
+          in: query
+          required: true
+          schema:
+            type: number
+        - name: lng
+          in: query
+          required: true
+          schema:
+            type: number
+      responses:
+        "200":
+          description: Geocoded address
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  address:
+                    type: string
+                  road:
+                    type: string
+                    nullable: true
+                  village:
+                    type: object
+                    properties:
+                      id:
+                        type: string
+                        format: uuid
+                      name:
+                        type: string
+                  subdistrict:
+                    type: object
+                    properties:
+                      id:
+                        type: string
+                        format: uuid
+                      name:
+                        type: string
+                  district:
+                    type: object
+                    properties:
+                      id:
+                        type: string
+                        format: uuid
+                      name:
+                        type: string
+                  province:
+                    type: object
+                    properties:
+                      id:
+                        type: string
+                        format: uuid
+                      name:
+                        type: string
+        "400":
+          description: Invalid parameters
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "404":
+          description: No wilayah found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+
+# ==================== COMPONENTS ====================
 components:
   securitySchemes:
     bearerAuth:
@@ -360,6 +5285,7 @@ components:
       bearerFormat: JWT
 
   schemas:
+    # Enums
     Role:
       type: string
       enum: [WARGA, SURVEYOR, VERIFIKATOR, OPERATOR, PETUGAS, PENGAMBIL_KEPUTUSAN, ADMIN_DAERAH, AUDITOR, RT_RW, ADMIN]
@@ -367,14 +5293,22 @@ components:
     ReportStatus:
       type: string
       enum:
+        - draft
         - submitted
         - under_review
         - verified
+        - assigned
         - in_progress
         - resolved
+        - closed
         - rejected
         - duplicate_merged
         - needs_survey
+        - needs_completion
+        - out_of_scope
+        - merged
+        - separated
+        - escalated
 
     AssessmentStatus:
       type: string
@@ -384,9 +5318,102 @@ components:
         - parse_failed
         - vlm_error
 
+    # Common
+    Pagination:
+      type: object
+      properties:
+        page:
+          type: integer
+        limit:
+          type: integer
+        total:
+          type: integer
+        total_pages:
+          type: integer
+
+    ErrorResponse:
+      type: object
+      required: [error]
+      properties:
+        error:
+          type: object
+          required: [code, message]
+          properties:
+            code:
+              type: string
+            message:
+              type: string
+        details:
+          type: object
+          nullable: true
+
+    # Auth
+    LoginRequest:
+      type: object
+      required: [email, password]
+      properties:
+        email:
+          type: string
+          format: email
+        password:
+          type: string
+          minLength: 6
+          maxLength: 128
+
+    LoginResponse:
+      type: object
+      required: [access_token, refresh_token, expires_in]
+      properties:
+        access_token:
+          type: string
+        refresh_token:
+          type: string
+        expires_in:
+          type: integer
+        user:
+          $ref: "#/components/schemas/User"
+
+    RefreshTokenRequest:
+      type: object
+      required: [refresh_token]
+      properties:
+        refresh_token:
+          type: string
+
+    TokenResponse:
+      type: object
+      required: [access_token, refresh_token, expires_in]
+      properties:
+        access_token:
+          type: string
+        refresh_token:
+          type: string
+        expires_in:
+          type: integer
+
+    RegisterVerifikatorRequest:
+      type: object
+      required: [email, password, name]
+      properties:
+        email:
+          type: string
+          format: email
+        password:
+          type: string
+          minLength: 8
+          maxLength: 128
+        name:
+          type: string
+          minLength: 1
+          maxLength: 255
+        wilayah_id:
+          type: string
+          format: uuid
+          nullable: true
+
+    # User
     User:
       type: object
-      required: [id, email, role, name, created_at, updated_at]
       properties:
         id:
           type: string
@@ -394,10 +5421,10 @@ components:
         email:
           type: string
           format: email
-        role:
-          $ref: "#/components/schemas/Role"
         name:
           type: string
+        role:
+          $ref: "#/components/schemas/Role"
         created_at:
           type: string
           format: date-time
@@ -409,9 +5436,43 @@ components:
           format: date-time
           nullable: true
 
+    UserCreateRequest:
+      type: object
+      required: [email, password, name, role]
+      properties:
+        email:
+          type: string
+          format: email
+        password:
+          type: string
+          minLength: 8
+          maxLength: 128
+        name:
+          type: string
+          minLength: 1
+          maxLength: 255
+        role:
+          $ref: "#/components/schemas/Role"
+        wilayah_id:
+          type: string
+          format: uuid
+          nullable: true
+
+    UserUpdateRequest:
+      type: object
+      properties:
+        role:
+          $ref: "#/components/schemas/Role"
+        password:
+          type: string
+          minLength: 8
+          maxLength: 128
+        disabled:
+          type: boolean
+
+    # Category
     Category:
       type: object
-      required: [id, slug, name, created_at]
       properties:
         id:
           type: string
@@ -423,13 +5484,90 @@ components:
         icon:
           type: string
           nullable: true
+        description:
+          type: string
+          nullable: true
+        parent_id:
+          type: string
+          format: uuid
+          nullable: true
+        code:
+          type: string
+          nullable: true
+        short_code:
+          type: string
+          nullable: true
+        color_class:
+          type: string
+          nullable: true
         created_at:
           type: string
           format: date-time
 
+    CategoryCreateRequest:
+      type: object
+      required: [name, slug]
+      properties:
+        name:
+          type: string
+          minLength: 1
+          maxLength: 100
+        slug:
+          type: string
+          minLength: 1
+          maxLength: 100
+        icon:
+          type: string
+          maxLength: 255
+        description:
+          type: string
+          maxLength: 500
+        parent_id:
+          type: string
+          format: uuid
+        code:
+          type: string
+          maxLength: 10
+        short_code:
+          type: string
+          maxLength: 5
+        color_class:
+          type: string
+          maxLength: 20
+
+    CategoryUpdateRequest:
+      type: object
+      properties:
+        name:
+          type: string
+          minLength: 1
+          maxLength: 100
+        slug:
+          type: string
+          minLength: 1
+          maxLength: 100
+        icon:
+          type: string
+          maxLength: 255
+        description:
+          type: string
+          maxLength: 500
+        parent_id:
+          type: string
+          format: uuid
+        code:
+          type: string
+          maxLength: 10
+        short_code:
+          type: string
+          maxLength: 5
+        color_class:
+          type: string
+          maxLength: 20
+
+    # Wilayah
     Wilayah:
       type: object
-      required: [id, name, level, created_at]
       properties:
         id:
           type: string
@@ -443,27 +5581,33 @@ components:
         level:
           type: string
           enum: [PROVINSI, KABUPATEN, KECAMATAN, DESA]
-        geom:
-          type: object
-          nullable: true
-        created_at:
-          type: string
-          format: date-time
 
+    WilayahCreateRequest:
+      type: object
+      required: [name, level]
+      properties:
+        name:
+          type: string
+          minLength: 1
+          maxLength: 255
+        parent_id:
+          type: string
+          format: uuid
+        level:
+          type: string
+          enum: [PROVINSI, KABUPATEN, KECAMATAN, DESA]
+
+    WilayahUpdateRequest:
+      type: object
+      properties:
+        name:
+          type: string
+          minLength: 1
+          maxLength: 255
+
+    # Report
     Report:
       type: object
-      required:
-        [
-          id,
-          idempotency_key,
-          category_id,
-          description,
-          lat,
-          lng,
-          status,
-          created_at,
-          updated_at,
-        ]
       properties:
         id:
           type: string
@@ -476,16 +5620,16 @@ components:
           format: uuid
         category:
           $ref: "#/components/schemas/Category"
+          nullable: true
         description:
           type: string
         geom:
           type: object
+          nullable: true
         lat:
           type: number
-          format: double
         lng:
           type: number
-          format: double
         photo_urls:
           type: array
           items:
@@ -517,7 +5661,7 @@ components:
           type: string
           format: date-time
 
-    CreateReportRequest:
+    ReportCreateRequest:
       type: object
       required: [idempotency_key, category_id, description, lat, lng]
       properties:
@@ -529,120 +5673,355 @@ components:
           format: uuid
         description:
           type: string
+          minLength: 1
+          maxLength: 2000
         lat:
           type: number
-          format: double
         lng:
           type: number
-          format: double
+        device_id:
+          type: string
+          format: uuid
         photo_urls:
           type: array
           items:
             type: string
-          default: []
-        exif_data:
-          type: object
-        device_id:
+            format: uri
+        reported_at:
           type: string
+          format: date-time
+        title:
+          type: string
+          maxLength: 255
+        population_affected:
+          type: integer
+          minimum: 0
+        vulnerability_index:
+          type: number
+          minimum: 0
+          maximum: 1
+        consent:
+          type: boolean
 
-    UpdateReportRequest:
+    ReportUpdateRequest:
       type: object
       properties:
         status:
           $ref: "#/components/schemas/ReportStatus"
-        severity:
+        description:
+          type: string
+          minLength: 1
+          maxLength: 2000
+        priority:
           type: integer
-          minimum: 1
-          maximum: 5
+          minimum: 0
+          maximum: 100
         assigned_to:
           type: string
           format: uuid
+          nullable: true
 
-    AgentAssessment:
+    PublicReportCreateRequest:
       type: object
-      required: [id, report_id, assessment_kind, assessment_status, created_at]
+      required: [idempotency_key, category_id, description, lat, lng, device_id]
       properties:
-        id:
+        idempotency_key:
           type: string
           format: uuid
-        report_id:
+        category_id:
           type: string
           format: uuid
-        assessment_kind:
+        description:
           type: string
-        assessment_status:
-          $ref: "#/components/schemas/AssessmentStatus"
-        vision_description:
+          minLength: 10
+          maxLength: 500
+        lat:
+          type: number
+        lng:
+          type: number
+        device_id:
           type: string
-          nullable: true
-        damage_severity:
+          format: uuid
+        photo_urls:
+          type: array
+          items:
+            type: string
+            format: uri
+        reported_at:
+          type: string
+          format: date-time
+        title:
+          type: string
+          maxLength: 255
+        population_affected:
           type: integer
-          minimum: 1
-          maximum: 5
-          nullable: true
-        exif_summary:
+          minimum: 0
+        vulnerability_index:
+          type: number
+          minimum: 0
+          maximum: 1
+        consent:
+          type: boolean
+
+    ReportsStats:
+      type: object
+      properties:
+        total:
+          type: integer
+        by_status:
           type: object
-          nullable: true
-        duplicate_candidates:
+          additionalProperties:
+            type: integer
+        by_category:
           type: array
           items:
             type: object
-          nullable: true
-        confidence:
+            properties:
+              id:
+                type: string
+                format: uuid
+              name:
+                type: string
+              slug:
+                type: string
+              icon:
+                type: string
+                nullable: true
+              count:
+                type: integer
+        by_wilayah:
+          type: array
+          items:
+            type: object
+            properties:
+              id:
+                type: string
+                format: uuid
+              name:
+                type: string
+              count:
+                type: integer
+        sla_breached:
+          type: integer
+        sla_at_risk:
+          type: integer
+        avg_verification_days:
           type: number
-          format: float
-          minimum: 0
-          maximum: 1
           nullable: true
-        recommended_status:
-          $ref: "#/components/schemas/ReportStatus"
-          nullable: true
-        tool_calls_made:
+
+    OperatorStats:
+      type: object
+      properties:
+        total:
           type: integer
-          nullable: true
-        latency_ms:
+        by_status:
+          type: object
+          additionalProperties:
+            type: integer
+        by_severity:
+          type: object
+          additionalProperties:
+            type: integer
+        sla_breached:
           type: integer
+        sla_at_risk:
+          type: integer
+        avg_resolution_days:
+          type: number
           nullable: true
-        model_version:
+        by_category:
+          type: array
+          items:
+            type: object
+            properties:
+              id:
+                type: string
+                format: uuid
+              name:
+                type: string
+              slug:
+                type: string
+              count:
+                type: integer
+        recent_escalations:
+          type: integer
+
+    ExecutiveDashboard:
+      type: object
+      properties:
+        total:
+          type: integer
+        by_status:
+          type: object
+          additionalProperties:
+            type: integer
+        by_category:
+          type: array
+          items:
+            type: object
+            properties:
+              id:
+                type: string
+                format: uuid
+              name:
+                type: string
+              slug:
+                type: string
+              icon:
+                type: string
+                nullable: true
+              count:
+                type: integer
+        sla_breached:
+          type: integer
+        sla_at_risk:
+          type: integer
+        recent_submissions:
+          type: integer
+        resolved_this_month:
+          type: integer
+        avg_verification_days:
+          type: number
+          nullable: true
+        avg_resolution_days:
+          type: number
+          nullable: true
+        active_operators:
+          type: integer
+        active_petugas:
+          type: integer
+        total_wilayah:
+          type: integer
+
+    # Agent
+    AgentAssessRequest:
+      type: object
+      required: [report_id]
+      properties:
+        report_id:
           type: string
-          nullable: true
-        created_at:
+          format: uuid
+        idempotency_key:
+          type: string
+          maxLength: 255
+
+    # Verifikator
+    VerifikatorCombineRequest:
+      type: object
+      required: [target_case_id]
+      properties:
+        target_case_id:
+          type: string
+        reason:
+          type: string
+
+    VerifikatorSeparateRequest:
+      type: object
+      required: [new_case_description]
+      properties:
+        new_case_description:
+          type: string
+        reason:
+          type: string
+
+    VerifikatorRejectRequest:
+      type: object
+      required: [reason]
+      properties:
+        reason:
+          type: string
+          minLength: 10
+
+    VerifikatorDecisionRequest:
+      type: object
+      required: [decision, reason]
+      properties:
+        decision:
+          type: string
+          enum: [valid, needs_completion, needs_survey, duplicate, out_of_scope, rejected]
+        reason:
+          type: string
+          minLength: 1
+        duplicate_of_report_id:
+          type: string
+          format: uuid
+        surveyor_id:
+          type: string
+          format: uuid
+        assigned_unit_id:
+          type: string
+          format: uuid
+        deadline:
           type: string
           format: date-time
 
-    LoginRequest:
+    VerifikatorReviewSanggahanRequest:
       type: object
-      required: [email, password]
+      required: [decision, reason]
       properties:
-        email:
+        decision:
           type: string
-          format: email
-        password:
+          enum: [accepted, rejected]
+        reason:
+          type: string
+          minLength: 1
+
+    VerifikatorVerifyCompletionRequest:
+      type: object
+      required: [decision, reason]
+      properties:
+        decision:
+          type: string
+          enum: [approved, rejected]
+        reason:
+          type: string
+          minLength: 1
+        completion_notes:
           type: string
 
-    LoginResponse:
+    # Photo
+    PhotoUploadRequest:
       type: object
-      required: [access_token, refresh_token, expires_in]
       properties:
-        access_token:
+        content_type:
           type: string
-        refresh_token:
+          enum: [image/jpeg, image/png]
+        idempotency_key:
           type: string
-        expires_in:
-          type: integer
-        user:
-          $ref: "#/components/schemas/User"
+          format: uuid
+        file:
+          type: string
 
-    ErrorResponse:
+    PhotoBatchUploadRequest:
       type: object
-      required: [error]
+      required: [photos]
       properties:
-        error:
-          type: string
-        detail:
-          type: string
-          nullable: true
+        photos:
+          type: array
+          items:
+            type: string
+            enum: [image/jpeg, image/png]
+          minItems: 1
+          maxItems: 20
 
+    # Warga
+    SanggahanRequest:
+      type: object
+      required: [reason]
+      properties:
+        reason:
+          type: string
+          minLength: 10
+
+    ReopenRequest:
+      type: object
+      required: [reason]
+      properties:
+        reason:
+          type: string
+          minLength: 10
+
+    # GeoJSON
     GeoJSONFeatureCollection:
       type: object
       required: [type, features]

@@ -58,11 +58,11 @@ const ComparisonCard = ({ report, isCurrentReport, commonAttributes }: Compariso
 
   return (
     <div className={`flex-1 min-w-0 border rounded-lg p-3 ${
-      isCurrentReport ? "border-blue-300 bg-blue-50/30" : "border-gray-200 bg-white"
+      isCurrentReport ? "border-info-300 bg-info-50/30" : "border-gray-200 bg-white"
     }`}>
       {isCurrentReport && (
         <div className="mb-2">
-          <span className="text-xs font-medium text-blue-600 bg-blue-100 px-2 py-0.5 rounded">
+          <span className="text-xs font-medium text-info-600 bg-info-100 px-2 py-0.5 rounded">
             Laporan Saat Ini
           </span>
         </div>
@@ -88,17 +88,17 @@ const ComparisonCard = ({ report, isCurrentReport, commonAttributes }: Compariso
           <StatusBadge status={report.status} />
         </div>
 
-        <div className={`${commonAttributes?.has("category") ? "bg-green-50 px-2 py-1 rounded" : ""}`}>
+        <div className={`${commonAttributes?.has("category") ? "bg-primary-50 px-2 py-1 rounded" : ""}`}>
           <span className="text-xs text-gray-500">Kategori:</span>
           <span className="ml-1 text-gray-700">{report.category?.name ?? report.category_id}</span>
         </div>
 
-        <div className={`${commonAttributes?.has("location") ? "bg-green-50 px-2 py-1 rounded" : ""}`}>
+        <div className={`${commonAttributes?.has("location") ? "bg-primary-50 px-2 py-1 rounded" : ""}`}>
           <span className="text-xs text-gray-500">Lokasi:</span>
           <span className="ml-1 text-gray-700 font-mono text-xs">{location}</span>
         </div>
 
-        <div className={`${commonAttributes?.has("created_at") ? "bg-green-50 px-2 py-1 rounded" : ""}`}>
+        <div className={`${commonAttributes?.has("created_at") ? "bg-primary-50 px-2 py-1 rounded" : ""}`}>
           <span className="text-xs text-gray-500">Waktu:</span>
           <span className="ml-1 text-gray-700">{formatDate(report.created_at)}</span>
         </div>
@@ -110,7 +110,7 @@ const ComparisonCard = ({ report, isCurrentReport, commonAttributes }: Compariso
           </div>
         )}
 
-        <div className={`${commonAttributes?.has("severity") ? "bg-green-50 px-2 py-1 rounded" : ""}`}>
+        <div className={`${commonAttributes?.has("severity") ? "bg-primary-50 px-2 py-1 rounded" : ""}`}>
           <span className="text-xs text-gray-500">Severity:</span>
           <span className="ml-1 text-gray-700">{report.severity != null ? `${report.severity}%` : "-"}</span>
         </div>
@@ -263,8 +263,8 @@ export const DuplicateComparisonCards = ({
 
   if (error) {
     return (
-      <div className="bg-white rounded-lg border border-red-200 p-4">
-        <p className="text-sm text-red-600">{error}</p>
+      <div className="bg-white rounded-lg border border-danger-200 p-4">
+        <p className="text-sm text-danger-600">{error}</p>
       </div>
     );
   }
@@ -337,7 +337,7 @@ export const DuplicateComparisonCards = ({
                     type="button"
                     onClick={() => handleMerge(candidate.report_id)}
                     disabled={isActioning}
-                    className="px-3 py-1.5 text-sm font-medium bg-purple-600 text-white rounded hover:bg-purple-700 disabled:opacity-50 transition-colors"
+                    className="px-3 py-1.5 text-sm font-medium bg-primary-500 text-white rounded hover:bg-primary-600 disabled:opacity-50 transition-colors"
                   >
                     {isActioning ? "Memproses..." : "Gabungkan"}
                   </button>
@@ -345,7 +345,7 @@ export const DuplicateComparisonCards = ({
               )}
 
               {state === "merged" && (
-                <div className="flex items-center justify-end gap-2 text-sm text-green-600">
+                <div className="flex items-center justify-end gap-2 text-sm text-primary-600">
                   <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
                   </svg>
@@ -354,7 +354,7 @@ export const DuplicateComparisonCards = ({
               )}
 
               {state === "separated" && (
-                <div className="flex items-center justify-end gap-2 text-sm text-blue-600">
+                <div className="flex items-center justify-end gap-2 text-sm text-info-600">
                   <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
                   </svg>

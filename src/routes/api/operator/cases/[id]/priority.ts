@@ -50,12 +50,12 @@ operatorPriorityRoute.post("/:id", requireAuth, requireRole("OPERATOR", "ADMIN")
 
       if (existingScoreR.rows[0]) {
         await client.query(
-          "UPDATE priority_scores SET override_score = $1, override_reason = $2, overridden_by = $3, overridden_at = NOW() WHERE report_id = $4",
+          "UPDATE priority_scores SET override_score = $1, override_reason = $2, override_by = $3, overridden_at = NOW() WHERE report_id = $4",
           [newScore, reason, user.sub, id]
         );
       } else {
         await client.query(
-          "INSERT INTO priority_scores (report_id, override_score, override_reason, overridden_by, computed_score) VALUES ($1, $2, $3, $4, $5)",
+          "INSERT INTO priority_scores (report_id, override_score, override_reason, override_by, computed_score) VALUES ($1, $2, $3, $4, $5)",
           [id, newScore, reason, user.sub, newScore]
         );
       }

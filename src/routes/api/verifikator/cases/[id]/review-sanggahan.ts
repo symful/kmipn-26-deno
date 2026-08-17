@@ -1,5 +1,6 @@
 import { Hono } from "hono";
 import type { Env } from "@/types/bindings";
+import { APPEALABLE_STATES } from "@/types/case-states";
 import { requireAuth, type AuthVariables } from "@/lib/auth";
 import { requireRole } from "@/middleware/roles";
 import { withClient } from "@/lib/db";
@@ -7,8 +8,6 @@ import { auditReportChange } from "@/lib/audit-helpers";
 import { safeHandler } from "@/lib/safeHandler";
 import { logger } from "@/lib/logger";
 import { VerifikatorReviewSanggahanSchema } from "@/lib/schemas";
-
-const APPEALABLE_STATES = ["rejected", "out_of_scope", "needs_completion"] as const;
 
 export const reviewSanggahanRoute = new Hono<{ Bindings: Env; Variables: AuthVariables }>();
 

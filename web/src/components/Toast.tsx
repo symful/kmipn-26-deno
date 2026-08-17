@@ -65,10 +65,10 @@ export function ToastContainer() {
           key={t.id}
           className={`px-4 py-3 rounded-lg shadow-lg text-white min-w-72 max-w-96 ${
             t.type === "error"
-              ? "bg-red-600"
+              ? "bg-danger-500"
               : t.type === "success"
-              ? "bg-green-600"
-              : "bg-blue-600"
+              ? "bg-primary-500"
+              : "bg-info-500"
           }`}
         >
           <div className="flex items-center justify-between gap-3">

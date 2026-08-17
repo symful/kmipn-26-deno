@@ -13,6 +13,7 @@ import "leaflet/dist/leaflet.css";
 import "leaflet.heat";
 import MarkerClusterGroup from "react-leaflet-cluster";
 import { logger } from "../lib/logger";
+import { colors } from "../theme/tokens";
 import type { Report } from "../types";
 
 export interface HeatmapConfig {
@@ -61,6 +62,14 @@ interface ClusterMarker {
   getBounds(): L.LatLngBounds;
 }
 
+const HEATMAP_GRADIENT = {
+  0.0: colors.selesai,
+  0.3: "#84cc16",
+  0.5: "#eab308",
+  0.7: "#f97316",
+  1.0: colors.perluTindakan,
+} as const;
+
 function computeHeatmapPoints(reports: Report[]): HeatmapPoint[] {
   if (reports.length === 0) return [];
   const points: HeatmapPoint[] = reports.map((r) => ({
@@ -102,13 +111,7 @@ function HeatmapLayer({
       radius: config?.radius ?? 25,
       blur: config?.blur ?? 15,
       maxZoom: config?.maxZoom ?? 18,
-      gradient: {
-        0.0: "#22c55e",
-        0.3: "#84cc16",
-        0.5: "#eab308",
-        0.7: "#f97316",
-        1.0: "#ef4444",
-      },
+      gradient: HEATMAP_GRADIENT,
     });
 
     heatLayerRef.current.addTo(map);
@@ -143,7 +146,7 @@ function Legend({ showHeatmap }: { showHeatmap: boolean }) {
                 className="h-2 w-12 rounded"
                 style={{
                   background:
-                    "linear-gradient(to right, #22c55e, #84cc16, #eab308, #f97316, #ef4444)",
+                    `linear-gradient(to right, ${HEATMAP_GRADIENT[0.0]}, ${HEATMAP_GRADIENT[0.3]}, ${HEATMAP_GRADIENT[0.5]}, ${HEATMAP_GRADIENT[0.7]}, ${HEATMAP_GRADIENT[1.0]})`,
                 }}
               />
             </div>
@@ -154,7 +157,7 @@ function Legend({ showHeatmap }: { showHeatmap: boolean }) {
           </>
         )}
         <div className="flex items-center gap-1 mt-1">
-          <div className="w-3 h-3 rounded-full bg-blue-500 opacity-80" />
+          <div className="w-3 h-3 rounded-full bg-sigap-diproses opacity-80" />
           <span>Cluster</span>
         </div>
       </div>
@@ -197,10 +200,10 @@ function CountryBoundaries() {
               return { opacity: 0, fillOpacity: 0 };
             }
             return {
-              color: "#d1d5db",
+              color: colors.border,
               weight: 1,
               opacity: 0.5,
-              fillColor: "#e5e7eb",
+              fillColor: colors.background,
               fillOpacity: 0.7,
             };
           },
@@ -286,7 +289,7 @@ export const MapView = ({
             };
 
             return L.divIcon({
-              html: `<div class="cluster-icon ${sizes[size]} bg-blue-500 text-white rounded-full flex items-center justify-center font-bold shadow-lg border-2 border-white ${fontSizes[size]}">${count}</div>`,
+              html: `<div class="cluster-icon ${sizes[size]} bg-sigap-diproses text-white rounded-full flex items-center justify-center font-bold shadow-lg border-2 border-white ${fontSizes[size]}">${count}</div>`,
               className: "",
               iconSize: L.point(0, 0),
             });

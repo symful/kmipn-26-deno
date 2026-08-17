@@ -1,5 +1,6 @@
 import { Hono } from "hono";
 import type { Env } from "@/types/bindings";
+import { TERMINAL_STATES } from "@/types/case-states";
 import { requireAuth, type AuthVariables } from "@/lib/auth";
 import { requireRole } from "@/middleware/roles";
 import { withClient } from "@/lib/db";
@@ -7,8 +8,6 @@ import { auditReportChange } from "@/lib/audit-helpers";
 import { safeHandler } from "@/lib/safeHandler";
 import { logger } from "@/lib/logger";
 import { evaluatePriority } from "@/lib/priority/calculator";
-
-const TERMINAL_STATES = ["closed", "rejected", "merged", "separated", "resolved"] as const;
 
 export const separateRoute = new Hono<{ Bindings: Env; Variables: AuthVariables }>();
 
@@ -77,7 +76,7 @@ separateRoute.post("/:id", requireAuth, requireRole("VERIFIKATOR", "ADMIN", "OPE
     if (notifRow?.reporter_id) {
       await withClient(c.env, async (client) => {
         await client.query(
-          `INSERT INTO notifications (user_id, type, message, related_report_id) VALUES ($1, $2, $3, $4)`,
+          `INSERT INTO notifications (user_id, kind, body, related_report_id) VALUES ($1, $2, $3, $4)`,
           [notifRow.reporter_id, "report_separated", "Laporan telah dipisahkan.", id]
         );
       });

@@ -22,6 +22,7 @@ import VerifyTraining from "./pages/verify/Training";
 import { WargaCreateReport } from "./pages/warga/CreateReport";
 import { OperatorDashboard } from "./pages/operator/Dashboard";
 import { OperatorAIConsole } from "./pages/operator/AIConsole";
+import { OperatorCaseDetail } from "./pages/operator/CaseDetail";
 import { PetugasTasks } from "./pages/petugas/Tasks";
 import { ExecDashboard } from "./pages/exec/Dashboard";
 import { AdminUsers } from "./pages/admin/Users";
@@ -32,8 +33,6 @@ import { AdminPriorityConfig } from "./pages/admin/PriorityConfig";
 import { AdminOutbox } from "./pages/admin/Outbox";
 import { AdminAIConsole } from "./pages/admin/AIConsole";
 import { AdminDaerahDashboard } from "./pages/admin-daerah/Dashboard";
-import { AdminDaerahWilayah } from "./pages/admin-daerah/Wilayah";
-import { AdminDaerahOutbox } from "./pages/admin-daerah/Outbox";
 import { AdminDaerahUnits } from "./pages/admin-daerah/Units";
 import { AdminDaerahSla } from "./pages/admin-daerah/Sla";
 import { AdminDaerahCaseList } from "./pages/admin-daerah/CaseList";
@@ -156,6 +155,16 @@ export const App = () => {
             }
           />
           <Route
+            path="/operator/cases/:id"
+            element={
+              <ProtectedRoute>
+                <RoleGuard roles={["OPERATOR", "ADMIN"]}>
+                  <OperatorCaseDetail />
+                </RoleGuard>
+              </ProtectedRoute>
+            }
+          />
+          <Route
             path="/operator/ai-console"
             element={
               <ProtectedRoute>
@@ -198,7 +207,7 @@ export const App = () => {
               path="wilayah"
               element={
                 <RoleGuard roles={["ADMIN_DAERAH", "ADMIN"]}>
-                  <AdminDaerahWilayah />
+                  <AdminWilayah />
                 </RoleGuard>
               }
             />
@@ -246,7 +255,7 @@ export const App = () => {
               path="integrasi"
               element={
                 <RoleGuard roles={["ADMIN_DAERAH", "ADMIN"]}>
-                  <AdminDaerahOutbox />
+                  <AdminOutbox />
                 </RoleGuard>
               }
             />

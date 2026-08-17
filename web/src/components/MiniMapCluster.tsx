@@ -2,6 +2,7 @@ import { useEffect, useState, useMemo } from "react";
 import { api } from "../api/client";
 import type { FacilityCluster } from "../types";
 import { logger } from "@/lib/logger";
+import { colors } from "../theme/tokens";
 
 interface MiniMapClusterProps {
   className?: string;
@@ -87,7 +88,7 @@ export function MiniMapCluster({ className = "", bbox, zoom = 10, month }: MiniM
     <div
       className={`relative overflow-hidden ${className}`}
       style={{
-        backgroundColor: "#eaeee9",
+        backgroundColor: colors.background,
         borderRadius: 13,
       }}
     >
@@ -95,8 +96,8 @@ export function MiniMapCluster({ className = "", bbox, zoom = 10, month }: MiniM
         className="absolute inset-0 opacity-50"
         style={{
           backgroundImage: `
-            linear-gradient(#dfe4de 1px, transparent 1px),
-            linear-gradient(90deg, #dfe4de 1px, transparent 1px)
+            linear-gradient(${colors.border} 1px, transparent 1px),
+            linear-gradient(90deg, ${colors.border} 1px, transparent 1px)
           `,
           backgroundSize: "34px 34px",
         }}
@@ -104,13 +105,13 @@ export function MiniMapCluster({ className = "", bbox, zoom = 10, month }: MiniM
 
       {loading && (
         <div className="absolute inset-0 flex items-center justify-center">
-          <div className="w-5 h-5 border-2 border-[#0f7a6b] border-t-transparent rounded-full animate-spin" />
+          <div className="w-5 h-5 border-2 border-sigap-primary border-t-transparent rounded-full animate-spin" />
         </div>
       )}
 
       {error && !loading && (
         <div className="absolute inset-0 flex items-center justify-center">
-          <span className="text-xs text-[#8a9099]">{error}</span>
+          <span className="text-xs text-sigap-textMuted">{error}</span>
         </div>
       )}
 
@@ -162,7 +163,7 @@ export function MiniMapCluster({ className = "", bbox, zoom = 10, month }: MiniM
 
           {normalizedClusters.length === 0 && !loading && (
             <div className="absolute inset-0 flex items-center justify-center">
-              <span className="text-xs text-[#8a9099]">Tidak ada data cluster</span>
+              <span className="text-xs text-sigap-textMuted">Tidak ada data cluster</span>
             </div>
           )}
         </div>
@@ -176,7 +177,7 @@ export function MiniMapCluster({ className = "", bbox, zoom = 10, month }: MiniM
           borderRadius: 6,
           fontSize: 11,
           fontWeight: 500,
-          color: "#616770",
+          color: colors.textTertiary,
           fontFamily: "'IBM Plex Sans', system-ui, sans-serif",
         }}
       >

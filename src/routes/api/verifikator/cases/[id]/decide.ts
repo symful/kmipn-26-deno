@@ -1,5 +1,6 @@
 import { Hono } from "hono";
 import type { Env } from "@/types/bindings";
+import { TERMINAL_STATES } from "@/types/case-states";
 import { requireAuth, type AuthVariables } from "@/lib/auth";
 import { requireRole } from "@/middleware/roles";
 import { withClient } from "@/lib/db";
@@ -10,7 +11,6 @@ import { VerifikatorDecisionSchema } from "@/lib/schemas";
 import { evaluatePriority } from "@/lib/priority/calculator";
 import { runAssessment } from "@/lib/agent/orchestrator";
 
-const TERMINAL_STATES = ["closed", "resolved", "rejected", "merged", "separated", "verified", "duplicate_merged"] as const;
 const UUID_REGEX = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
 
 export const decideRoute = new Hono<{ Bindings: Env; Variables: AuthVariables }>();

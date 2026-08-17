@@ -7,6 +7,7 @@ import { withClient } from "@/lib/db";
 import { appendAudit } from "@/lib/audit";
 import { logger } from "@/lib/logger";
 import { applyWilayahFilter } from "@/lib/rbac";
+import { redactPII } from "@/lib/csv-redaction";
 
 export const exportGeojsonRoute = new Hono<{ Bindings: Env; Variables: AuthVariables }>();
 
@@ -39,7 +40,7 @@ exportGeojsonRoute.get(
         properties: {
           id: row.id,
           category_id: row.category_id,
-          description: String(row.description ?? "").slice(0, 200),
+          description: redactPII(String(row.description ?? "")).slice(0, 200),
           status: row.status,
           severity: row.severity,
           created_at: row.created_at,

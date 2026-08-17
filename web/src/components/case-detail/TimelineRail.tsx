@@ -1,4 +1,6 @@
-import { colors, caseStatusColors } from "../../theme/tokens";
+import { useEffect, useState } from "react";
+import { api } from "../../api/client";
+import { logger } from "@/lib/logger";
 
 export interface TimelineEvent {
   time: string;
@@ -7,208 +9,100 @@ export interface TimelineEvent {
 }
 
 interface TimelineRailProps {
-  events: TimelineEvent[];
-  loading?: boolean;
-  error?: string | null;
-  onRetry?: () => void;
+  reportId: string;
 }
 
-export function TimelineRailLoadingState() {
-  return (
-    <div
-      className="flex flex-col gap-3 w-[340px] flex-shrink-0"
-      role="region"
-      aria-label="Memuat timeline"
-    >
-      <div className="px-1">
-        <span
-          className="text-xs font-semibold uppercase tracking-wider"
-          style={{ color: colors.textSecondary }}
-        >
-          Timeline &amp; keputusan
-        </span>
-      </div>
-      <div className="flex flex-col gap-4">
-        {[1, 2, 3].map((i) => (
-          <div key={i} className="flex items-start gap-3">
-            <div className="flex flex-col items-center pt-1">
-              <span
-                className="inline-block w-2.5 h-2.5 rounded-full flex-shrink-0 animate-pulse"
-                style={{ backgroundColor: colors.border }}
-                aria-hidden="true"
-              />
-              <span
-                className="w-px flex-1 my-1 animate-pulse"
-                style={{ backgroundColor: colors.border }}
-                aria-hidden="true"
-              />
+export const TimelineRail = ({ reportId }: TimelineRailProps) => {
+  const [events, setEvents] = useState<TimelineEvent[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+
+  const loadTimeline = async () => {
+    setLoading(true);
+    setError(null);
+    try {
+      const res = await api.reportTimeline(reportId);
+      // Transform API response to TimelineEvent format
+      const transformed: TimelineEvent[] = res.events.map((e) => {
+        let dotColor: "amber" | "teal" | "gray" = "gray";
+        if (e.status === "submitted" || e.status === "verified") dotColor = "teal";
+        else if (e.status === "under_review" || e.status === "needs_survey") dotColor = "amber";
+        return {
+          time: new Date(e.occurred_at).toLocaleDateString("id-ID", {
+            day: "2-digit",
+            month: "short",
+            hour: "2-digit",
+            minute: "2-digit",
+          }),
+          description: e.label,
+          dotColor,
+        };
+      });
+      setEvents(transformed);
+    } catch (e) {
+      logger.error("Failed to load timeline", { error: e });
+      setError("Gagal memuat timeline");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    if (reportId) {
+      loadTimeline();
+    }
+  }, [reportId]);
+
+  if (loading) {
+    return (
+      <div className="bg-white rounded-xl border border-neutral-200 p-5">
+        <div className="animate-pulse space-y-3">
+          {[1, 2, 3].map((i) => (
+            <div key={i} className="flex gap-3">
+              <div className="w-3 h-3 rounded-full bg-neutral-200"></div>
+              <div className="flex-1 space-y-2">
+                <div className="h-3 bg-neutral-200 rounded w-3/4"></div>
+                <div className="h-2 bg-neutral-200 rounded w-1/2"></div>
+              </div>
             </div>
-            <div className="flex flex-col gap-0.5 pb-4 min-w-0">
-              <span
-                className="text-xs font-mono animate-pulse"
-                style={{ color: colors.border, width: 60 }}
-              >
-                &nbsp;
-              </span>
-              <span
-                className="text-sm leading-snug animate-pulse"
-                style={{ color: colors.border, width: "80%" }}
-              >
-                &nbsp;
-              </span>
+          ))}
+        </div>
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="bg-white rounded-xl border border-neutral-200 p-5">
+        <p className="text-sm text-danger-600">{error}</p>
+        <button onClick={loadTimeline} className="mt-2 text-xs text-primary-600 hover:underline">
+          Coba lagi
+        </button>
+      </div>
+    );
+  }
+
+  return (
+    <div className="bg-white rounded-xl border border-neutral-200 p-5">
+      <h4 className="text-xs font-bold text-neutral-500 uppercase tracking-wider mb-3">Timeline</h4>
+      <div className="space-y-4">
+        {events.length === 0 ? (
+          <p className="text-sm text-neutral-400">Tidak ada aktivitas</p>
+        ) : (
+          events.map((event, i) => (
+            <div key={i} className="flex gap-3">
+              <div className={`w-3 h-3 rounded-full mt-1 flex-shrink-0 ${
+                event.dotColor === "amber" ? "bg-warning-500" :
+                event.dotColor === "teal" ? "bg-primary-500" : "bg-neutral-300"
+              }`}></div>
+              <div>
+                <p className="text-sm text-neutral-700">{event.description}</p>
+                <p className="text-xs text-neutral-400 mt-0.5">{event.time}</p>
+              </div>
             </div>
-          </div>
-        ))}
-      </div>
-    </div>
-  );
-}
-
-export function TimelineRailEmptyState() {
-  return (
-    <div
-      className="flex flex-col gap-3 w-[340px] flex-shrink-0"
-      role="region"
-      aria-label="Timeline kosong"
-    >
-      <div className="px-1">
-        <span
-          className="text-xs font-semibold uppercase tracking-wider"
-          style={{ color: colors.textSecondary }}
-        >
-          Timeline &amp; keputusan
-        </span>
-      </div>
-      <div className="flex items-center justify-center py-8">
-        <p className="text-sm" style={{ color: colors.textMuted }}>
-          Tidak ada timeline
-        </p>
-      </div>
-    </div>
-  );
-}
-
-export function TimelineRailErrorState({
-  error,
-  onRetry,
-}: {
-  error: string;
-  onRetry?: () => void;
-}) {
-  return (
-    <div
-      className="flex flex-col gap-3 w-[340px] flex-shrink-0"
-      role="alert"
-      aria-label="Error timeline"
-    >
-      <div className="px-1">
-        <span
-          className="text-xs font-semibold uppercase tracking-wider"
-          style={{ color: colors.textSecondary }}
-        >
-          Timeline &amp; keputusan
-        </span>
-      </div>
-      <div
-        className="flex flex-col items-center justify-center gap-3 py-6 px-4 rounded-lg"
-        style={{ backgroundColor: colors.surface, border: `1px solid ${colors.border}` }}
-      >
-        <p className="text-sm text-center" style={{ color: colors.perluTindakan }}>
-          {error || "Gagal memuat timeline"}
-        </p>
-        {onRetry && (
-          <button
-            type="button"
-            onClick={onRetry}
-            className="text-xs font-semibold px-3 py-1.5 rounded-lg transition-colors hover:opacity-90"
-            style={{ backgroundColor: colors.primary, color: "white" }}
-          >
-            Coba Lagi
-          </button>
+          ))
         )}
       </div>
     </div>
   );
-}
-
-const DOT_COLORS = {
-  amber: caseStatusColors.menunggu,
-  teal: colors.primary,
-  gray: caseStatusColors.ditolak,
-} as const;
-
-function TimelineDot({ color }: { color: "amber" | "teal" | "gray" }) {
-  const bgColor = DOT_COLORS[color];
-  return (
-    <span
-      className="inline-block w-2.5 h-2.5 rounded-full flex-shrink-0"
-      style={{ backgroundColor: bgColor }}
-      aria-hidden="true"
-    />
-  );
-}
-
-function TimelineItem({ event }: { event: TimelineEvent }) {
-  return (
-    <div className="flex items-start gap-3">
-      <div className="flex flex-col items-center pt-1">
-        <TimelineDot color={event.dotColor} />
-        <span
-          className="w-px flex-1 my-1"
-          style={{ backgroundColor: colors.border }}
-          aria-hidden="true"
-        />
-      </div>
-      <div className="flex flex-col gap-0.5 pb-4 min-w-0">
-        <span
-          className="text-xs font-mono"
-          style={{ color: colors.textMuted }}
-        >
-          {event.time}
-        </span>
-        <span
-          className="text-sm text-sigap-textPrimary leading-snug"
-        >
-          {event.description}
-        </span>
-      </div>
-    </div>
-  );
-}
-
-export function TimelineRail({ events, loading, error, onRetry }: TimelineRailProps) {
-  if (loading) {
-    return <TimelineRailLoadingState />;
-  }
-
-  if (error) {
-    return <TimelineRailErrorState error={error} {...(onRetry ? { onRetry } : {})} />;
-  }
-
-  if (!events || events.length === 0) {
-    return <TimelineRailEmptyState />;
-  }
-
-  return (
-    <div
-      className="flex flex-col gap-3 w-[340px] flex-shrink-0"
-      role="region"
-      aria-label="Timeline dan keputusan"
-    >
-      <div className="px-1">
-        <span
-          className="text-xs font-semibold uppercase tracking-wider"
-          style={{ color: colors.textSecondary }}
-        >
-          Timeline &amp; keputusan
-        </span>
-      </div>
-
-      <div className="flex flex-col">
-        {events.map((event, index) => (
-          <TimelineItem key={index} event={event} />
-        ))}
-      </div>
-    </div>
-  );
-}
+};

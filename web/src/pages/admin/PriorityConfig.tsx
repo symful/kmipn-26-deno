@@ -198,11 +198,11 @@ export const AdminPriorityConfig = () => {
   const previewScore = computePreview(editWeights);
 
   return (
-    <div className="flex min-h-[100dvh] bg-[#f9faf8]">
+    <div className="flex min-h-[100dvh] bg-sigap-surface">
       {/* Sidebar */}
-      <aside className="w-[220px] bg-[#16302b] text-[#cfe4df] flex flex-col shrink-0">
+      <aside className="w-[220px] bg-surface-sidebar text-sigap-textMuted flex flex-col shrink-0">
         <div className="flex items-center gap-2.5 px-4 py-4 pb-5">
-          <div className="w-8 h-8 rounded-lg bg-[#0f7a6b] flex items-center justify-center text-white font-bold text-base">
+          <div className="w-8 h-8 rounded-lg bg-sigap-primary flex items-center justify-center text-white font-bold text-base">
             P
           </div>
           <span className="text-base font-bold text-white">PantauDesa</span>
@@ -215,8 +215,8 @@ export const AdminPriorityConfig = () => {
               href={item.path}
               className={`flex items-center gap-2.5 px-3 py-2.5 rounded-lg text-sm font-medium transition-colors ${
                 item.active
-                  ? "bg-[#0f7a6b] text-white"
-                  : "hover:bg-[#234a43] text-[#cfe4df]"
+                  ? "bg-sigap-primary text-white"
+                  : "hover:bg-[#234A43] text-sigap-textMuted"
               }`}
             >
               <NavIcon type={item.icon} />
@@ -225,14 +225,14 @@ export const AdminPriorityConfig = () => {
           ))}
         </nav>
 
-        <div className="mt-auto px-3 pt-4 border-t border-[#234a43]">
-          <div className="flex items-center gap-2.5 px-3 py-2.5 text-sm text-[#9dc0b9]">
-            <span className="w-8 h-8 rounded-full bg-[#0f7a6b] flex items-center justify-center text-xs font-bold text-white">
+        <div className="mt-auto px-3 pt-4 border-t border-[#234A43]">
+          <div className="flex items-center gap-2.5 px-3 py-2.5 text-sm text-[#9DC0B9]">
+            <span className="w-8 h-8 rounded-full bg-sigap-primary flex items-center justify-center text-xs font-bold text-white">
               {user?.name?.slice(0, 2).toUpperCase() ?? "AD"}
             </span>
             <div className="flex-1 min-w-0">
               <div className="text-xs font-semibold truncate text-white">{user?.name ?? "Admin"}</div>
-              <div className="text-[10px] text-[#9dc0b9] truncate">{user?.role ?? "ADMIN"}</div>
+              <div className="text-[10px] text-[#9DC0B9] truncate">{user?.role ?? "ADMIN"}</div>
             </div>
           </div>
         </div>
@@ -241,9 +241,9 @@ export const AdminPriorityConfig = () => {
       {/* Main Content */}
       <div className="flex-1 flex flex-col min-w-0">
         {/* Header */}
-        <header className="h-14 border-b border-[#e4e7e2] flex items-center gap-4 px-6 shrink-0 bg-white">
+        <header className="h-14 border-b border-sigap-border flex items-center gap-4 px-6 shrink-0 bg-white">
           <div className="ml-auto flex items-center gap-3">
-            <span className="w-8 h-8 rounded-full bg-[#eef0ec] flex items-center justify-center text-xs font-bold text-[#0a5c50]">
+            <span className="w-8 h-8 rounded-full bg-neutral-100 flex items-center justify-center text-xs font-bold text-primary-600">
               {user?.name?.slice(0, 2).toUpperCase() ?? "AD"}
             </span>
           </div>
@@ -254,14 +254,14 @@ export const AdminPriorityConfig = () => {
           {/* Page Title */}
           <div className="flex items-center justify-between">
             <div>
-              <h2 className="text-xl font-bold text-[#17191c]">Konfigurasi Prioritas</h2>
-              <p className="text-xs text-[#616770] mt-0.5">Kelola versi formula penentuan prioritas kasus</p>
+              <h2 className="text-xl font-bold text-sigap-textPrimary">Konfigurasi Prioritas</h2>
+              <p className="text-xs text-sigap-textTertiary mt-0.5">Kelola versi formula penentuan prioritas kasus</p>
             </div>
             {isAdmin && (
               <button
                 onClick={handleCreateVersion}
                 disabled={creating}
-                className="inline-flex items-center gap-2 px-4 py-2.5 rounded-lg text-sm font-semibold text-white bg-[#0f7a6b] hover:bg-[#0a5c50] disabled:opacity-50 transition-colors"
+                className="inline-flex items-center gap-2 px-4 py-2.5 rounded-lg text-sm font-semibold text-white bg-sigap-primary hover:bg-primary-600 disabled:opacity-50 transition-colors"
               >
                 <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
@@ -272,13 +272,13 @@ export const AdminPriorityConfig = () => {
           </div>
 
           {error && (
-            <div className="p-3 rounded-lg bg-[#fef2f2] border border-[#fecaca] text-sm text-[#c0392b]">
+            <div className="p-3 rounded-lg bg-danger-100 border border-danger-200 text-sm text-danger-600">
               {error}
             </div>
           )}
 
           {successMsg && (
-            <div className="p-3 rounded-lg bg-[#f0fdf4] border border-[#bbf7d0] text-sm text-[#16a34a]">
+            <div className="p-3 rounded-lg bg-green-50 border border-green-200 text-sm text-green-700">
               {successMsg}
             </div>
           )}
@@ -286,16 +286,16 @@ export const AdminPriorityConfig = () => {
           {loading ? (
             <div className="space-y-3">
               {[1, 2, 3].map((i) => (
-                <div key={i} className="h-20 bg-white rounded-xl border border-[#e4e7e2] animate-pulse" />
+                <div key={i} className="h-20 bg-white rounded-xl border border-sigap-border animate-pulse" />
               ))}
             </div>
           ) : versions.length === 0 ? (
-            <div className="bg-white rounded-xl border border-[#e4e7e2] p-8 text-center">
-              <p className="text-sm text-[#8a9099]">Belum ada versi formula.</p>
+            <div className="bg-white rounded-xl border border-sigap-border p-8 text-center">
+              <p className="text-sm text-sigap-textMuted">Belum ada versi formula.</p>
               {isAdmin && (
                 <button
                   onClick={handleCreateVersion}
-                  className="mt-3 text-sm text-[#0f7a6b] font-semibold hover:underline"
+                  className="mt-3 text-sm text-sigap-primary font-semibold hover:underline"
                 >
                   Buat versi pertama
                 </button>
@@ -305,7 +305,7 @@ export const AdminPriorityConfig = () => {
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
               {/* Version History */}
               <div className="lg:col-span-1">
-                <h3 className="text-xs font-semibold text-[#616770] mb-3 uppercase tracking-wide">
+                <h3 className="text-xs font-semibold text-sigap-textTertiary mb-3 uppercase tracking-wide">
                   Riwayat Versi
                 </h3>
                 <div className="space-y-2">
@@ -315,25 +315,24 @@ export const AdminPriorityConfig = () => {
                       onClick={() => selectVersion(v)}
                       className={`w-full text-left p-4 rounded-xl border transition-all ${
                         selectedVersion?.version === v.version
-                          ? "border-[#0f7a6b] bg-[#0f7a6b]/5"
-                          : "border-[#e4e7e2] bg-white hover:border-[#0f7a6b]/40"
+                          ? "border-sigap-primary bg-sigap-primary/5"
+                          : "border-sigap-border bg-white hover:border-sigap-primary/40"
                       }`}
                     >
                       <div className="flex items-center justify-between mb-1">
-                        <span className="font-bold text-sm text-[#17191c]">
+                        <span className="font-bold text-sm text-sigap-textPrimary">
                           v{v.version}
                         </span>
                         {v.is_active && (
                           <span
-                            className="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-semibold"
-                            style={{ backgroundColor: "#0f7a6b20", color: "#0a5c50" }}
+                            className="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-semibold bg-primary-100 text-primary-600"
                           >
-                            <span className="w-1.5 h-1.5 rounded-full bg-[#0f7a6b] mr-1.5" />
+                            <span className="w-1.5 h-1.5 rounded-full bg-sigap-primary mr-1.5" />
                             Aktif
                           </span>
                         )}
                       </div>
-                      <p className="text-xs text-[#8a9099]">
+                      <p className="text-xs text-sigap-textMuted">
                         {new Date(v.created_at).toLocaleDateString("id-ID", {
                           day: "numeric",
                           month: "short",
@@ -341,7 +340,7 @@ export const AdminPriorityConfig = () => {
                         })}
                       </p>
                       {v.is_active && v.activated_at && (
-                        <p className="text-xs text-[#8a9099] mt-0.5">
+                        <p className="text-xs text-sigap-textMuted mt-0.5">
                           Diaktifkan{" "}
                           {new Date(v.activated_at).toLocaleDateString("id-ID", {
                             day: "numeric",
@@ -358,18 +357,17 @@ export const AdminPriorityConfig = () => {
               {/* Version Editor */}
               <div className="lg:col-span-2">
                 {selectedVersion ? (
-                  <div className="bg-white rounded-xl border border-[#e4e7e2] p-6">
+                  <div className="bg-white rounded-xl border border-sigap-border p-6">
                     <div className="flex items-center justify-between mb-5">
                       <div className="flex items-center gap-3">
-                        <h3 className="font-bold text-lg text-[#17191c]">
+                        <h3 className="font-bold text-lg text-sigap-textPrimary">
                           Edit Versi {selectedVersion.version}
                         </h3>
                         {selectedVersion.is_active && (
                           <span
-                            className="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-semibold"
-                            style={{ backgroundColor: "#0f7a6b20", color: "#0a5c50" }}
+                            className="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-semibold bg-primary-100 text-primary-600"
                           >
-                            <span className="w-1.5 h-1.5 rounded-full bg-[#0f7a6b] mr-1.5" />
+                            <span className="w-1.5 h-1.5 rounded-full bg-sigap-primary mr-1.5" />
                             Aktif
                           </span>
                         )}
@@ -378,7 +376,7 @@ export const AdminPriorityConfig = () => {
                         <button
                           onClick={() => handleActivate(selectedVersion)}
                           disabled={activating}
-                          className="text-sm px-4 py-2 rounded-lg border border-[#0f7a6b] text-[#0f7a6b] hover:bg-[#0f7a6b]/5 transition-colors disabled:opacity-50 font-medium"
+                          className="text-sm px-4 py-2 rounded-lg border border-sigap-primary text-sigap-primary hover:bg-sigap-primary/5 transition-colors disabled:opacity-50 font-medium"
                         >
                           {activating ? "Mengaktifkan..." : "Aktifkan"}
                         </button>
@@ -387,28 +385,28 @@ export const AdminPriorityConfig = () => {
 
                     {selectedVersion.is_active ? (
                       <div className="space-y-4">
-                        <p className="text-sm text-[#8a9099]">
+                        <p className="text-sm text-sigap-textMuted">
                           Bobot formula versi aktif sedang digunakan untuk menghitung prioritas kasus.
                         </p>
                         <div className="grid grid-cols-2 gap-3">
                           {WEIGHT_META.map((meta) => (
                             <div
                               key={meta.key}
-                              className="bg-[#f4f5f3] rounded-lg p-4 border border-[#e4e7e2]"
+                              className="bg-sigap-background rounded-lg p-4 border border-sigap-border"
                             >
                               <div className="flex items-center gap-2 mb-2">
                                 <div
                                   className="w-3 h-3 rounded-full"
                                   style={{ backgroundColor: meta.color }}
                                 />
-                                <span className="text-xs font-semibold text-[#616770] uppercase tracking-wide">
+                                <span className="text-xs font-semibold text-sigap-textTertiary uppercase tracking-wide">
                                   {meta.label}
                                 </span>
                               </div>
-                              <p className="text-2xl font-bold text-[#17191c]">
+                              <p className="text-2xl font-bold text-sigap-textPrimary">
                                 {(selectedVersion.weights[meta.key] * 100).toFixed(0)}%
                               </p>
-                              <p className="text-xs text-[#8a9099] mt-1">{meta.description}</p>
+                              <p className="text-xs text-sigap-textMuted mt-1">{meta.description}</p>
                             </div>
                           ))}
                         </div>
@@ -430,25 +428,25 @@ export const AdminPriorityConfig = () => {
                           ))}
                         </div>
 
-                        <div className="mt-5 p-4 bg-[#f4f5f3] rounded-lg border border-[#e4e7e2]">
+                        <div className="mt-5 p-4 bg-sigap-background rounded-lg border border-sigap-border">
                           <div className="flex items-center justify-between mb-2">
-                            <span className="text-sm font-semibold text-[#616770]">
+                            <span className="text-sm font-semibold text-sigap-textTertiary">
                               Total Bobot:
                             </span>
                             <span
                               className={`text-sm font-bold ${
-                                isValid ? "text-[#0a5c50]" : "text-[#c0392b]"
+                                isValid ? "text-primary-600" : "text-danger-500"
                               }`}
                             >
                               {(totalWeight * 100).toFixed(1)}%
                             </span>
                           </div>
                           {!isValid && (
-                            <p className="text-xs text-[#c0392b] mb-2">
+                            <p className="text-xs text-danger-500 mb-2">
                               Total bobot harus sama dengan 100%
                             </p>
                           )}
-                          <div className="h-2 bg-[#e4e7e2] rounded-full overflow-hidden">
+                          <div className="h-2 bg-sigap-border rounded-full overflow-hidden">
                             <div
                               className="h-full transition-all duration-300 rounded-full"
                               style={{
@@ -464,7 +462,7 @@ export const AdminPriorityConfig = () => {
                             type="button"
                             onClick={handleSaveWeights}
                             disabled={saving || !isValid}
-                            className="w-full mt-4 px-4 py-3 bg-[#0f7a6b] text-white rounded-lg font-semibold disabled:opacity-50 hover:bg-[#0a5c50] transition-colors"
+                            className="w-full mt-4 px-4 py-3 bg-sigap-primary text-white rounded-lg font-semibold disabled:opacity-50 hover:bg-primary-600 transition-colors"
                           >
                             {saving ? "Menyimpan..." : "Simpan"}
                           </button>
@@ -472,46 +470,46 @@ export const AdminPriorityConfig = () => {
                       </>
                     )}
 
-                    <div className="mt-6 pt-5 border-t border-[#e4e7e2]">
-                      <h4 className="text-sm font-semibold mb-3 text-[#616770] uppercase tracking-wide">
+                    <div className="mt-6 pt-5 border-t border-sigap-border">
+                      <h4 className="text-sm font-semibold mb-3 text-sigap-textTertiary uppercase tracking-wide">
                         Preview Perhitungan
                       </h4>
-                      <p className="text-xs text-[#8a9099] mb-3">
+                      <p className="text-xs text-sigap-textMuted mb-3">
                         Simulasi skor prioritas untuk kasus contoh dengan nilai normalisasi:
                       </p>
                       <div className="grid grid-cols-4 gap-2 mb-3">
                         {WEIGHT_META.map((meta) => (
-                          <div key={meta.key} className="text-center bg-[#f4f5f3] rounded-lg p-2">
-                            <p className="text-xs text-[#8a9099]">{meta.label}</p>
-                            <p className="text-xs font-semibold text-[#17191c]">
+                          <div key={meta.key} className="text-center bg-sigap-background rounded-lg p-2">
+                            <p className="text-xs text-sigap-textMuted">{meta.label}</p>
+                            <p className="text-xs font-semibold text-sigap-textPrimary">
                               0.{meta.key === "severity" ? "6" : meta.key === "impact" ? "3" : meta.key === "vulnerability" ? "4" : "5"}
                             </p>
                           </div>
                         ))}
                       </div>
-                      <div className="flex items-center justify-between bg-[#f4f5f3] rounded-lg p-3 border border-[#e4e7e2]">
-                        <span className="text-sm font-medium text-[#616770]">
+                      <div className="flex items-center justify-between bg-sigap-background rounded-lg p-3 border border-sigap-border">
+                        <span className="text-sm font-medium text-sigap-textTertiary">
                           Skor Prioritas:
                         </span>
-                        <span className="text-xl font-bold text-[#0f7a6b]">{previewScore}</span>
+                        <span className="text-xl font-bold text-sigap-primary">{previewScore}</span>
                       </div>
-                      <p className="text-xs text-[#8a9099] mt-2">
+                      <p className="text-xs text-sigap-textMuted mt-2">
                         Rumus: Σ(normalized_value × weight) × 100
                       </p>
                     </div>
                   </div>
                 ) : (
-                  <div className="bg-white rounded-xl border border-[#e4e7e2] p-8 text-center">
-                    <p className="text-sm text-[#8a9099]">Pilih versi untuk melihat detail</p>
+                  <div className="bg-white rounded-xl border border-sigap-border p-8 text-center">
+                    <p className="text-sm text-sigap-textMuted">Pilih versi untuk melihat detail</p>
                   </div>
                 )}
               </div>
             </div>
           )}
 
-          <div className="mt-6 p-4 bg-white rounded-xl border border-[#e4e7e2]">
-            <h4 className="text-sm font-semibold mb-2 text-[#17191c]">Tentang Formula Prioritas</h4>
-            <p className="text-xs text-[#8a9099] leading-relaxed">
+          <div className="mt-6 p-4 bg-white rounded-xl border border-sigap-border">
+            <h4 className="text-sm font-semibold mb-2 text-sigap-textPrimary">Tentang Formula Prioritas</h4>
+            <p className="text-xs text-sigap-textMuted leading-relaxed">
               Formula prioritas menentukan bagaimana skor kasus dihitung. Setiap versi menyimpan
               bobot untuk 4 faktor: Severity (keparahan), Impact (dampak jumlah warga), Vulnerability
               (kerentanan wilayah), dan SLA Pressure (tekanan waktu SLA). Bobot harus selalu
@@ -535,22 +533,22 @@ type WeightFieldProps = {
 
 function WeightField({ label, description, value, onChange, color }: WeightFieldProps) {
   return (
-    <div className="flex items-start gap-4 p-4 bg-[#f4f5f3] rounded-lg border border-[#e4e7e2]">
+    <div className="flex items-start gap-4 p-4 bg-sigap-background rounded-lg border border-sigap-border">
       <div
         className="w-1 h-full min-h-[60px] rounded-full flex-shrink-0"
         style={{ backgroundColor: color }}
       />
       <div className="flex-1">
         <div className="flex items-center justify-between mb-1">
-          <label className="text-sm font-semibold text-[#17191c]">{label}</label>
+          <label className="text-sm font-semibold text-sigap-textPrimary">{label}</label>
           <span
-            className="text-sm font-bold px-2 py-0.5 rounded text-[#17191c]"
+            className="text-sm font-bold px-2 py-0.5 rounded text-sigap-textPrimary"
             style={{ backgroundColor: `${color}20` }}
           >
             {(value * 100).toFixed(0)}%
           </span>
         </div>
-        <p className="text-xs text-[#8a9099] mb-3">{description}</p>
+        <p className="text-xs text-sigap-textMuted mb-3">{description}</p>
         <input
           type="range"
           min="0"
@@ -558,7 +556,7 @@ function WeightField({ label, description, value, onChange, color }: WeightField
           step="0.01"
           value={value}
           onChange={(e) => onChange(parseFloat(e.target.value))}
-          className="w-full h-2 bg-[#e4e7e2] rounded-full appearance-none cursor-pointer"
+          className="w-full h-2 bg-sigap-border rounded-full appearance-none cursor-pointer"
           style={{ accentColor: color }}
         />
       </div>

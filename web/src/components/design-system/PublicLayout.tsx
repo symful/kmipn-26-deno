@@ -1,111 +1,89 @@
-import React from 'react';
-import { Outlet } from 'react-router-dom';
-
-const navItems = ['Ringkasan', 'Peta & Daftar', 'Statistik', 'Metodologi'];
+import { Link } from "react-router-dom";
+import type { ReactNode } from "react";
 
 interface PublicLayoutProps {
-  children?: React.ReactNode;
+  children: ReactNode;
 }
 
-export function PublicLayout({ children }: PublicLayoutProps) {
+export const PublicLayout = ({ children }: PublicLayoutProps) => {
   return (
-    <div style={{ minHeight: '100vh', backgroundColor: '#F9FAF8' }}>
-      <header style={{
-        height: 60,
-        backgroundColor: 'white',
-        borderBottom: '1px solid #E4E7E2',
-        display: 'flex',
-        alignItems: 'center',
-        padding: '0 24px',
-      }}>
-        <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
-          <div style={{
-            width: 32,
-            height: 32,
-            backgroundColor: '#0F7A6B',
-            borderRadius: 8,
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-            color: 'white',
-            fontWeight: 700,
-          }}>
+    <div className="min-h-screen flex flex-col bg-sigap-background">
+      <header className="bg-white border-b border-neutral-200 px-4 md:px-7 py-3 md:py-[15px]">
+        <div className="flex items-center gap-3">
+          <div className="w-7 h-7 rounded-[7px] bg-sigap-primary flex items-center justify-center text-white font-bold text-sm">
             P
           </div>
-          <span style={{
-            padding: '4px 8px',
-            backgroundColor: '#E2F1EE',
-            color: '#0F7A6B',
-            fontSize: 11,
-            fontWeight: 600,
-            borderRadius: 4,
-          }}>
+          <span className="text-base font-bold tracking-tight text-sigap-textPrimary">
+            PantauDesa
+          </span>
+          <span className="text-xs text-sigap-textTertiary bg-neutral-100 rounded px-2 py-0.5 ml-1">
             Portal Publik
           </span>
         </div>
-
-        <nav style={{
-          display: 'flex',
-          gap: 24,
-          marginLeft: 48,
-        }}>
-          {navItems.map((item, i) => (
-            <span
-              key={item}
-              style={{
-                fontSize: 14,
-                fontWeight: i === 1 ? 600 : 500,
-                color: i === 1 ? '#0F7A6B' : '#3A3F45',
-                cursor: 'pointer',
-                paddingBottom: i === 1 ? 2 : 0,
-                borderBottom: i === 1 ? '2px solid #0F7A6B' : '2px solid transparent',
-              }}
-            >
-              {item}
-            </span>
-          ))}
+        <nav className="hidden md:flex gap-6 text-sm text-sigap-textTertiary mt-3 ml-10">
+          <Link to="/" className="hover:text-sigap-primary transition-colors">
+            Beranda
+          </Link>
+          <Link to="/public/cases" className="hover:text-sigap-primary transition-colors">
+            Peta & Daftar
+          </Link>
+          <Link to="/public/statistics" className="hover:text-sigap-primary transition-colors">
+            Statistik
+          </Link>
+          <Link to="/methodology" className="hover:text-sigap-primary transition-colors">
+            Metodologi
+          </Link>
         </nav>
-
-        <div style={{ flex: 1 }} />
-
-        <button style={{
-          padding: '8px 16px',
-          border: '1px solid #E4E7E2',
-          borderRadius: 8,
-          backgroundColor: 'white',
-          fontSize: 14,
-          fontWeight: 500,
-          cursor: 'pointer',
-          marginRight: 8,
-        }}>
-          Masuk
-        </button>
-        <button style={{
-          padding: '8px 16px',
-          backgroundColor: '#0F7A6B',
-          border: 'none',
-          borderRadius: 8,
-          color: 'white',
-          fontSize: 14,
-          fontWeight: 600,
-          cursor: 'pointer',
-        }}>
-          Buat laporan
-        </button>
+        <nav className="flex md:hidden gap-4 text-xs text-sigap-textTertiary mt-3 overflow-x-auto">
+          <Link to="/" className="hover:text-sigap-primary transition-colors whitespace-nowrap">
+            Beranda
+          </Link>
+          <Link to="/public/cases" className="hover:text-sigap-primary transition-colors whitespace-nowrap">
+            Peta & Daftar
+          </Link>
+          <Link to="/public/statistics" className="hover:text-sigap-primary transition-colors whitespace-nowrap">
+            Statistik
+          </Link>
+          <Link to="/methodology" className="hover:text-sigap-primary transition-colors whitespace-nowrap">
+            Metodologi
+          </Link>
+        </nav>
       </header>
 
-      <main style={{ padding: 24 }}>
-        {children ?? <Outlet />}
+      <main className="flex-1">
+        {children}
       </main>
 
-      <footer style={{
-        padding: '16px 24px',
-        borderTop: '1px solid #E4E7E2',
-        fontSize: 12,
-        color: '#8A9099',
-      }}>
-        Data laporan telah dianonimisasi untuk melindungi privasi pelapor.
+      <footer className="bg-white border-t border-neutral-200 px-4 md:px-7 py-6 md:py-8 mt-auto">
+        <div className="max-w-7xl mx-auto">
+          <div className="flex flex-col md:flex-row md:items-start gap-4 md:gap-8">
+            <div className="flex items-center gap-3">
+              <div className="w-7 h-7 rounded-[7px] bg-sigap-primary flex items-center justify-center text-white font-bold text-sm">
+                P
+              </div>
+              <span className="text-base font-bold tracking-tight text-sigap-textPrimary">
+                PantauDesa
+              </span>
+            </div>
+            <div className="flex-1">
+              <h3 className="text-sm font-semibold text-sigap-textPrimary mb-2">
+                Tentang SIGAP
+              </h3>
+              <p className="text-xs md:text-sm text-sigap-textSecondary leading-relaxed max-w-2xl">
+                SIGAP (Sistem Informasi Gestion Área Penyakit) adalah platform pemetaan dan monitoring
+                pembangunan desa yang memungkinkan warga untuk melaporkan dan memantau berbagai masalah
+                pembangunan di lingkungan mereka. Laporan diproses melalui verifikasi berlapis untuk
+                memastikan akurasi dan ditindaklanjuti oleh instansi pemerintah terkait.
+              </p>
+            </div>
+          </div>
+          <div className="mt-4 pt-4 border-t border-neutral-100">
+            <p className="text-xs text-sigap-textMuted text-center md:text-left">
+              &copy; {new Date().getFullYear()} SIGAP - Sistem Informasi Gestion Área Penyakit
+            </p>
+          </div>
+        </div>
       </footer>
     </div>
   );
-}
+};

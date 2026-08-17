@@ -1,7 +1,7 @@
 import { useEffect, useState, useCallback } from "react";
 import { Link } from "react-router-dom";
 import { api } from "../../api/client";
-import { colors } from "../../theme/tokens";
+import { colors, bgSoft } from "../../theme/tokens";
 import { logger } from "@/lib/logger";
 
 interface AuditorStats {
@@ -123,7 +123,7 @@ export const AuditorDashboard = () => {
               </div>
               <div className="bg-white rounded-lg p-4 border border-sigap-border">
                 <p className="text-xs text-sigap-textMuted">Failed (7d)</p>
-                <p className="text-2xl font-bold text-red-600">{stats.failed_attempts.toLocaleString()}</p>
+                <p className="text-2xl font-bold text-sigap-perluTindakan">{stats.failed_attempts.toLocaleString()}</p>
               </div>
             </div>
 
@@ -134,11 +134,11 @@ export const AuditorDashboard = () => {
                   <div className="flex items-center gap-3">
                     {chainIntegrity.ok ? (
                       <>
-                        <div className="w-10 h-10 rounded-full bg-green-100 flex items-center justify-center">
-                          <span className="text-green-600 text-xl">✓</span>
+                        <div className="w-10 h-10 rounded-full bg-sigap-selesai flex items-center justify-center">
+                          <span className="text-sigap-selesai text-xl">✓</span>
                         </div>
                         <div>
-                          <p className="font-semibold text-green-600">Integrity Verified</p>
+                          <p className="font-semibold text-sigap-selesai">Integrity Verified</p>
                           <p className="text-xs text-sigap-textMuted">
                             {chainIntegrity.count.toLocaleString()} entries checked
                           </p>
@@ -146,11 +146,11 @@ export const AuditorDashboard = () => {
                       </>
                     ) : (
                       <>
-                        <div className="w-10 h-10 rounded-full bg-red-100 flex items-center justify-center">
-                          <span className="text-red-600 text-xl">✗</span>
+                        <div className="w-10 h-10 rounded-full bg-sigap-perluTindakan flex items-center justify-center">
+                          <span className="text-sigap-perluTindakan text-xl">✗</span>
                         </div>
                         <div>
-                          <p className="font-semibold text-red-600">Integrity Broken</p>
+                          <p className="font-semibold text-sigap-perluTindakan">Integrity Broken</p>
                           <p className="text-xs text-sigap-textMuted">
                             First break at entry {chainIntegrity.first_break_at}
                           </p>
@@ -213,7 +213,7 @@ export const AuditorDashboard = () => {
                           </td>
                           <td className="py-2 px-3 truncate max-w-[150px]">{entry.actor ?? "-"}</td>
                           <td className="py-2 px-3">
-                            <span className="px-2 py-1 bg-red-100 text-red-700 rounded text-xs font-medium">
+                            <span className="px-2 py-1 bg-sigap-perluTindakan text-sigap-perluTindakan rounded text-xs font-medium">
                               {entry.action}
                             </span>
                           </td>

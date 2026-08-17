@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import { api } from "../../api/client";
 import type { Report } from "../../types";
 import { useAuthStore } from "../../stores/auth";
-import { colors } from "../../theme/tokens";
+import { colors, statusColors, extendedColors } from "../../theme/tokens";
 import { Link } from "react-router-dom";
 import { MapView } from "../../components/MapView";
 import { logger } from "@/lib/logger";
@@ -34,16 +34,16 @@ interface ToolStats {
 
 const AssessmentStatusBadge = ({ status }: { status: string }) => {
   const normalized = status.toLowerCase();
-  const styles: Record<string, { bg: string; text: string }> = {
-    completed: { bg: "bg-green-100", text: "text-green-700" },
-    success: { bg: "bg-green-100", text: "text-green-700" },
-    timeout: { bg: "bg-yellow-100", text: "text-yellow-700" },
-    parse_failed: { bg: "bg-red-100", text: "text-red-700" },
-    vlm_error: { bg: "bg-red-100", text: "text-red-700" },
-    failed: { bg: "bg-red-100", text: "text-red-700" },
-    error: { bg: "bg-red-100", text: "text-red-700" },
+  const statusStyles: Record<string, { bg: string; text: string }> = {
+    completed: { bg: "#dcfce7", text: "#166534" },
+    success: { bg: "#dcfce7", text: "#166534" },
+    timeout: { bg: "#fef9c3", text: "#854d0e" },
+    parse_failed: { bg: "#fee2e2", text: "#991b1b" },
+    vlm_error: { bg: "#fee2e2", text: "#991b1b" },
+    failed: { bg: "#fee2e2", text: "#991b1b" },
+    error: { bg: "#fee2e2", text: "#991b1b" },
   };
-  const { bg, text } = styles[normalized] ?? { bg: "bg-gray-100", text: "text-gray-700" };
+  const { bg, text } = statusStyles[normalized] ?? { bg: "#f3f4f6", text: "#374151" };
   const labels: Record<string, string> = {
     completed: "Completed",
     success: "Success",
@@ -54,7 +54,10 @@ const AssessmentStatusBadge = ({ status }: { status: string }) => {
     error: "Error",
   };
   return (
-    <span className={`px-2 py-0.5 rounded text-xs font-medium ${bg} ${text}`}>
+    <span
+      className="px-2 py-0.5 rounded text-xs font-medium"
+      style={{ backgroundColor: bg, color: text }}
+    >
       {labels[normalized] ?? status}
     </span>
   );
@@ -125,7 +128,7 @@ export const OperatorAIConsole = () => {
       .reports(params)
       .then(async (data) => {
         const items: AssessmentWithReport[] = [];
-        const assessmentPromises = data.reports.map(async (report) => {
+        const assessmentPromises = data.items.map(async (report) => {
           try {
             const res = await api.reportAssessments(report.id);
             if (res.assessments && res.assessments.length > 0) {
@@ -163,7 +166,7 @@ export const OperatorAIConsole = () => {
             new Date(a.assessment.created_at).getTime()
         );
         setAssessments(items);
-        setTotal(data.total);
+        setTotal(data.pagination.total);
       })
       .catch((e) => { logger.error("Failed to fetch assessments", { error: e }); setError("Gagal memuat data assessment"); })
       .finally(() => setLoading(false));
@@ -313,11 +316,11 @@ export const OperatorAIConsole = () => {
           </div>
           <div className="bg-sigap-surface rounded-lg border border-sigap-border p-4">
             <p className="text-xs text-sigap-textMuted mb-1">Berhasil</p>
-            <p className="text-2xl font-bold text-green-600">{stats.completed}</p>
+            <p className="text-2xl font-bold" style={{ color: colors.selesai }}>{stats.completed}</p>
           </div>
           <div className="bg-sigap-surface rounded-lg border border-sigap-border p-4">
             <p className="text-xs text-sigap-textMuted mb-1">Gagal</p>
-            <p className="text-2xl font-bold text-red-600">{stats.failed}</p>
+            <p className="text-2xl font-bold" style={{ color: colors.danger }}>{stats.failed}</p>
           </div>
           <div className="bg-sigap-surface rounded-lg border border-sigap-border p-4">
             <p className="text-xs text-sigap-textMuted mb-1">Rata-rata Confidence</p>
@@ -325,7 +328,7 @@ export const OperatorAIConsole = () => {
           </div>
           <div className="bg-sigap-surface rounded-lg border border-sigap-border p-4">
             <p className="text-xs text-sigap-textMuted mb-1">Failure Rate</p>
-            <p className="text-2xl font-bold text-orange-600">{stats.failureRate}%</p>
+            <p className="text-2xl font-bold" style={{ color: colors.warning }}>{stats.failureRate}%</p>
           </div>
         </div>
 
@@ -417,7 +420,10 @@ export const OperatorAIConsole = () => {
         {loading ? (
           <p className="text-sigap-textMuted py-8 text-center">Memuat...</p>
         ) : error ? (
-          <div className="p-4 rounded bg-red-50 border border-red-200 text-sm text-red-700">
+          <div
+            className="p-4 rounded text-sm"
+            style={{ backgroundColor: colors.dangerBg, borderColor: extendedColors.dangerBorder, color: colors.danger, borderWidth: "1px", borderStyle: "solid" }}
+          >
             {error}
           </div>
         ) : assessments.length === 0 ? (

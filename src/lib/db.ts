@@ -8,7 +8,6 @@ export async function withClient<T>(
   env: Env,
   fn: (client: Client) => Promise<T>,
 ): Promise<T> {
-  // In Cloudflare Workers, Hyperdrive binding is available
   const isWorker = typeof caches !== "undefined" && typeof fetch !== "undefined";
   const connectionString = isWorker
     ? env.HYPERDRIVE.connectionString
@@ -17,7 +16,6 @@ export async function withClient<T>(
   const url = new URL(connectionString);
   const password = url.password ? decodeURIComponent(url.password) : "";
 
-  // Let pg handle Cloudflare detection internally - it uses pg-cloudflare automatically
   const client = new Client({
     host: url.hostname,
     port: url.port ? parseInt(url.port, 10) : 5432,

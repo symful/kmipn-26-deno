@@ -84,7 +84,7 @@ async function main() {
     kecId = existing.rows[0]?.id;
   }
 
-  const desas = ["Ciburuy", "Kaler", "Girang", "Wetan", "Hegarsari", "Sukamanah", "Taman\x智慧", "Puro"];
+  const desas = ["Ciburuy", "Kaler", "Girang", "Wetan", "Hegarsari", "Sukamanah", "Taman\u667A\u616E", "Puro"];
   for (const desaName of desas) {
     await c.query(
       `INSERT INTO wilayah (name, level, parent_id) VALUES ($1, 'DESA', $2) ON CONFLICT DO NOTHING`,

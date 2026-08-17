@@ -45,7 +45,7 @@ auditExportRoute.get(
       const where = filters.length ? `WHERE ${filters.join(" AND ")}` : "";
 
       const r = await client.query(
-        `SELECT id, actor, action, object_type, object_id, before_data, after_data, reason, prev_hash, entry_hash, created_at
+        `SELECT id, actor, action, object_type, object_id, before_data, after_data, reason, created_at
          FROM audit_log ${where}
          ORDER BY created_at DESC
          LIMIT 10000`,
@@ -60,8 +60,6 @@ auditExportRoute.get(
         before: row.before_data,
         after: row.after_data,
         reason: row.reason,
-        prev_hash: row.prev_hash,
-        entry_hash: row.entry_hash,
         created_at: row.created_at,
       }));
     });
@@ -77,7 +75,7 @@ auditExportRoute.get(
       });
     }
 
-    const headers = ["id", "actor", "action", "object_type", "object_id", "reason", "prev_hash", "entry_hash", "created_at"];
+    const headers = ["id", "actor", "action", "object_type", "object_id", "reason", "created_at"];
     const lines: string[] = [headers.map(csvEscape).join(",")];
     for (const entry of entries) {
       lines.push([
@@ -87,8 +85,6 @@ auditExportRoute.get(
         csvEscape(entry.object_type),
         csvEscape(entry.object_id ?? ""),
         csvEscape(entry.reason ?? ""),
-        csvEscape(entry.prev_hash ?? ""),
-        csvEscape(entry.entry_hash ?? ""),
         csvEscape(entry.created_at),
       ].join(","));
     }

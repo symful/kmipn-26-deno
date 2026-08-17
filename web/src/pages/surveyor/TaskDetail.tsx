@@ -399,7 +399,7 @@ export default function TaskDetail() {
                   {photoUploading[i] ? "Mengunggah..." : c.photo ? "Ganti Foto" : "Ambil Foto"}
                 </button>
                 {c.photo && (
-                  <span className="text-xs text-green-600">Foto terunggah</span>
+                  <span className="text-xs text-green-600 font-medium">Foto terunggah</span>
                 )}
 
                 <button
@@ -411,7 +411,7 @@ export default function TaskDetail() {
                   {gpsLoading[i] ? "Mendapatkan GPS..." : c.gps ? "Update GPS" : "Ambil GPS"}
                 </button>
                 {c.gps && (
-                  <span className="text-xs text-green-600 font-mono">
+                  <span className="text-xs text-green-600 font-mono font-medium">
                     {c.gps.lat.toFixed(6)}, {c.gps.lng.toFixed(6)}
                   </span>
                 )}
@@ -431,13 +431,13 @@ export default function TaskDetail() {
         </div>
 
         {error && (
-          <p className="text-sm text-sigap-perluTindakan bg-red-50 p-2 rounded">
+          <p className={`text-sm text-sigap-perluTindakan bg-danger-50 p-2 rounded`}>
             {error}
           </p>
         )}
 
         {syncStatus === "queued" && (
-          <p className="text-sm text-amber-600 bg-amber-50 p-2 rounded">
+          <p className={`text-sm text-warning-600 bg-warning-50 p-2 rounded`}>
             Data disimpan secara offline. Akan dikirim saat koneksi tersedia.
           </p>
         )}
@@ -446,7 +446,7 @@ export default function TaskDetail() {
           type="button"
           onClick={submit}
           disabled={!canSubmit}
-          className="w-full px-4 py-2 bg-blue-600 text-white rounded font-medium disabled:opacity-50"
+          className={`w-full px-4 py-2 bg-primary-600 text-white rounded font-medium disabled:opacity-50`}
         >
           {submitting
             ? "Mengirim..."

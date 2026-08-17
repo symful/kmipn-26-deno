@@ -54,6 +54,10 @@ export interface Env {
   OUTBOUND_HMAC_HEADER?: string;
   /** Comma-separated list of allowed CORS origins */
   ALLOWED_ORIGINS?: string;
+  /** Max retry attempts for failed assessments */
+  RETRY_MAX_ATTEMPTS?: string;
+  /** Batch limit for failed assessments retry */
+  RETRY_BATCH_LIMIT?: string;
 }
 
 declare global {

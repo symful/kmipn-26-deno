@@ -348,11 +348,11 @@ export const AdminUsers = () => {
   };
 
   return (
-    <div className="flex min-h-[100dvh] bg-[#f9faf8]">
+    <div className="flex min-h-[100dvh] bg-sigap-surface">
       {/* Sidebar */}
-      <aside className="w-[220px] bg-[#16302b] text-[#cfe4df] flex flex-col shrink-0">
+      <aside className="w-[220px] bg-surface-sidebar text-sigap-textMuted flex flex-col shrink-0">
         <div className="flex items-center gap-2.5 px-4 py-4 pb-5">
-          <div className="w-8 h-8 rounded-lg bg-[#0f7a6b] flex items-center justify-center text-white font-bold text-base">
+          <div className="w-8 h-8 rounded-lg bg-sigap-primary flex items-center justify-center text-white font-bold text-base">
             P
           </div>
           <span className="text-base font-bold text-white">PantauDesa</span>
@@ -365,8 +365,8 @@ export const AdminUsers = () => {
               href={item.path}
               className={`flex items-center gap-2.5 px-3 py-2.5 rounded-lg text-sm font-medium transition-colors ${
                 item.active
-                  ? "bg-[#0f7a6b] text-white"
-                  : "hover:bg-[#234a43] text-[#cfe4df]"
+                  ? "bg-sigap-primary text-white"
+                  : "hover:bg-[#234A43] text-sigap-textMuted"
               }`}
             >
               <NavIcon type={item.icon} />
@@ -375,14 +375,14 @@ export const AdminUsers = () => {
           ))}
         </nav>
 
-        <div className="mt-auto px-3 pt-4 border-t border-[#234a43]">
-          <div className="flex items-center gap-2.5 px-3 py-2.5 text-sm text-[#9dc0b9]">
-            <span className="w-8 h-8 rounded-full bg-[#0f7a6b] flex items-center justify-center text-xs font-bold text-white">
+        <div className="mt-auto px-3 pt-4 border-t border-[#234A43]">
+          <div className="flex items-center gap-2.5 px-3 py-2.5 text-sm text-[#9DC0B9]">
+            <span className="w-8 h-8 rounded-full bg-sigap-primary flex items-center justify-center text-xs font-bold text-white">
               {user?.name?.slice(0, 2).toUpperCase() ?? "AD"}
             </span>
             <div className="flex-1 min-w-0">
               <div className="text-xs font-semibold truncate text-white">{user?.name ?? "Admin"}</div>
-              <div className="text-[10px] text-[#9dc0b9] truncate">{user?.role ?? "ADMIN"}</div>
+              <div className="text-[10px] text-[#9DC0B9] truncate">{user?.role ?? "ADMIN"}</div>
             </div>
           </div>
         </div>
@@ -391,14 +391,14 @@ export const AdminUsers = () => {
       {/* Main Content */}
       <div className="flex-1 flex flex-col min-w-0">
         {/* Header */}
-        <header className="h-14 border-b border-[#e4e7e2] flex items-center gap-4 px-6 shrink-0 bg-white">
-          <div className="max-w-[360px] flex-1 bg-[#f4f5f3] border border-[#e4e7e2] rounded-lg px-3 py-2 flex items-center gap-2">
+        <header className="h-14 border-b border-sigap-border flex items-center gap-4 px-6 shrink-0 bg-white">
+          <div className="max-w-[360px] flex-1 bg-sigap-background border border-sigap-border rounded-lg px-3 py-2 flex items-center gap-2">
             <SearchIcon />
-            <span className="text-xs text-[#8a9099]">Cari users...</span>
+            <span className="text-xs text-sigap-textMuted">Cari users...</span>
           </div>
 
           <div className="ml-auto flex items-center gap-3">
-            <span className="w-8 h-8 rounded-full bg-[#eef0ec] flex items-center justify-center text-xs font-bold text-[#0a5c50]">
+            <span className="w-8 h-8 rounded-full bg-neutral-100 flex items-center justify-center text-xs font-bold text-primary-600">
               {user?.name?.slice(0, 2).toUpperCase() ?? "AD"}
             </span>
           </div>
@@ -409,8 +409,8 @@ export const AdminUsers = () => {
           {/* Page Title */}
           <div className="flex items-center justify-between">
             <div>
-              <h2 className="text-xl font-bold text-[#17191c]">Manajemen User</h2>
-              <p className="text-xs text-[#616770] mt-0.5">Kelola pengguna sistem dan hak akses</p>
+              <h2 className="text-xl font-bold text-sigap-textPrimary">Manajemen User</h2>
+              <p className="text-xs text-sigap-textTertiary mt-0.5">Kelola pengguna sistem dan hak akses</p>
             </div>
             <button
               onClick={() => {
@@ -418,7 +418,7 @@ export const AdminUsers = () => {
                 setCreateError(null);
                 setCreateSuccess(null);
               }}
-              className="inline-flex items-center gap-2 px-4 py-2.5 rounded-lg text-sm font-semibold text-white bg-[#0f7a6b] hover:bg-[#0a5c50] transition-colors shadow-btn"
+              className="inline-flex items-center gap-2 px-4 py-2.5 rounded-lg text-sm font-semibold text-white bg-sigap-primary hover:bg-primary-600 transition-colors shadow-btn"
             >
               <UserPlusIcon />
               Buat User
@@ -426,10 +426,10 @@ export const AdminUsers = () => {
           </div>
 
           {/* Filters Card */}
-          <div className="bg-white border border-[#e4e7e2] rounded-xl p-4">
+          <div className="bg-white border border-sigap-border rounded-xl p-4">
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div>
-                <label htmlFor="search-filter" className="block text-xs font-semibold text-[#616770] mb-1.5">
+                <label htmlFor="search-filter" className="block text-xs font-semibold text-sigap-textTertiary mb-1.5">
                   Cari
                 </label>
                 <div className="relative">
@@ -445,13 +445,13 @@ export const AdminUsers = () => {
                       setPage(1);
                     }}
                     placeholder="Nama atau email..."
-                    className="w-full pl-10 pr-4 py-2.5 rounded-lg border border-[#e4e7e2] bg-[#f4f5f3] text-sm text-[#17191c] placeholder-[#8a9099] focus:outline-none focus:ring-2 focus:ring-[#0f7a6b]/30 focus:border-[#0f7a6b] transition-colors"
+                    className="w-full pl-10 pr-4 py-2.5 rounded-lg border border-sigap-border bg-sigap-background text-sm text-sigap-textPrimary placeholder-sigap-textMuted focus:outline-none focus:ring-2 focus:ring-sigap-primary/30 focus:border-sigap-primary transition-colors"
                   />
                 </div>
               </div>
 
               <div>
-                <label htmlFor="role-filter" className="block text-xs font-semibold text-[#616770] mb-1.5">
+                <label htmlFor="role-filter" className="block text-xs font-semibold text-sigap-textTertiary mb-1.5">
                   Filter Role
                 </label>
                 <select
@@ -461,7 +461,7 @@ export const AdminUsers = () => {
                     setRoleFilter(e.target.value as UserRole | "");
                     setPage(1);
                   }}
-                  className="w-full px-4 py-2.5 rounded-lg border border-[#e4e7e2] bg-[#f4f5f3] text-sm text-[#17191c] focus:outline-none focus:ring-2 focus:ring-[#0f7a6b]/30 focus:border-[#0f7a6b] transition-colors"
+                  className="w-full px-4 py-2.5 rounded-lg border border-sigap-border bg-sigap-background text-sm text-sigap-textPrimary focus:outline-none focus:ring-2 focus:ring-sigap-primary/30 focus:border-sigap-primary transition-colors"
                 >
                   <option value="">Semua Role</option>
                   {ROLES.map((r) => (
@@ -476,30 +476,30 @@ export const AdminUsers = () => {
 
           {/* Stats Row */}
           <div className="grid grid-cols-3 gap-4">
-            <div className="bg-white border border-[#e4e7e2] border-t-[3px] border-t-[#0f7a6b] rounded-xl p-4">
-              <div className="text-2xl font-bold text-[#0a5c50]">{total}</div>
-              <div className="text-xs text-[#616770] mt-0.5">Total User</div>
+            <div className="bg-white border border-sigap-border border-t-[3px] border-t-sigap-primary rounded-xl p-4">
+              <div className="text-2xl font-bold text-primary-600">{total}</div>
+              <div className="text-xs text-sigap-textTertiary mt-0.5">Total User</div>
             </div>
-            <div className="bg-white border border-[#e4e7e2] border-t-[3px] border-t-[#2563eb] rounded-xl p-4">
-              <div className="text-2xl font-bold text-[#1d4ed8]">{users.filter(u => !u.disabled).length}</div>
-              <div className="text-xs text-[#616770] mt-0.5">Active</div>
+            <div className="bg-white border border-sigap-border border-t-[3px] border-t-info-500 rounded-xl p-4">
+              <div className="text-2xl font-bold text-info-600">{users.filter(u => !u.disabled).length}</div>
+              <div className="text-xs text-sigap-textTertiary mt-0.5">Active</div>
             </div>
-            <div className="bg-white border border-[#e4e7e2] border-t-[3px] border-t-[#8a9099] rounded-xl p-4">
-              <div className="text-2xl font-bold text-[#616770]">{users.filter(u => u.disabled).length}</div>
-              <div className="text-xs text-[#616770] mt-0.5">Inactive</div>
+            <div className="bg-white border border-sigap-border border-t-[3px] border-t-neutral-400 rounded-xl p-4">
+              <div className="text-2xl font-bold text-neutral-500">{users.filter(u => u.disabled).length}</div>
+              <div className="text-xs text-sigap-textTertiary mt-0.5">Inactive</div>
             </div>
           </div>
 
           {/* Table Card */}
-          <div className="bg-white rounded-xl border border-[#e4e7e2] overflow-hidden">
-            <div className="px-6 py-4 border-b border-[#e4e7e2] flex items-center justify-between">
-              <h3 className="text-base font-bold text-[#17191c]">Daftar User</h3>
-              <p className="text-sm text-[#616770]">{total} total</p>
+          <div className="bg-white rounded-xl border border-sigap-border overflow-hidden">
+            <div className="px-6 py-4 border-b border-sigap-border flex items-center justify-between">
+              <h3 className="text-base font-bold text-sigap-textPrimary">Daftar User</h3>
+              <p className="text-sm text-sigap-textTertiary">{total} total</p>
             </div>
 
             {loading ? (
               <div className="px-6 py-12 text-center">
-                <div className="inline-flex items-center gap-2 text-[#8a9099]">
+                <div className="inline-flex items-center gap-2 text-sigap-textMuted">
                   <svg className="animate-spin w-5 h-5" fill="none" viewBox="0 0 24 24">
                     <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
                     <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z" />
@@ -508,33 +508,32 @@ export const AdminUsers = () => {
                 </div>
               </div>
             ) : users.length === 0 ? (
-              <div className="px-6 py-12 text-center text-[#8a9099]">Tidak ada data user.</div>
+              <div className="px-6 py-12 text-center text-sigap-textMuted">Tidak ada data user.</div>
             ) : (
               <>
                 <div className="overflow-x-auto">
                   <table className="w-full text-sm min-w-[800px]">
                     <thead>
-                      <tr className="bg-[#f4f5f3] border-b border-[#e4e7e2]">
-                        <th className="text-left py-3 px-6 text-xs font-semibold text-[#616770]">Email</th>
-                        <th className="text-left py-3 px-6 text-xs font-semibold text-[#616770]">Nama</th>
-                        <th className="text-left py-3 px-6 text-xs font-semibold text-[#616770]">Role</th>
-                        <th className="text-left py-3 px-6 text-xs font-semibold text-[#616770]">Status</th>
-                        <th className="text-left py-3 px-6 text-xs font-semibold text-[#616770]">Dibuat</th>
-                        <th className="text-left py-3 px-6 text-xs font-semibold text-[#616770]">Aksi</th>
+                      <tr className="bg-sigap-background border-b border-sigap-border">
+                        <th className="text-left py-3 px-6 text-xs font-semibold text-sigap-textTertiary">Email</th>
+                        <th className="text-left py-3 px-6 text-xs font-semibold text-sigap-textTertiary">Nama</th>
+                        <th className="text-left py-3 px-6 text-xs font-semibold text-sigap-textTertiary">Role</th>
+                        <th className="text-left py-3 px-6 text-xs font-semibold text-sigap-textTertiary">Status</th>
+                        <th className="text-left py-3 px-6 text-xs font-semibold text-sigap-textTertiary">Dibuat</th>
+                        <th className="text-left py-3 px-6 text-xs font-semibold text-sigap-textTertiary">Aksi</th>
                       </tr>
                     </thead>
                     <tbody>
                       {users.map((u) => (
                         <tr
                           key={u.id}
-                          className="border-b border-[#e4e7e2] last:border-0 hover:bg-[#f4f5f3]/50 transition-colors"
+                          className="border-b border-sigap-border last:border-0 hover:bg-sigap-background/50 transition-colors"
                         >
-                          <td className="py-3.5 px-6 text-[#8a9099]">{u.email}</td>
-                          <td className="py-3.5 px-6 font-medium text-[#17191c]">{u.name}</td>
+                          <td className="py-3.5 px-6 text-sigap-textMuted">{u.email}</td>
+                          <td className="py-3.5 px-6 font-medium text-sigap-textPrimary">{u.name}</td>
                           <td className="py-3.5 px-6">
                             <span
-                              className="inline-flex px-2.5 py-1 rounded-full text-xs font-semibold"
-                              style={{ backgroundColor: "#0f7a6b20", color: "#0a5c50" }}
+                              className="inline-flex px-2.5 py-1 rounded-full text-xs font-semibold bg-primary-100 text-primary-600"
                             >
                               {ROLE_LABELS[u.role] ?? u.role}
                             </span>
@@ -542,28 +541,26 @@ export const AdminUsers = () => {
                           <td className="py-3.5 px-6">
                             {u.disabled ? (
                               <span
-                                className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-semibold"
-                                style={{ backgroundColor: "#8a909920", color: "#616770" }}
+                                className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-semibold bg-neutral-100 text-neutral-500"
                               >
-                                <span className="w-1.5 h-1.5 rounded-full bg-[#8a9099]" />
+                                <span className="w-1.5 h-1.5 rounded-full bg-neutral-400" />
                                 Inactive
                               </span>
                             ) : (
                               <span
-                                className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-semibold"
-                                style={{ backgroundColor: "#22c55e20", color: "#16a34a" }}
+                                className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-semibold bg-green-100 text-green-700"
                               >
-                                <span className="w-1.5 h-1.5 rounded-full bg-[#22c55e]" />
+                                <span className="w-1.5 h-1.5 rounded-full bg-green-500" />
                                 Active
                               </span>
                             )}
                           </td>
-                          <td className="py-3.5 px-6 text-[#8a9099]">{formatDate(u.created_at)}</td>
+                          <td className="py-3.5 px-6 text-sigap-textMuted">{formatDate(u.created_at)}</td>
                           <td className="py-3.5 px-6">
                             <div className="flex items-center gap-2">
                               <button
                                 onClick={() => handleEditOpen(u)}
-                                className="inline-flex items-center justify-center w-8 h-8 rounded-lg text-[#8a9099] hover:text-[#0f7a6b] hover:bg-[#0f7a6b]/10 transition-colors"
+                                className="inline-flex items-center justify-center w-8 h-8 rounded-lg text-sigap-textMuted hover:text-sigap-primary hover:bg-sigap-primary/10 transition-colors"
                                 title="Edit"
                               >
                                 <PencilIcon />
@@ -572,7 +569,7 @@ export const AdminUsers = () => {
                               {u.disabled ? (
                                 <button
                                   onClick={() => handleConfirmOpen(u, "reactivate")}
-                                  className="inline-flex items-center justify-center w-8 h-8 rounded-lg text-[#8a9099] hover:text-[#22c55e] hover:bg-[#22c55e]/10 transition-colors"
+                                  className="inline-flex items-center justify-center w-8 h-8 rounded-lg text-sigap-textMuted hover:text-green-600 hover:bg-green-100 transition-colors"
                                   title="Aktifkan"
                                 >
                                   <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -582,7 +579,7 @@ export const AdminUsers = () => {
                               ) : (
                                 <button
                                   onClick={() => handleConfirmOpen(u, "deactivate")}
-                                  className="inline-flex items-center justify-center w-8 h-8 rounded-lg text-[#8a9099] hover:text-[#b8730a] hover:bg-[#b8730a]/10 transition-colors"
+                                  className="inline-flex items-center justify-center w-8 h-8 rounded-lg text-sigap-textMuted hover:text-warning-500 hover:bg-warning-100 transition-colors"
                                   title="Nonaktifkan"
                                 >
                                   <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -593,7 +590,7 @@ export const AdminUsers = () => {
 
                               <button
                                 onClick={() => handleConfirmOpen(u, "delete")}
-                                className="inline-flex items-center justify-center w-8 h-8 rounded-lg text-[#8a9099] hover:text-[#c0392b] hover:bg-[#c0392b]/10 transition-colors"
+                                className="inline-flex items-center justify-center w-8 h-8 rounded-lg text-sigap-textMuted hover:text-danger-500 hover:bg-danger-100 transition-colors"
                                 title="Hapus"
                               >
                                 <TrashIcon />
@@ -607,25 +604,25 @@ export const AdminUsers = () => {
                 </div>
 
                 {totalPages > 1 && (
-                  <div className="px-6 py-4 border-t border-[#e4e7e2] flex items-center justify-between">
-                    <p className="text-sm text-[#616770]">
+                  <div className="px-6 py-4 border-t border-sigap-border flex items-center justify-between">
+                    <p className="text-sm text-sigap-textTertiary">
                       Menampilkan {users.length} dari {total} data
                     </p>
                     <div className="flex items-center gap-2">
                       <button
                         onClick={() => setPage((p) => Math.max(1, p - 1))}
                         disabled={page === 1}
-                        className="px-3 py-1.5 rounded-lg border border-[#e4e7e2] text-sm text-[#616770] hover:bg-[#f4f5f3] disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+                        className="px-3 py-1.5 rounded-lg border border-sigap-border text-sm text-sigap-textTertiary hover:bg-sigap-background disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
                       >
                         Prev
                       </button>
-                      <span className="text-sm text-[#616770] px-2">
+                      <span className="text-sm text-sigap-textTertiary px-2">
                         Halaman {page} dari {totalPages}
                       </span>
                       <button
                         onClick={() => setPage((p) => p + 1)}
                         disabled={page >= totalPages}
-                        className="px-3 py-1.5 rounded-lg border border-[#e4e7e2] text-sm text-[#616770] hover:bg-[#f4f5f3] disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+                        className="px-3 py-1.5 rounded-lg border border-sigap-border text-sm text-sigap-textTertiary hover:bg-sigap-background disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
                       >
                         Next
                       </button>
@@ -641,9 +638,9 @@ export const AdminUsers = () => {
       {/* Create User Modal */}
       {showCreateModal && (
         <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
-          <div className="bg-white rounded-xl border border-[#e4e7e2] w-full max-w-md max-h-[90vh] overflow-hidden flex flex-col">
-            <div className="flex items-center justify-between px-6 py-4 border-b border-[#e4e7e2]">
-              <h3 className="text-lg font-bold text-[#17191c]">Buat User</h3>
+          <div className="bg-white rounded-xl border border-sigap-border w-full max-w-md max-h-[90vh] overflow-hidden flex flex-col">
+            <div className="flex items-center justify-between px-6 py-4 border-b border-sigap-border">
+              <h3 className="text-lg font-bold text-sigap-textPrimary">Buat User</h3>
               <button
                 onClick={() => {
                   setShowCreateModal(false);
@@ -652,7 +649,7 @@ export const AdminUsers = () => {
                   setCreateForm({ email: "", password: "", name: "", role: "VERIFIKATOR", wilayah_id: null });
                   setCreateErrors({});
                 }}
-                className="text-[#8a9099] hover:text-[#17191c] transition-colors"
+                className="text-sigap-textMuted hover:text-sigap-textPrimary transition-colors"
               >
                 <XIcon />
               </button>
@@ -661,72 +658,72 @@ export const AdminUsers = () => {
             <div className="flex-1 overflow-y-auto p-6">
               <form id="create-user-form" onSubmit={handleCreateSubmit} className="space-y-4">
                 <div>
-                  <label htmlFor="create-name" className="block text-sm font-semibold text-[#616770] mb-1.5">
-                    Nama <span className="text-[#c0392b]">*</span>
+                  <label htmlFor="create-name" className="block text-sm font-semibold text-sigap-textTertiary mb-1.5">
+                    Nama <span className="text-danger-500">*</span>
                   </label>
                   <input
                     id="create-name"
                     type="text"
                     value={createForm.name}
                     onChange={(e) => setCreateForm((f) => ({ ...f, name: e.target.value }))}
-                    className={`w-full px-4 py-2.5 rounded-lg border bg-[#f4f5f3] text-sm text-[#17191c] placeholder-[#8a9099] focus:outline-none focus:ring-2 focus:ring-[#0f7a6b]/30 focus:border-[#0f7a6b] transition-colors ${
-                      createErrors.name ? "border-[#c0392b]" : "border-[#e4e7e2]"
+                    className={`w-full px-4 py-2.5 rounded-lg border bg-sigap-background text-sm text-sigap-textPrimary placeholder-sigap-textMuted focus:outline-none focus:ring-2 focus:ring-sigap-primary/30 focus:border-sigap-primary transition-colors ${
+                      createErrors.name ? "border-danger-500" : "border-sigap-border"
                     }`}
                     placeholder="Nama lengkap"
                   />
                   {createErrors.name && (
-                    <p className="text-xs text-[#c0392b] mt-1">{createErrors.name}</p>
+                    <p className="text-xs text-danger-500 mt-1">{createErrors.name}</p>
                   )}
                 </div>
 
                 <div>
-                  <label htmlFor="create-email" className="block text-sm font-semibold text-[#616770] mb-1.5">
-                    Email <span className="text-[#c0392b]">*</span>
+                  <label htmlFor="create-email" className="block text-sm font-semibold text-sigap-textTertiary mb-1.5">
+                    Email <span className="text-danger-500">*</span>
                   </label>
                   <input
                     id="create-email"
                     type="email"
                     value={createForm.email}
                     onChange={(e) => setCreateForm((f) => ({ ...f, email: e.target.value }))}
-                    className={`w-full px-4 py-2.5 rounded-lg border bg-[#f4f5f3] text-sm text-[#17191c] placeholder-[#8a9099] focus:outline-none focus:ring-2 focus:ring-[#0f7a6b]/30 focus:border-[#0f7a6b] transition-colors ${
-                      createErrors.email ? "border-[#c0392b]" : "border-[#e4e7e2]"
+                    className={`w-full px-4 py-2.5 rounded-lg border bg-sigap-background text-sm text-sigap-textPrimary placeholder-sigap-textMuted focus:outline-none focus:ring-2 focus:ring-sigap-primary/30 focus:border-sigap-primary transition-colors ${
+                      createErrors.email ? "border-danger-500" : "border-sigap-border"
                     }`}
                     placeholder="email@contoh.com"
                   />
                   {createErrors.email && (
-                    <p className="text-xs text-[#c0392b] mt-1">{createErrors.email}</p>
+                    <p className="text-xs text-danger-500 mt-1">{createErrors.email}</p>
                   )}
                 </div>
 
                 <div>
-                  <label htmlFor="create-password" className="block text-sm font-semibold text-[#616770] mb-1.5">
-                    Password <span className="text-[#c0392b]">*</span>
+                  <label htmlFor="create-password" className="block text-sm font-semibold text-sigap-textTertiary mb-1.5">
+                    Password <span className="text-danger-500">*</span>
                   </label>
                   <input
                     id="create-password"
                     type="password"
                     value={createForm.password}
                     onChange={(e) => setCreateForm((f) => ({ ...f, password: e.target.value }))}
-                    className={`w-full px-4 py-2.5 rounded-lg border bg-[#f4f5f3] text-sm text-[#17191c] placeholder-[#8a9099] focus:outline-none focus:ring-2 focus:ring-[#0f7a6b]/30 focus:border-[#0f7a6b] transition-colors ${
-                      createErrors.password ? "border-[#c0392b]" : "border-[#e4e7e2]"
+                    className={`w-full px-4 py-2.5 rounded-lg border bg-sigap-background text-sm text-sigap-textPrimary placeholder-sigap-textMuted focus:outline-none focus:ring-2 focus:ring-sigap-primary/30 focus:border-sigap-primary transition-colors ${
+                      createErrors.password ? "border-danger-500" : "border-sigap-border"
                     }`}
                     placeholder="Minimal 8 karakter"
                   />
                   {createErrors.password && (
-                    <p className="text-xs text-[#c0392b] mt-1">{createErrors.password}</p>
+                    <p className="text-xs text-danger-500 mt-1">{createErrors.password}</p>
                   )}
                 </div>
 
                 <div>
-                  <label htmlFor="create-role" className="block text-sm font-semibold text-[#616770] mb-1.5">
-                    Role <span className="text-[#c0392b]">*</span>
+                  <label htmlFor="create-role" className="block text-sm font-semibold text-sigap-textTertiary mb-1.5">
+                    Role <span className="text-danger-500">*</span>
                   </label>
                   <select
                     id="create-role"
                     value={createForm.role}
                     onChange={(e) => handleRoleChange(e.target.value as UserRole)}
-                    className={`w-full px-4 py-2.5 rounded-lg border bg-[#f4f5f3] text-sm text-[#17191c] focus:outline-none focus:ring-2 focus:ring-[#0f7a6b]/30 focus:border-[#0f7a6b] transition-colors ${
-                      createErrors.role ? "border-[#c0392b]" : "border-[#e4e7e2]"
+                    className={`w-full px-4 py-2.5 rounded-lg border bg-sigap-background text-sm text-sigap-textPrimary focus:outline-none focus:ring-2 focus:ring-sigap-primary/30 focus:border-sigap-primary transition-colors ${
+                      createErrors.role ? "border-danger-500" : "border-sigap-border"
                     }`}
                   >
                     {ROLES.map((r) => (
@@ -736,15 +733,15 @@ export const AdminUsers = () => {
                     ))}
                   </select>
                   {createErrors.role && (
-                    <p className="text-xs text-[#c0392b] mt-1">{createErrors.role}</p>
+                    <p className="text-xs text-danger-500 mt-1">{createErrors.role}</p>
                   )}
                 </div>
 
                 <div>
-                  <label htmlFor="create-wilayah" className="block text-sm font-semibold text-[#616770] mb-1.5">
+                  <label htmlFor="create-wilayah" className="block text-sm font-semibold text-sigap-textTertiary mb-1.5">
                     Wilayah Scope{" "}
                     {WILAYAH_SCOPED_ROLES.includes(createForm.role) && (
-                      <span className="text-[#c0392b]">*</span>
+                      <span className="text-danger-500">*</span>
                     )}
                   </label>
                   <select
@@ -756,8 +753,8 @@ export const AdminUsers = () => {
                         wilayah_id: e.target.value || null,
                       }))
                     }
-                    className={`w-full px-4 py-2.5 rounded-lg border bg-[#f4f5f3] text-sm text-[#17191c] focus:outline-none focus:ring-2 focus:ring-[#0f7a6b]/30 focus:border-[#0f7a6b] transition-colors ${
-                      createErrors.wilayah_id ? "border-[#c0392b]" : "border-[#e4e7e2]"
+                    className={`w-full px-4 py-2.5 rounded-lg border bg-sigap-background text-sm text-sigap-textPrimary focus:outline-none focus:ring-2 focus:ring-sigap-primary/30 focus:border-sigap-primary transition-colors ${
+                      createErrors.wilayah_id ? "border-danger-500" : "border-sigap-border"
                     }`}
                     disabled={wilayahLoading}
                   >
@@ -775,30 +772,30 @@ export const AdminUsers = () => {
                     ))}
                   </select>
                   {createErrors.wilayah_id && (
-                    <p className="text-xs text-[#c0392b] mt-1">{createErrors.wilayah_id}</p>
+                    <p className="text-xs text-danger-500 mt-1">{createErrors.wilayah_id}</p>
                   )}
                   {!WILAYAH_SCOPED_ROLES.includes(createForm.role) && (
-                    <p className="text-xs text-[#8a9099] mt-1">
+                    <p className="text-xs text-sigap-textMuted mt-1">
                       Role ini tidak menggunakan scope wilayah
                     </p>
                   )}
                 </div>
 
                 {createError && (
-                  <div className="p-3 rounded-lg bg-[#fef2f2] border border-[#fecaca] text-sm text-[#c0392b]">
+                  <div className="p-3 rounded-lg bg-danger-100 border border-danger-200 text-sm text-danger-600">
                     {createError}
                   </div>
                 )}
 
                 {createSuccess && (
-                  <div className="p-3 rounded-lg bg-[#f0fdf4] border border-[#bbf7d0] text-sm text-[#16a34a]">
+                  <div className="p-3 rounded-lg bg-green-50 border border-green-200 text-sm text-green-700">
                     {createSuccess}
                   </div>
                 )}
               </form>
             </div>
 
-            <div className="flex items-center justify-end gap-3 px-6 py-4 border-t border-[#e4e7e2] bg-[#f9faf8]">
+            <div className="flex items-center justify-end gap-3 px-6 py-4 border-t border-sigap-border bg-sigap-surface">
               <button
                 onClick={() => {
                   setShowCreateModal(false);
@@ -807,7 +804,7 @@ export const AdminUsers = () => {
                   setCreateForm({ email: "", password: "", name: "", role: "VERIFIKATOR", wilayah_id: null });
                   setCreateErrors({});
                 }}
-                className="px-4 py-2 rounded-lg border border-[#e4e7e2] text-sm font-medium text-[#616770] hover:bg-[#f4f5f3] transition-colors"
+                className="px-4 py-2 rounded-lg border border-sigap-border text-sm font-medium text-sigap-textTertiary hover:bg-sigap-background transition-colors"
               >
                 Batal
               </button>
@@ -815,7 +812,7 @@ export const AdminUsers = () => {
                 type="submit"
                 form="create-user-form"
                 disabled={createSubmitting}
-                className="px-4 py-2 rounded-lg text-sm font-semibold text-white bg-[#0f7a6b] hover:bg-[#0a5c50] disabled:opacity-50 transition-colors"
+                className="px-4 py-2 rounded-lg text-sm font-semibold text-white bg-sigap-primary hover:bg-primary-600 disabled:opacity-50 transition-colors"
               >
                 {createSubmitting ? "Menyimpan..." : "Simpan"}
               </button>
@@ -827,15 +824,15 @@ export const AdminUsers = () => {
       {/* Edit User Modal */}
       {editModal && (
         <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
-          <div className="bg-white rounded-xl border border-[#e4e7e2] w-full max-w-md">
-            <div className="flex items-center justify-between px-6 py-4 border-b border-[#e4e7e2]">
-              <h3 className="text-lg font-bold text-[#17191c]">Edit User</h3>
+          <div className="bg-white rounded-xl border border-sigap-border w-full max-w-md">
+            <div className="flex items-center justify-between px-6 py-4 border-b border-sigap-border">
+              <h3 className="text-lg font-bold text-sigap-textPrimary">Edit User</h3>
               <button
                 onClick={() => {
                   setEditModal(null);
                   setEditError(null);
                 }}
-                className="text-[#8a9099] hover:text-[#17191c] transition-colors"
+                className="text-sigap-textMuted hover:text-sigap-textPrimary transition-colors"
               >
                 <XIcon />
               </button>
@@ -843,15 +840,15 @@ export const AdminUsers = () => {
 
             <div className="p-6 space-y-4">
               <div>
-                <p className="text-xs text-[#8a9099] mb-1">Nama</p>
-                <p className="text-sm font-semibold text-[#17191c]">{editModal.user.name}</p>
+                <p className="text-xs text-sigap-textMuted mb-1">Nama</p>
+                <p className="text-sm font-semibold text-sigap-textPrimary">{editModal.user.name}</p>
               </div>
               <div>
-                <p className="text-xs text-[#8a9099] mb-1">Email</p>
-                <p className="text-sm font-semibold text-[#17191c]">{editModal.user.email}</p>
+                <p className="text-xs text-sigap-textMuted mb-1">Email</p>
+                <p className="text-sm font-semibold text-sigap-textPrimary">{editModal.user.email}</p>
               </div>
               <div>
-                <label htmlFor="edit-role" className="block text-sm font-semibold text-[#616770] mb-1.5">
+                <label htmlFor="edit-role" className="block text-sm font-semibold text-sigap-textTertiary mb-1.5">
                   Role
                 </label>
                 <select
@@ -862,7 +859,7 @@ export const AdminUsers = () => {
                       m ? { ...m, role: e.target.value as UserRole } : null
                     )
                   }
-                  className="w-full px-4 py-2.5 rounded-lg border border-[#e4e7e2] bg-[#f4f5f3] text-sm text-[#17191c] focus:outline-none focus:ring-2 focus:ring-[#0f7a6b]/30 focus:border-[#0f7a6b] transition-colors"
+                  className="w-full px-4 py-2.5 rounded-lg border border-sigap-border bg-sigap-background text-sm text-sigap-textPrimary focus:outline-none focus:ring-2 focus:ring-sigap-primary/30 focus:border-sigap-primary transition-colors"
                 >
                   {ROLES.map((r) => (
                     <option key={r} value={r}>
@@ -871,23 +868,23 @@ export const AdminUsers = () => {
                   ))}
                 </select>
               </div>
-              {editError && <p className="text-sm text-[#c0392b]">{editError}</p>}
+              {editError && <p className="text-sm text-danger-500">{editError}</p>}
             </div>
 
-            <div className="flex items-center justify-end gap-3 px-6 py-4 border-t border-[#e4e7e2] bg-[#f9faf8]">
+            <div className="flex items-center justify-end gap-3 px-6 py-4 border-t border-sigap-border bg-sigap-surface">
               <button
                 onClick={() => {
                   setEditModal(null);
                   setEditError(null);
                 }}
-                className="px-4 py-2 rounded-lg border border-[#e4e7e2] text-sm font-medium text-[#616770] hover:bg-[#f4f5f3] transition-colors"
+                className="px-4 py-2 rounded-lg border border-sigap-border text-sm font-medium text-sigap-textTertiary hover:bg-sigap-background transition-colors"
               >
                 Batal
               </button>
               <button
                 onClick={handleEditSave}
                 disabled={editSubmitting}
-                className="px-4 py-2 rounded-lg text-sm font-semibold text-white bg-[#0f7a6b] hover:bg-[#0a5c50] disabled:opacity-50 transition-colors"
+                className="px-4 py-2 rounded-lg text-sm font-semibold text-white bg-sigap-primary hover:bg-primary-600 disabled:opacity-50 transition-colors"
               >
                 {editSubmitting ? "Menyimpan..." : "Simpan"}
               </button>
@@ -899,16 +896,16 @@ export const AdminUsers = () => {
       {/* Confirm Action Modal */}
       {confirmModal && (
         <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
-          <div className="bg-white rounded-xl border border-[#e4e7e2] w-full max-w-sm">
+          <div className="bg-white rounded-xl border border-sigap-border w-full max-w-sm">
             <div className="p-6">
-              <h3 className="text-lg font-bold text-[#17191c] mb-2">
+              <h3 className="text-lg font-bold text-sigap-textPrimary mb-2">
                 {confirmModal.action === "delete"
                   ? "Hapus User"
                   : confirmModal.action === "deactivate"
                   ? "Nonaktifkan User"
                   : "Aktifkan User"}
               </h3>
-              <p className="text-sm text-[#616770]">
+              <p className="text-sm text-sigap-textTertiary">
                 {confirmModal.action === "delete"
                   ? `Apakah Anda yakin ingin menghapus ${confirmModal.user.name}? User tidak akan dapat login lagi.`
                   : confirmModal.action === "deactivate"
@@ -916,16 +913,16 @@ export const AdminUsers = () => {
                   : `Apakah Anda yakin ingin mengaktifkan kembali ${confirmModal.user.name}?`}
               </p>
               {confirmError && (
-                <p className="text-sm text-[#c0392b] mt-3">{confirmError}</p>
+                <p className="text-sm text-danger-500 mt-3">{confirmError}</p>
               )}
             </div>
-            <div className="flex items-center justify-end gap-3 px-6 py-4 border-t border-[#e4e7e2] bg-[#f9faf8]">
+            <div className="flex items-center justify-end gap-3 px-6 py-4 border-t border-sigap-border bg-sigap-surface">
               <button
                 onClick={() => {
                   setConfirmModal(null);
                   setConfirmError(null);
                 }}
-                className="px-4 py-2 rounded-lg border border-[#e4e7e2] text-sm font-medium text-[#616770] hover:bg-[#f4f5f3] transition-colors"
+                className="px-4 py-2 rounded-lg border border-sigap-border text-sm font-medium text-sigap-textTertiary hover:bg-sigap-background transition-colors"
               >
                 Batal
               </button>
@@ -934,10 +931,10 @@ export const AdminUsers = () => {
                 disabled={confirmSubmitting}
                 className={`px-4 py-2 rounded-lg text-sm font-semibold text-white disabled:opacity-50 transition-colors ${
                   confirmModal.action === "delete"
-                    ? "bg-[#c0392b] hover:bg-[#a5271a]"
+                    ? "bg-danger-500 hover:bg-danger-600"
                     : confirmModal.action === "deactivate"
-                    ? "bg-[#b8730a] hover:bg-[#8a5808]"
-                    : "bg-[#0f7a6b] hover:bg-[#0a5c50]"
+                    ? "bg-warning-500 hover:bg-warning-600"
+                    : "bg-sigap-primary hover:bg-primary-600"
                 }`}
               >
                 {confirmSubmitting

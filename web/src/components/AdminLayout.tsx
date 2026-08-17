@@ -1,7 +1,6 @@
 import { Link, Outlet, useNavigate } from "react-router-dom";
 import { useAuthStore } from "../stores/auth";
 import { NotificationCenter } from "./NotificationCenter";
-import { RoleSwitcher } from "./RoleSwitcher";
 import { colors } from "../theme/tokens";
 
 export const AdminLayout = () => {
@@ -57,7 +56,6 @@ export const AdminLayout = () => {
               Keluar
             </button>
             <NotificationCenter pollIntervalMs={30000} />
-            <RoleSwitcher />
           </div>
         </div>
       </header>

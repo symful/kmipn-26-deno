@@ -1,245 +1,116 @@
-import { useState } from "react";
-import { colors, caseStatusColors, caseStatusLabels, bgSoft } from "../../theme/tokens";
+import { colors } from "../../theme/tokens";
 
-export interface CaseListItem {
+interface CaseListItem {
   id: string;
   title: string;
   village: string;
   timeAgo: string;
-  status: "menunggu" | "dalam_proses" | "perlu_tindakan" | "diterima" | "ditolak";
+  status: string;
+  statusColor: string;
+  statusBg: string;
   reportCount: number;
-  priorityDot?: "teal" | "amber" | "blue";
+  initials: string;
 }
 
-export interface CaseListRailProps {
-  items?: CaseListItem[];
-  onCaseClick?: (id: string) => void;
+interface CaseListRailProps {
+  items: CaseListItem[];
+  onCaseClick: (id: string) => void;
 }
 
-function getPriorityDotColor(dot?: "teal" | "amber" | "blue"): string {
-  switch (dot) {
-    case "teal":
-      return colors.primary;
-    case "amber":
-      return "#FBBF24";
-    case "blue":
-      return "#3B82F6";
-    default:
-      return colors.textMuted;
-  }
-}
-
-export function CaseListRail({ items = [], onCaseClick }: CaseListRailProps) {
-  const [searchQuery, setSearchQuery] = useState("");
-
-  const filteredItems = items.filter((item) =>
-    item.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
-    item.village.toLowerCase().includes(searchQuery.toLowerCase())
-  );
-
+export const CaseListRail = ({ items, onCaseClick }: CaseListRailProps) => {
   return (
     <div
+      className="flex flex-col overflow-hidden"
       style={{
         width: 400,
-        height: "100%",
-        backgroundColor: "white",
         borderLeft: `1px solid ${colors.border}`,
-        display: "flex",
-        flexDirection: "column",
-        overflow: "hidden",
+        backgroundColor: colors.bgCard,
       }}
     >
-      <div
-        style={{
-          padding: "12px 16px",
-          borderBottom: `1px solid ${colors.border}`,
-        }}
-      >
-        <div style={{ position: "relative" }}>
-          <input
-            type="text"
-            value={searchQuery}
-            onChange={(e) => setSearchQuery(e.target.value)}
-            placeholder="Cari kasus..."
-            style={{
-              width: "100%",
-              height: 38,
-              paddingLeft: 38,
-              paddingRight: 12,
-              fontSize: 13,
-              border: `1px solid ${colors.border}`,
-              borderRadius: 8,
-              outline: "none",
-              backgroundColor: bgSoft,
-              color: colors.textPrimary,
-            }}
-          />
-          <span
-            style={{
-              position: "absolute",
-              left: 12,
-              top: "50%",
-              transform: "translateY(-50%)",
-              fontSize: 16,
-              color: colors.textMuted,
-            }}
-          >
-            🔍
-          </span>
+      <div className="px-5 py-3.5 border-b" style={{ borderColor: colors.border }}>
+        <div
+          className="px-3 py-2 rounded-lg border text-xs"
+          style={{
+            backgroundColor: colors.bgSurface,
+            borderColor: colors.border,
+            color: colors.textMuted,
+          }}
+        >
+          Cari wilayah atau fasilitas…
         </div>
       </div>
 
-      <div
-        style={{
-          flex: 1,
-          overflowY: "auto",
-          padding: "8px 12px",
-        }}
-      >
-        {filteredItems.length === 0 ? (
-          <div
-            style={{
-              display: "flex",
-              flexDirection: "column",
-              alignItems: "center",
-              justifyContent: "center",
-              height: 200,
-              color: colors.textMuted,
-              fontSize: 13,
-            }}
-          >
-            <span style={{ fontSize: 32, marginBottom: 8 }}>📋</span>
-            <span>Tidak ada kasus</span>
+      <div className="flex-1 overflow-y-auto px-5 py-3.5 flex flex-col gap-2.5">
+        {items.length === 0 ? (
+          <div className="p-4 text-center">
+            <p className="text-sm" style={{ color: colors.textMuted }}>Tidak ada kasus</p>
           </div>
         ) : (
-          filteredItems.map((item) => (
-            <div
-              key={item.id}
-              onClick={() => onCaseClick?.(item.id)}
-              style={{
-                padding: "12px",
-                marginBottom: 8,
-                backgroundColor: "white",
-                border: `1px solid ${colors.border}`,
-                borderRadius: 11,
-                cursor: onCaseClick ? "pointer" : "default",
-                transition: "border-color 200ms, box-shadow 200ms",
-              }}
-              onMouseEnter={(e) => {
-                e.currentTarget.style.borderColor = colors.primary;
-                e.currentTarget.style.boxShadow = `0 2px 8px ${colors.primary}20`;
-              }}
-              onMouseLeave={(e) => {
-                e.currentTarget.style.borderColor = colors.border;
-                e.currentTarget.style.boxShadow = "none";
-              }}
-            >
-              <div
+          <div className="flex flex-col gap-2.5">
+            {items.map((item) => (
+              <button
+                key={item.id}
+                onClick={() => onCaseClick(item.id)}
+                className="w-full text-left rounded-xl border p-3.5 hover:opacity-90 transition-opacity cursor-pointer"
                 style={{
+                  backgroundColor: colors.bgCard,
+                  borderColor: colors.border,
                   display: "flex",
-                  alignItems: "flex-start",
-                  gap: 10,
-                  marginBottom: 8,
-                }}
-              >
-                <div
-                  style={{
-                    width: 36,
-                    height: 36,
-                    borderRadius: 8,
-                    backgroundColor: getPriorityDotColor(item.priorityDot) + "15",
-                    display: "flex",
-                    alignItems: "center",
-                    justifyContent: "center",
-                    flexShrink: 0,
-                  }}
-                >
-                  <span
-                    style={{
-                      width: 10,
-                      height: 10,
-                      borderRadius: "50%",
-                      backgroundColor: getPriorityDotColor(item.priorityDot),
-                    }}
-                  />
-                </div>
-
-                <span
-                  style={{
-                    fontSize: 14,
-                    fontWeight: 500,
-                    color: colors.textPrimary,
-                    lineHeight: 1.35,
-                    flex: 1,
-                  }}
-                >
-                  {item.title}
-                </span>
-              </div>
-
-              <div
-                style={{
-                  fontSize: 12,
-                  color: colors.textTertiary,
-                  marginBottom: 4,
-                }}
-              >
-                {item.village}
-              </div>
-
-              <div
-                style={{
-                  display: "flex",
-                  alignItems: "center",
-                  justifyContent: "space-between",
-                  marginTop: 8,
+                  gap: 11,
                 }}
               >
                 <span
+                  className="flex-shrink-0 flex items-center justify-center rounded-lg"
                   style={{
-                    display: "inline-flex",
-                    alignItems: "center",
-                    padding: "2px 8px",
-                    borderRadius: 4,
-                    fontSize: 10,
+                    width: 38,
+                    height: 38,
+                    backgroundColor: colors.primaryLight,
+                    color: colors.primaryDark,
+                    fontFamily: "'IBM Plex Mono', monospace",
                     fontWeight: 600,
-                    backgroundColor: (caseStatusColors[item.status] || "#6B7280") + "20",
-                    color: caseStatusColors[item.status] || "#6B7280",
+                    fontSize: 12,
                   }}
                 >
-                  {caseStatusLabels[item.status] || item.status}
+                  {item.initials}
                 </span>
-
-                <div
-                  style={{
-                    display: "flex",
-                    alignItems: "center",
-                    gap: 8,
-                  }}
-                >
-                  <span
-                    style={{
-                      fontSize: 11,
-                      color: colors.textMuted,
-                    }}
+                <div className="flex-1 min-w-0">
+                  <p
+                    className="truncate"
+                    style={{ fontSize: 13.5, fontWeight: 600, color: colors.textPrimary }}
                   >
-                    {item.timeAgo}
-                  </span>
-
-                  <span
-                    style={{
-                      fontSize: 11,
-                      color: colors.textTertiary,
-                    }}
+                    {item.title}
+                  </p>
+                  <p
+                    className="mt-0.5 truncate"
+                    style={{ fontSize: 11.5, color: colors.textTertiary }}
                   >
-                    {item.reportCount} laporan
-                  </span>
+                    {item.village} · {item.timeAgo}
+                  </p>
+                  <div className="flex items-center gap-1.5 mt-1.5">
+                    <span
+                      className="inline-flex items-center gap-1 rounded px-2 py-0.5 text-xs font-semibold"
+                      style={{
+                        backgroundColor: item.statusBg,
+                        color: item.statusColor,
+                      }}
+                    >
+                      {item.status}
+                    </span>
+                    {item.reportCount > 1 && (
+                      <span
+                        className="text-xs"
+                        style={{ color: colors.textTertiary, alignSelf: "center" }}
+                      >
+                        {item.reportCount} laporan
+                      </span>
+                    )}
+                  </div>
                 </div>
-              </div>
-            </div>
-          ))
+              </button>
+            ))}
+          </div>
         )}
       </div>
     </div>
   );
-}
+};

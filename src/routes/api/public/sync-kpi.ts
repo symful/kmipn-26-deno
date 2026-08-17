@@ -70,7 +70,6 @@ publicSyncKpiRoute.post(
 
     return c.json({
       id: result.id,
-      device_id: result.device_id,
       platform: result.platform,
       status: result.status,
       reports_count: result.reports_count,

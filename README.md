@@ -16,6 +16,7 @@ The system uses event sourcing via an outbox pattern to sync with external syste
 | Runtime | Cloudflare Workers (V8 isolates) |
 | Frontend | Vite + React SPA (served from `web/`) |
 | Database | PostgreSQL + PostGIS via Cloudflare Hyperdrive |
+| D1 | D1 binding reserved for future use; current data layer is PostgreSQL via Hyperdrive |
 | Object Storage | Cloudflare R2 |
 | Auth | JWT via [jose](https://github.com/panva/jose) |
 | Validation | [Zod](https://zod.dev/) |
@@ -162,19 +163,57 @@ npm run test:e2e:ui
 
 ## Deployment
 
+### Pre-Deployment Checklist
+
+Before deploying, verify:
+
+1. **Environment variables** — `.env` has all required values (`POSTGRESQL_URI`, `JWT_SECRET`, `LLM_API_KEY`, `R2_PUBLIC_URL`, `APP_BASE_URL`)
+2. **Migrations applied** — Run `npm run migrations:status` to confirm all migrations are applied
+3. **Build succeeds** — Run `npm run build` locally to catch any compilation errors
+4. **TypeScript clean** — Run `npm run typecheck` to verify no type errors
+
+### Production Environment Setup
+
+For production, ensure the following variables are set in your Cloudflare Workers environment (via `wrangler secret put` or Cloudflare dashboard):
+
+```bash
+# Required secrets
+wrangler secret put JWT_SECRET
+wrangler secret put LLM_API_KEY
+wrangler secret put POSTGRESQL_URI
+
+# Required vars (can be in .env or dashboard)
+# POSTGRESQL_URI, R2_PUBLIC_URL, APP_BASE_URL, ALLOWED_ORIGINS
+```
+
+### Deploy
+
 Deploy to Cloudflare Workers:
 
 ```bash
 npm run deploy
 ```
 
-Dry run before deploying:
+Dry run (validates config without deploying):
 
 ```bash
 npm run deploy:dryrun
 ```
 
-Both commands run `npm run build` first, then deploy with `wrangler deploy`. Configuration is read from `.env`.
+Both commands run `npm run build` first, then deploy with `wrangler deploy`.
+
+### Test Against Deployed URL
+
+After deploying, verify the worker is running:
+
+```bash
+# Health check
+curl https://your-worker.your-subdomain.workers.dev/api/health
+
+# Expected: {"ok":true}
+```
+
+The `APP_BASE_URL` environment variable should match the deployed worker URL (e.g., `https://sigap.live`). Update this before deploying if the URL changed.
 
 ## Project Structure
 
@@ -189,7 +228,6 @@ kmipn-26-deno/
 │   │   ├── logger.ts        # Structured logging
 │   │   ├── schemas.ts       # Zod schemas
 │   │   ├── rbac.ts          # Role-based access control
-│   │   ├── rbac-matrix.ts   # RBAC permission matrix
 │   │   ├── audit.ts         # Audit logging
 │   │   ├── outbox/          # Outbox pattern implementation
 │   │   │   └── adapters/    # SIPD and Satu Data adapters

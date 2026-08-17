@@ -1,5 +1,6 @@
 import { Hono } from "hono";
 import type { Env } from "@/types/bindings";
+import { REOPENABLE_STATES } from "@/types/case-states";
 import { requireAuth, type AuthVariables } from "@/lib/auth";
 import { withClient } from "@/lib/db";
 import { appendAudit } from "@/lib/audit";
@@ -7,9 +8,7 @@ import { safeHandler } from "@/lib/safeHandler";
 import { logger } from "@/lib/logger";
 import { z } from "zod";
 
-const UUID_REGEX = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
-
-const REOPENABLE_STATES = ["closed", "resolved"] as const;
+const UUID_REGEX = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
 
 const ReopenSchema = z.object({
   reason: z.string().min(10, "Alasan permintaan buka ulang minimal 10 karakter"),

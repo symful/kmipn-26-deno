@@ -72,7 +72,7 @@ export default function VerifyReport() {
   if (done) {
     return (
       <div className="p-4 max-w-xl mx-auto">
-        <div className="p-6 bg-green-100 text-green-800 rounded text-center">
+        <div className="p-6 bg-success-100 text-success-700 rounded text-center">
           <h1 className="text-2xl font-bold mb-2">Verifikasi terkirim</h1>
           <p>Terima kasih. Verifikasi Anda telah dicatat.</p>
         </div>
@@ -149,7 +149,7 @@ export default function VerifyReport() {
           </div>
 
           {submitError && (
-            <p className="text-sm text-sigap-perluTindakan bg-red-50 p-2 rounded">
+            <p className="text-sm text-sigap-perluTindakan bg-danger-50 p-2 rounded">
               {submitError}
             </p>
           )}
@@ -158,7 +158,7 @@ export default function VerifyReport() {
             type="button"
             onClick={submit}
             disabled={!canSubmit}
-            className="w-full px-4 py-2 bg-blue-600 text-white rounded font-medium disabled:opacity-50"
+            className="w-full px-4 py-2 bg-sigap-primary text-white rounded font-medium disabled:opacity-50"
           >
             {submitting ? "Mengirim..." : "Kirim Verifikasi"}
           </button>
@@ -214,26 +214,26 @@ export default function VerifyReport() {
 
             <section>
               <h3 className="text-lg font-bold mb-3 text-sigap-primary">Apa yang Harus Dicek</h3>
-              <div className="bg-green-50 border border-green-200 rounded-lg p-4">
+              <div className="bg-success-50 border border-success-100 rounded-lg p-4">
                 <ul className="space-y-2 text-sm">
                   <li className="flex items-start gap-2">
-                    <span className="text-green-600">✓</span>
+                    <span className="text-success-600">✓</span>
                     <span>Kerusakan sesuai dengan deskripsi laporan</span>
                   </li>
                   <li className="flex items-start gap-2">
-                    <span className="text-green-600">✓</span>
+                    <span className="text-success-600">✓</span>
                     <span>Lokasi kerusakan cocok dengan koordinat</span>
                   </li>
                   <li className="flex items-start gap-2">
-                    <span className="text-green-600">✓</span>
+                    <span className="text-success-600">✓</span>
                     <span>Kategori kerusakan sesuai dengan jenis kerusakan</span>
                   </li>
                   <li className="flex items-start gap-2">
-                    <span className="text-green-600">✓</span>
+                    <span className="text-success-600">✓</span>
                     <span>Kerusakan masih belum diperbaiki</span>
                   </li>
                   <li className="flex items-start gap-2">
-                    <span className="text-green-600">✓</span>
+                    <span className="text-success-600">✓</span>
                     <span>Foto bukti jelas dan dapat dipercaya</span>
                   </li>
                 </ul>
@@ -242,18 +242,18 @@ export default function VerifyReport() {
 
             <section>
               <h3 className="text-lg font-bold mb-3 text-sigap-primary">Kapan Harus Tolak</h3>
-              <div className="bg-red-50 border border-red-200 rounded-lg p-4">
+              <div className="bg-danger-50 border border-danger-100 rounded-lg p-4">
                 <ul className="space-y-2 text-sm">
                   <li className="flex items-start gap-2">
-                    <span className="text-red-600">✗</span>
+                    <span className="text-danger-600">✗</span>
                     <span>Lokasi kerusakan tidak ditemukan atau berbeda</span>
                   </li>
                   <li className="flex items-start gap-2">
-                    <span className="text-red-600">✗</span>
+                    <span className="text-danger-600">✗</span>
                     <span>Kerusakan sudah diperbaiki atau tidak ada</span>
                   </li>
                   <li className="flex items-start gap-2">
-                    <span className="text-red-600">✗</span>
+                    <span className="text-danger-600">✗</span>
                     <span>Laporan tidak jelas, duplikat, atau tidak valid</span>
                   </li>
                 </ul>

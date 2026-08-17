@@ -67,8 +67,8 @@ exportCsvRoute.get(
       const redactedDesc = redactPII(desc).slice(0, 500);
       const lat = Number(row.lat);
       const lng = Number(row.lng);
-      const roundedLat = Number.isFinite(lat) ? lat.toFixed(4) : "";
-      const roundedLng = Number.isFinite(lng) ? lng.toFixed(4) : "";
+      const roundedLat = Number.isFinite(lat) ? lat.toFixed(3) : "";
+      const roundedLng = Number.isFinite(lng) ? lng.toFixed(3) : "";
       lines.push([
         csvEscape(row.id),
         csvEscape(row.created_at),

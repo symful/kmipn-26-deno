@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import { api } from "../../api/client";
 import { useAuthStore } from "../../stores/auth";
-import { colors, spacing, radius, bgSoft, dangerBorder, dangerTextStrong } from "../../theme/tokens";
+import { colors, spacing, radius, bgSoft, dangerBorder, dangerTextStrong, extendedColors } from "../../theme/tokens";
 import { logger } from "@/lib/logger";
 
 interface PetugasTask {
@@ -186,7 +186,7 @@ export const PetugasTasks = () => {
     }
   };
 
-  const handlePhotoUpload = async (taskId: string, files: FileList) => {
+  const handlePhotoUpload = async (taskId: string, reportId: string, files: FileList) => {
     if (files.length === 0) return;
 
     const urls: string[] = [];
@@ -195,8 +195,17 @@ export const PetugasTasks = () => {
       if (!file) continue;
 
       try {
-        const data = await api.uploadEvidenceFile(file, "task-evidence", "task_evidence");
-        urls.push(data.url);
+        const contentType = file.type === "image/png" ? "image/png" : "image/jpeg";
+        const urlData = await api.photoUploadUrl(reportId, contentType);
+        const response = await fetch(urlData.upload_url, {
+          method: "PUT",
+          headers: { "Content-Type": contentType },
+          body: file,
+        });
+        if (!response.ok) {
+          throw new Error(`Upload failed: ${response.statusText}`);
+        }
+        urls.push(urlData.public_url);
       } catch (err) {
         logger.error("Photo upload error", { error: err });
         alert("Gagal mengunggah foto: " + (err instanceof Error ? err.message : String(err)));
@@ -285,14 +294,17 @@ export const PetugasTasks = () => {
     }
   };
 
+  // Status badge colors using design tokens
+  const statusBadge: Record<string, { bg: string; text: string }> = {
+    completed: { bg: extendedColors.successBorder, text: colors.selesai },
+    in_progress: { bg: colors.infoBg, text: colors.diproses },
+    pending_clarification: { bg: colors.warningBg, text: colors.offlineText },
+    rejected: { bg: colors.dangerBg, text: colors.perluTindakan },
+  };
+
   const statusColor = (s: string) => {
-    switch (s) {
-      case "completed": return "bg-green-100 text-green-800";
-      case "in_progress": return "bg-blue-100 text-blue-800";
-      case "pending_clarification": return "bg-orange-100 text-orange-800";
-      case "rejected": return "bg-red-100 text-red-800";
-      default: return "bg-yellow-100 text-yellow-800";
-    }
+    const badge = statusBadge[s] ?? { bg: colors.warningBg, text: colors.offlineText };
+    return { backgroundColor: badge.bg, color: badge.text };
   };
 
   if (loading) {
@@ -301,7 +313,7 @@ export const PetugasTasks = () => {
         <div className="p-6 max-w-4xl mx-auto">
           {/* Loading skeleton */}
           {[1, 2, 3].map((i) => (
-            <div key={i} className="mb-4 p-4 rounded-xl border" style={{ backgroundColor: "#fff", borderColor: colors.border }}>
+            <div key={i} className="mb-4 p-4 rounded-xl border" style={{ backgroundColor: colors.bgCard, borderColor: colors.border }}>
               <div className="flex">
                 <div className="w-1 h-16 rounded" style={{ backgroundColor: colors.border }} />
                 <div className="flex-1 ml-4 space-y-3">
@@ -345,7 +357,7 @@ export const PetugasTasks = () => {
       {/* S-01 Header */}
       <header
         className="px-6 py-4 border-b"
-        style={{ backgroundColor: "#fff", borderColor: colors.border }}
+        style={{ backgroundColor: colors.bgCard, borderColor: colors.border }}
       >
         <div className="max-w-4xl mx-auto">
           <div className="flex items-center justify-between mb-1">
@@ -373,7 +385,7 @@ export const PetugasTasks = () => {
       {/* S-01 Filter Chips */}
       <div
         className="px-6 py-3 border-b overflow-x-auto"
-        style={{ backgroundColor: "#fff", borderColor: colors.border }}
+        style={{ backgroundColor: colors.bgCard, borderColor: colors.border }}
       >
         <div className="max-w-4xl mx-auto flex gap-2">
           {FILTER_CHIPS.map((chip) => {
@@ -385,7 +397,7 @@ export const PetugasTasks = () => {
                 className="px-4 py-2 rounded-full text-sm font-medium whitespace-nowrap transition-colors"
                 style={{
                   backgroundColor: isSelected ? colors.primary : bgSoft,
-                  color: isSelected ? "#fff" : colors.textSecondary,
+                  color: isSelected ? colors.bgCard : colors.textSecondary,
                   border: `1px solid ${isSelected ? colors.primary : colors.border}`,
                 }}
               >
@@ -402,7 +414,7 @@ export const PetugasTasks = () => {
           <div className="text-center py-16">
             <div
               className="w-20 h-20 mx-auto mb-4 rounded-full flex items-center justify-center"
-              style={{ backgroundColor: bgSoft, border: `2px solid ${colors.border}` }}
+              style={{ backgroundColor: bgSoft, border: `2px solid ${colors.border}`, color: colors.textTertiary }}
             >
               <svg className="w-10 h-10" style={{ color: colors.textTertiary }} fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M20 13V6a2 2 0 00-2-2H6a2 2 0 00-2 2v7m16 0v5a2 2 0 01-2 2H6a2 2 0 01-2-2v-5m16 0h-2.586a1 1 0 00-.707.293l-2.414 2.414a1 1 0 01-.707.293h-2.172a1 1 0 01-.707-.293l-2.414-2.414A1 1 0 006.586 13H4" />
@@ -427,7 +439,7 @@ export const PetugasTasks = () => {
                   key={task.id}
                   className="rounded-xl overflow-hidden"
                   style={{
-                    backgroundColor: "#fff",
+                    backgroundColor: colors.bgCard,
                     border: `1px solid ${colors.border}`,
                     borderLeft: `4px solid ${priorityColor}`,
                   }}
@@ -442,7 +454,8 @@ export const PetugasTasks = () => {
                             {task.report_description || `Task ${task.id.slice(0, 8)}`}
                           </h3>
                           <span
-                            className={`inline-flex items-center px-2 py-0.5 rounded text-xs font-semibold ${statusColor(task.status)}`}
+                            className="inline-flex items-center px-2 py-0.5 rounded text-xs font-semibold"
+                            style={statusColor(task.status)}
                           >
                             {statusLabel(task.status)}
                           </span>
@@ -506,7 +519,7 @@ export const PetugasTasks = () => {
                         {/* S-01 Priority Badge */}
                         <div
                           className="inline-flex items-center gap-1.5 px-2 py-1 rounded-md text-xs font-semibold"
-                          style={{ backgroundColor: priorityColor + "15", color: priorityColor }}
+                          style={{ backgroundColor: bgSoft, color: priorityColor }}
                         >
                           <span
                             className="w-1.5 h-1.5 rounded-full"
@@ -612,7 +625,7 @@ export const PetugasTasks = () => {
                             className="w-full px-3 py-2 rounded-lg text-sm resize-none focus:outline-none focus:ring-2"
                             style={{
                               border: `1px solid ${colors.border}`,
-                              backgroundColor: "#fff",
+                              backgroundColor: colors.bgCard,
                               color: colors.textPrimary,
                             }}
                           />
@@ -644,7 +657,7 @@ export const PetugasTasks = () => {
                             multiple
                             className="hidden"
                             onChange={(e) => {
-                              if (e.target.files) handlePhotoUpload(task.id, e.target.files);
+                              if (e.target.files) handlePhotoUpload(task.id, task.report_id, e.target.files);
                               e.target.value = "";
                             }}
                           />
@@ -685,7 +698,7 @@ export const PetugasTasks = () => {
                           className="w-full px-3 py-2 rounded-lg text-sm resize-none focus:outline-none focus:ring-2"
                           style={{
                             border: `1px solid ${colors.border}`,
-                            backgroundColor: "#fff",
+                            backgroundColor: colors.bgCard,
                             color: colors.textPrimary,
                           }}
                         />
@@ -721,7 +734,7 @@ export const PetugasTasks = () => {
                           className="w-full px-3 py-2 rounded-lg text-sm resize-none focus:outline-none focus:ring-2 mb-2"
                           style={{
                             border: `1px solid ${colors.border}`,
-                            backgroundColor: "#fff",
+                            backgroundColor: colors.bgCard,
                             color: colors.textPrimary,
                           }}
                         />

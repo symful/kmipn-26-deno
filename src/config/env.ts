@@ -31,29 +31,30 @@ export interface AppConfig {
   JWT_SECRET: string;
 }
 
-function parseNumberArray(value: string | undefined, defaultValue: number[]): number[] {
-  if (!value) return defaultValue;
+function parseNumberArray(value: string | undefined): number[] {
+  if (!value) throw new Error("OUTBOX_RETRY_DELAYS_MINUTES is required");
   const parsed = value.split(",").map((s) => Number(s.trim())).filter((n) => !isNaN(n));
-  return parsed.length > 0 ? parsed : defaultValue;
+  if (parsed.length === 0) throw new Error("OUTBOX_RETRY_DELAYS_MINUTES must contain at least one valid number");
+  return parsed;
 }
 
 export function getConfig(env: Record<string, string | undefined>): AppConfig {
   const config = {
-    TOOL_TIMEOUT_MS: Number(env.TOOL_TIMEOUT_MS ?? 30_000),
-    MAX_RETRIES: Number(env.MAX_RETRIES ?? 3),
-    MAX_ITERATIONS: Number(env.MAX_ITERATIONS ?? 5),
-    LOCATION_TOLERANCE_METERS: Number(env.LOCATION_TOLERANCE_METERS ?? 100),
-    TIME_TOLERANCE_HOURS: Number(env.TIME_TOLERANCE_HOURS ?? 24),
-    DUPLICATE_RADIUS_METERS: Number(env.DUPLICATE_RADIUS_METERS ?? 50),
-    DUPLICATE_LIMIT: Number(env.DUPLICATE_LIMIT ?? 10),
-    SLA_DEFAULT_DAYS: Number(env.SLA_DEFAULT_DAYS ?? 7),
-    SHARE_TOKEN_EXPIRY_HOURS: Number(env.SHARE_TOKEN_EXPIRY_HOURS ?? 168),
-    OUTBOX_MAX_RETRIES: Number(env.OUTBOX_MAX_RETRIES ?? 5),
-    OUTBOX_RETRY_DELAYS_MINUTES: parseNumberArray(env.OUTBOX_RETRY_DELAYS_MINUTES, [1, 5, 30, 120, 720]),
-    OUTBOX_BATCH_LIMIT: Number(env.OUTBOX_BATCH_LIMIT ?? 100),
-    FAILED_ASSESSMENTS_BATCH_LIMIT: Number(env.FAILED_ASSESSMENTS_BATCH_LIMIT ?? 50),
-    DEFAULT_PAGE_SIZE: Number(env.DEFAULT_PAGE_SIZE ?? 20),
-    MAX_PAGE_SIZE: Number(env.MAX_PAGE_SIZE ?? 100),
+    TOOL_TIMEOUT_MS: Number(env.TOOL_TIMEOUT_MS ?? (() => { throw new Error("TOOL_TIMEOUT_MS is required") })()),
+    MAX_RETRIES: Number(env.MAX_RETRIES ?? (() => { throw new Error("MAX_RETRIES is required") })()),
+    MAX_ITERATIONS: Number(env.MAX_ITERATIONS ?? (() => { throw new Error("MAX_ITERATIONS is required") })()),
+    LOCATION_TOLERANCE_METERS: Number(env.LOCATION_TOLERANCE_METERS ?? (() => { throw new Error("LOCATION_TOLERANCE_METERS is required") })()),
+    TIME_TOLERANCE_HOURS: Number(env.TIME_TOLERANCE_HOURS ?? (() => { throw new Error("TIME_TOLERANCE_HOURS is required") })()),
+    DUPLICATE_RADIUS_METERS: Number(env.DUPLICATE_RADIUS_METERS ?? (() => { throw new Error("DUPLICATE_RADIUS_METERS is required") })()),
+    DUPLICATE_LIMIT: Number(env.DUPLICATE_LIMIT ?? (() => { throw new Error("DUPLICATE_LIMIT is required") })()),
+    SLA_DEFAULT_DAYS: Number(env.SLA_DEFAULT_DAYS ?? (() => { throw new Error("SLA_DEFAULT_DAYS is required") })()),
+    SHARE_TOKEN_EXPIRY_HOURS: Number(env.SHARE_TOKEN_EXPIRY_HOURS ?? (() => { throw new Error("SHARE_TOKEN_EXPIRY_HOURS is required") })()),
+    OUTBOX_MAX_RETRIES: Number(env.OUTBOX_MAX_RETRIES ?? (() => { throw new Error("OUTBOX_MAX_RETRIES is required") })()),
+    OUTBOX_RETRY_DELAYS_MINUTES: parseNumberArray(env.OUTBOX_RETRY_DELAYS_MINUTES),
+    OUTBOX_BATCH_LIMIT: Number(env.OUTBOX_BATCH_LIMIT ?? (() => { throw new Error("OUTBOX_BATCH_LIMIT is required") })()),
+    FAILED_ASSESSMENTS_BATCH_LIMIT: Number(env.FAILED_ASSESSMENTS_BATCH_LIMIT ?? (() => { throw new Error("FAILED_ASSESSMENTS_BATCH_LIMIT is required") })()),
+    DEFAULT_PAGE_SIZE: Number(env.DEFAULT_PAGE_SIZE ?? (() => { throw new Error("DEFAULT_PAGE_SIZE is required") })()),
+    MAX_PAGE_SIZE: Number(env.MAX_PAGE_SIZE ?? (() => { throw new Error("MAX_PAGE_SIZE is required") })()),
     JWT_SECRET: "",
     ALLOWED_IMAGE_HOSTS: env.ALLOWED_IMAGE_HOSTS,
   } as AppConfig;

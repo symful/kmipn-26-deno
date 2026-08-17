@@ -104,7 +104,7 @@ export const AdminDashboard = () => {
   useEffect(() => {
     api
       .reports()
-      .then((data) => setReports(data.reports))
+      .then((data) => setReports(data.items))
       .catch((e) => { logger.error("Failed to fetch reports", { error: e }); setReports([]); })
       .finally(() => setLoading(false));
     api
@@ -131,10 +131,10 @@ export const AdminDashboard = () => {
   const maxTrendValue = backlog.length > 0 ? Math.max(...backlog.flatMap(d => [d.laporan_count, d.kasus_count])) : 1;
 
   return (
-    <div className="flex min-h-[100dvh] bg-[#f9faf8]">
-      <aside className="w-[220px] bg-[#16302b] text-[#cfe4df] flex flex-col shrink-0">
+    <div className="flex min-h-[100dvh] bg-sigap-surface">
+      <aside className="w-[220px] bg-surface-sidebar text-sigap-textMuted flex flex-col shrink-0">
         <div className="flex items-center gap-2.5 px-4 py-4 pb-5">
-          <div className="w-8 h-8 rounded-lg bg-[#0f7a6b] flex items-center justify-center text-white font-bold text-base">
+          <div className="w-8 h-8 rounded-lg bg-sigap-primary flex items-center justify-center text-white font-bold text-base">
             P
           </div>
           <span className="text-base font-bold text-white">PantauDesa</span>
@@ -147,14 +147,14 @@ export const AdminDashboard = () => {
               to={item.path}
               className={`flex items-center gap-2.5 px-3 py-2.5 rounded-lg text-sm font-medium transition-colors ${
                 location.pathname === item.path || (item.path === "/admin" && location.pathname === "/admin/dashboard")
-                  ? "bg-[#0f7a6b] text-white"
-                  : "hover:bg-[#234a43] text-[#cfe4df]"
+                  ? "bg-sigap-primary text-white"
+                  : "hover:bg-[#234A43] text-sigap-textMuted"
               }`}
             >
               <NavIcon type={item.icon} />
               <span>{item.label}</span>
               {item.badge && (
-                <span className="ml-auto bg-[#c0392b] text-white text-[10px] font-bold rounded-full px-1.5 py-0.5">
+                <span className="ml-auto bg-danger-500 text-white text-[10px] font-bold rounded-full px-1.5 py-0.5">
                   {item.badge}
                 </span>
               )}
@@ -162,11 +162,11 @@ export const AdminDashboard = () => {
           ))}
         </nav>
 
-        <div className="mt-auto px-3 pt-4 border-t border-[#234a43]">
+        <div className="mt-auto px-3 pt-4 border-t border-[#234A43]">
           {bottomNavItems.map((item) => (
             <button
               key={item.label}
-              className="flex items-center gap-2.5 px-3 py-2.5 rounded-lg text-sm w-full hover:bg-[#234a43] transition-colors text-[#9dc0b9]"
+              className="flex items-center gap-2.5 px-3 py-2.5 rounded-lg text-sm w-full hover:bg-[#234A43] transition-colors text-[#9DC0B9]"
             >
               <NavIcon type={item.icon} />
               <span>{item.label}</span>
@@ -176,19 +176,19 @@ export const AdminDashboard = () => {
       </aside>
 
       <div className="flex-1 flex flex-col min-w-0">
-        <header className="h-14 border-b border-[#e4e7e2] flex items-center gap-4 px-6 shrink-0 bg-white">
-          <div className="max-w-[360px] flex-1 bg-[#f4f5f3] border border-[#e4e7e2] rounded-lg px-3 py-2 flex items-center gap-2">
+        <header className="h-14 border-b border-sigap-border flex items-center gap-4 px-6 shrink-0 bg-white">
+          <div className="max-w-[360px] flex-1 bg-sigap-background border border-sigap-border rounded-lg px-3 py-2 flex items-center gap-2">
             <SearchIcon />
-            <span className="text-xs text-[#8a9099]">Cari kasus, desa, atau ID…</span>
+            <span className="text-xs text-sigap-textMuted">Cari kasus, desa, atau ID…</span>
           </div>
 
-          <div className="flex items-center gap-2 bg-[#e2f1ee] border border-[#bfe0d9] rounded-lg px-3 py-2 text-xs font-semibold text-[#0a5c50]">
+          <div className="flex items-center gap-2 bg-primary-50 border border-successBorder rounded-lg px-3 py-2 text-xs font-semibold text-primary-600">
             <span>Kec. Cisarua · Jul 2026</span>
             <span>▾</span>
           </div>
 
           <div className="ml-auto flex items-center gap-3">
-            <span className="w-8 h-8 rounded-full bg-[#eef0ec] flex items-center justify-center text-xs font-bold text-[#0a5c50]">
+            <span className="w-8 h-8 rounded-full bg-neutral-100 flex items-center justify-center text-xs font-bold text-primary-600">
               BM
             </span>
           </div>
@@ -197,49 +197,49 @@ export const AdminDashboard = () => {
         <div className="flex-1 overflow-hidden p-6 flex flex-col gap-5">
           <div>
             <h2 className="text-xl font-bold">Apa yang harus ditangani hari ini?</h2>
-            <p className="text-xs text-[#616770] mt-0.5">Data per 17 Jul 2026 08:40 WIB · cakupan 8 desa</p>
+            <p className="text-xs text-sigap-textTertiary mt-0.5">Data per 17 Jul 2026 08:40 WIB · cakupan 8 desa</p>
           </div>
 
           <div className="grid grid-cols-5 gap-3">
-            <div className="bg-white border border-[#e4e7e2] border-t-[3px] border-t-[#2563eb] rounded-xl p-4">
+            <div className="bg-white border border-sigap-border border-t-[3px] border-t-info-500 rounded-xl p-4">
               <div className="text-2xl font-bold">{totalCases}</div>
-              <div className="text-xs text-[#616770] mt-0.5">Total kasus</div>
+              <div className="text-xs text-sigap-textTertiary mt-0.5">Total kasus</div>
             </div>
-            <div className="bg-white border border-[#e4e7e2] border-t-[3px] border-t-[#b8730a] rounded-xl p-4">
-              <div className="text-2xl font-bold text-[#8a5808]">{pendingVerification}</div>
-              <div className="text-xs text-[#616770] mt-0.5">Perlu verifikasi</div>
+            <div className="bg-white border border-sigap-border border-t-[3px] border-t-warning-500 rounded-xl p-4">
+              <div className="text-2xl font-bold text-warning-600">{pendingVerification}</div>
+              <div className="text-xs text-sigap-textTertiary mt-0.5">Perlu verifikasi</div>
             </div>
-            <div className="bg-white border border-[#e4e7e2] border-t-[3px] border-t-[#c0392b] rounded-xl p-4">
-              <div className="text-2xl font-bold text-[#a5271a]">{slaBreached}</div>
-              <div className="text-xs text-[#616770] mt-0.5">SLA terlewat</div>
+            <div className="bg-white border border-sigap-border border-t-[3px] border-t-danger-500 rounded-xl p-4">
+              <div className="text-2xl font-bold text-danger-600">{slaBreached}</div>
+              <div className="text-xs text-sigap-textTertiary mt-0.5">SLA terlewat</div>
             </div>
-            <div className="bg-white border border-[#e4e7e2] border-t-[3px] border-t-[#0f7a6b] rounded-xl p-4">
-              <div className="text-2xl font-bold text-[#0a5c50]">{inProgress}</div>
-              <div className="text-xs text-[#616770] mt-0.5">Sedang diproses</div>
+            <div className="bg-white border border-sigap-border border-t-[3px] border-t-sigap-primary rounded-xl p-4">
+              <div className="text-2xl font-bold text-primary-600">{inProgress}</div>
+              <div className="text-xs text-sigap-textTertiary mt-0.5">Sedang diproses</div>
             </div>
-            <div className="bg-white border border-[#e4e7e2] border-t-[3px] border-t-[#8a9099] rounded-xl p-4">
+            <div className="bg-white border border-sigap-border border-t-[3px] border-t-neutral-400 rounded-xl p-4">
               <div className="text-2xl font-bold">{newCases}</div>
-              <div className="text-xs text-[#616770] mt-0.5">Kasus baru</div>
+              <div className="text-xs text-sigap-textTertiary mt-0.5">Kasus baru</div>
             </div>
           </div>
 
           <div className="grid grid-cols-[1.5fr_1fr] gap-5 flex-1 min-h-0">
             <div className="flex flex-col gap-4">
-              <div className="bg-white border border-[#e4e7e2] rounded-xl p-4">
+              <div className="bg-white border border-sigap-border rounded-xl p-4">
                 <div className="flex justify-between items-baseline mb-4">
                   <span className="text-sm font-bold">Umur backlog kasus</span>
-                  <span className="text-xs text-[#616770]">30 hari · <b className="text-[#17191c]">laporan</b> vs <b className="text-[#17191c]">kasus</b></span>
+                  <span className="text-xs text-sigap-textTertiary">30 hari · <b className="text-sigap-textPrimary">laporan</b> vs <b className="text-sigap-textPrimary">kasus</b></span>
                 </div>
                 <div className="flex items-end gap-1.5 h-28">
                   {backlog.map((d, i) => (
                     <div key={i} className="flex-1 flex flex-col justify-end gap-0.5">
                       <div className="flex flex-col gap-0.5 justify-end" style={{ height: "110px" }}>
                         <div
-                          className="w-full bg-[#c7d7fb] rounded-t-sm"
+                          className="w-full bg-info-100 rounded-t-sm"
                           style={{ height: `${maxTrendValue > 0 ? (d.laporan_count / maxTrendValue) * 100 : 0}%` }}
                         />
                         <div
-                          className="w-full bg-[#0f7a6b] rounded-t-sm"
+                          className="w-full bg-sigap-primary rounded-t-sm"
                           style={{ height: `${maxTrendValue > 0 ? (d.kasus_count / maxTrendValue) * 100 : 0}%` }}
                         />
                       </div>
@@ -248,10 +248,10 @@ export const AdminDashboard = () => {
                 </div>
               </div>
 
-              <div className="bg-white border border-[#e4e7e2] rounded-xl p-4 flex-1 flex flex-col">
+              <div className="bg-white border border-sigap-border rounded-xl p-4 flex-1 flex flex-col">
                 <div className="flex justify-between items-baseline mb-3">
                   <span className="text-sm font-bold">Peta ringkas kasus</span>
-                  <Link to="/admin/cases?view=map" className="text-xs text-[#0f7a6b] font-semibold">Buka Peta & Kasus →</Link>
+                  <Link to="/admin/cases?view=map" className="text-xs text-sigap-primary font-semibold">Buka Peta & Kasus →</Link>
                 </div>
                 <div className="flex-1 rounded-lg min-h-[150px]">
                   <MiniMapCluster className="w-full h-full min-h-[150px]" />
@@ -260,80 +260,80 @@ export const AdminDashboard = () => {
             </div>
 
             <div className="flex flex-col gap-4 min-h-0">
-              <div className="bg-white border border-[#e4e7e2] rounded-xl p-4 flex-1 flex flex-col">
+              <div className="bg-white border border-sigap-border rounded-xl p-4 flex-1 flex flex-col">
                 <span className="text-sm font-bold mb-3">Kasus kritis</span>
                 <div className="flex flex-col gap-0">
-                  <div className="flex gap-2.5 items-center pb-3 border-b border-[#eef0ec]">
-                    <span className="w-2 h-2 rounded-full bg-[#c0392b] shrink-0" />
+                  <div className="flex gap-2.5 items-center pb-3 border-b border-neutral-100">
+                    <span className="w-2 h-2 rounded-full bg-danger-500 shrink-0" />
                     <div className="flex-1 min-w-0">
                       <div className="text-xs font-semibold truncate">Jembatan retak RW 07</div>
-                      <div className="text-[11px] text-[#616770]">CB-1790 · Ds. Kaler</div>
+                      <div className="text-[11px] text-sigap-textTertiary">CB-1790 · Ds. Kaler</div>
                     </div>
-                    <span className="text-[11px] font-bold text-[#a5271a]">SLA -1h</span>
+                    <span className="text-[11px] font-bold text-danger-600">SLA -1h</span>
                   </div>
-                  <div className="flex gap-2.5 items-center py-3 border-b border-[#eef0ec]">
-                    <span className="w-2 h-2 rounded-full bg-[#c0392b] shrink-0" />
+                  <div className="flex gap-2.5 items-center py-3 border-b border-neutral-100">
+                    <span className="w-2 h-2 rounded-full bg-danger-500 shrink-0" />
                     <div className="flex-1 min-w-0">
                       <div className="text-xs font-semibold truncate">Jalan longsor akses utama</div>
-                      <div className="text-[11px] text-[#616770]">CB-1802 · Ds. Girang</div>
+                      <div className="text-[11px] text-sigap-textTertiary">CB-1802 · Ds. Girang</div>
                     </div>
-                    <span className="text-[11px] font-bold text-[#a5271a]">SLA -3h</span>
+                    <span className="text-[11px] font-bold text-danger-600">SLA -3h</span>
                   </div>
-                  <div className="flex gap-2.5 items-center py-3 border-b border-[#eef0ec]">
-                    <span className="w-2 h-2 rounded-full bg-[#b8730a] shrink-0" />
+                  <div className="flex gap-2.5 items-center py-3 border-b border-neutral-100">
+                    <span className="w-2 h-2 rounded-full bg-warning-500 shrink-0" />
                     <div className="flex-1 min-w-0">
                       <div className="text-xs font-semibold truncate">Air keruh 3 dusun</div>
-                      <div className="text-[11px] text-[#616770]">CB-1811 · Ds. Ciburuy</div>
+                      <div className="text-[11px] text-sigap-textTertiary">CB-1811 · Ds. Ciburuy</div>
                     </div>
-                    <span className="text-[11px] font-bold text-[#8a5808]">SLA 2j</span>
+                    <span className="text-[11px] font-bold text-warning-600">SLA 2j</span>
                   </div>
                   <div className="flex gap-2.5 items-center pt-3">
-                    <span className="w-2 h-2 rounded-full bg-[#b8730a] shrink-0" />
+                    <span className="w-2 h-2 rounded-full bg-warning-500 shrink-0" />
                     <div className="flex-1 min-w-0">
                       <div className="text-xs font-semibold truncate">Penerangan jalan mati</div>
-                      <div className="text-[11px] text-[#616770]">CB-1815 · Ds. Wetan</div>
+                      <div className="text-[11px] text-sigap-textTertiary">CB-1815 · Ds. Wetan</div>
                     </div>
-                    <span className="text-[11px] font-bold text-[#8a5808]">SLA 5j</span>
+                    <span className="text-[11px] font-bold text-warning-600">SLA 5j</span>
                   </div>
                 </div>
               </div>
 
-              <div className="bg-white border border-[#e4e7e2] rounded-xl p-4">
+              <div className="bg-white border border-sigap-border rounded-xl p-4">
                 <div className="flex justify-between items-center mb-3">
                   <span className="text-sm font-bold">Kualitas & sinkronisasi data</span>
                 </div>
                 <div className="flex gap-3">
                   <div className="flex-1">
-                    <div className="text-xl font-bold text-[#0a5c50]">98%</div>
-                    <div className="text-[11px] text-[#616770] leading-tight mt-0.5">Laporan tersinkron</div>
+                    <div className="text-xl font-bold text-primary-600">98%</div>
+                    <div className="text-[11px] text-sigap-textTertiary leading-tight mt-0.5">Laporan tersinkron</div>
                   </div>
                   <div className="flex-1">
-                    <div className="text-xl font-bold text-[#8a5808]">7</div>
-                    <div className="text-[11px] text-[#616770] leading-tight mt-0.5">Menunggu koneksi surveyor</div>
+                    <div className="text-xl font-bold text-warning-600">7</div>
+                    <div className="text-[11px] text-sigap-textTertiary leading-tight mt-0.5">Menunggu koneksi surveyor</div>
                   </div>
                 </div>
               </div>
 
-              <div className="bg-white border border-[#e4e7e2] rounded-xl p-4">
+              <div className="bg-white border border-sigap-border rounded-xl p-4">
                 <div className="flex justify-between items-center mb-3">
                   <span className="text-sm font-bold">Laporan terbaru</span>
-                  <Link to="/admin/cases" className="text-xs text-[#0f7a6b] font-semibold">Lihat semua →</Link>
+                  <Link to="/admin/cases" className="text-xs text-sigap-primary font-semibold">Lihat semua →</Link>
                 </div>
                 <div className="flex flex-col gap-2">
                   {loading ? (
-                    <p className="text-xs text-[#8a9099] text-center py-4">Memuat...</p>
+                    <p className="text-xs text-sigap-textMuted text-center py-4">Memuat...</p>
                   ) : reports.slice(0, 5).map((r) => (
                     <Link
                       key={r.id}
                       to={`/admin/cases/${r.id}`}
-                      className="flex items-center gap-2 p-2 rounded-lg hover:bg-[#f4f5f3] transition-colors"
+                      className="flex items-center gap-2 p-2 rounded-lg hover:bg-sigap-background transition-colors"
                     >
-                      <span className="w-8 h-8 rounded-lg bg-[#e2f1ee] text-[#0a5c50] flex items-center justify-center text-[11px] font-bold shrink-0">
+                      <span className="w-8 h-8 rounded-lg bg-primary-100 text-primary-600 flex items-center justify-center text-[11px] font-bold shrink-0">
                         {r.category?.name?.slice(0, 2).toUpperCase() ?? "CS"}
                       </span>
                       <div className="flex-1 min-w-0">
                         <div className="text-xs font-semibold truncate">{r.category?.name ?? r.category_id}</div>
-                        <div className="text-[10px] text-[#616770]">{new Date(r.created_at).toLocaleDateString("id-ID")}</div>
+                        <div className="text-[10px] text-sigap-textTertiary">{new Date(r.created_at).toLocaleDateString("id-ID")}</div>
                       </div>
                       <StatusBadge status={r.status} />
                     </Link>

@@ -69,7 +69,7 @@ closeRoute.post(
       if (notifRow?.reporter_id) {
         await withClient(c.env, async (client) => {
           await client.query(
-            `INSERT INTO notifications (user_id, type, message, related_report_id) VALUES ($1, $2, $3, $4)`,
+            `INSERT INTO notifications (user_id, kind, body, related_report_id) VALUES ($1, $2, $3, $4)`,
             [notifRow.reporter_id, "report_closed", "Laporan telah ditutup.", id]
           );
         });

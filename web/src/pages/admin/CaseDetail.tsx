@@ -4,14 +4,14 @@ import type { Report, AgentAssessment, PriorityResponse } from "../../types";
 import { StatusBadge } from "../../components/StatusBadge";
 import { AIAssessmentViewer } from "../../components/AIAssessmentViewer";
 import { TimelineRail, type TimelineEvent } from "../../components/case-detail/TimelineRail";
-import { SupportingGallery, SupportingGalleryLoadingState, SupportingGalleryEmptyState, SupportingGalleryErrorState } from "../../components/case-detail/SupportingGallery";
+import { SupportingGallery } from "../../components/case-detail/SupportingGallery";
 import { api } from "../../api/client";
 import { useAuthStore } from "../../stores/auth";
 import { colors } from "../../theme/tokens";
 import { logger } from "@/lib/logger";
 
 type DecisionType = "valid" | "needs_completion" | "needs_survey" | "duplicate" | "out_of_scope" | "rejected";
-type TabType = "detail" | "history" | "ai_assessment" | "documents" | "activity";
+type TabType = "ringkasan" | "bukti" | "verifikasi" | "tugas" | "audit";
 
 interface StatusTransition {
   label: string;
@@ -58,61 +58,8 @@ export const AdminCaseDetail = () => {
   const [verifyReason, setVerifyReason] = useState("");
   const [verifyNotes, setVerifyNotes] = useState("");
   const [actionLoading, setActionLoading] = useState(false);
-  const [activeTab, setActiveTab] = useState<TabType>("detail");
+  const [activeTab, setActiveTab] = useState<TabType>("ringkasan");
   const user = useAuthStore((s) => s.user);
-  const [timelineLoading, setTimelineLoading] = useState(false);
-  const [timelineError, setTimelineError] = useState<string | null>(null);
-  const [timelineEvents, setTimelineEvents] = useState<TimelineEvent[]>([]);
-  const [supportingLoading, setSupportingLoading] = useState(false);
-  const [supportingError, setSupportingError] = useState<string | null>(null);
-  const [supportingReports, setSupportingReports] = useState<Array<{ id: string; photo_urls: string[]; created_at: string; status: string }>>([]);
-
-  const loadTimeline = async () => {
-    if (!id) return;
-    setTimelineLoading(true);
-    setTimelineError(null);
-    try {
-      const res = await api.reportTimeline(id);
-      // Transform API response to TimelineEvent format
-      const transformed: TimelineEvent[] = res.events.map((e) => {
-        let dotColor: "amber" | "teal" | "gray" = "gray";
-        if (e.status === "submitted" || e.status === "verified") dotColor = "teal";
-        else if (e.status === "under_review" || e.status === "needs_survey") dotColor = "amber";
-        return {
-          time: new Date(e.occurred_at).toLocaleDateString("id-ID", {
-            day: "2-digit",
-            month: "short",
-            hour: "2-digit",
-            minute: "2-digit",
-          }),
-          description: e.label,
-          dotColor,
-        };
-      });
-      setTimelineEvents(transformed);
-    } catch (e) {
-      logger.error("Failed to load timeline", { error: e });
-      setTimelineError("Gagal memuat timeline");
-    } finally {
-      setTimelineLoading(false);
-    }
-  };
-
-  const loadSupporting = async () => {
-    if (!id) return;
-    setSupportingLoading(true);
-    setSupportingError(null);
-    try {
-      const res = await api.reportSupporting(id);
-      setSupportingReports(res.reports);
-    } catch (e) {
-      logger.error("Failed to load supporting reports", { error: e });
-      setSupportingError("Gagal memuat laporan pendukung");
-    } finally {
-      setSupportingLoading(false);
-    }
-  };
-
   const load = async () => {
     if (!id) return;
     setLoading(true);
@@ -156,8 +103,6 @@ export const AdminCaseDetail = () => {
     if (report) {
       loadAssessments();
       loadPriority();
-      loadTimeline();
-      loadSupporting();
     }
   }, [report]);
 
@@ -560,9 +505,9 @@ export const AdminCaseDetail = () => {
   const getPriorityColor = (level: string) => {
     switch (level) {
       case "Kritis": return colors.perluTindakan || "#dc2626";
-      case "Tinggi": return "#b8730a";
+      case "Tinggi": return colors.warning || "#B8730A";
       case "Sedang": return colors.diproses || "#2563eb";
-      case "Rendah": return "#22c55e";
+      case "Rendah": return colors.selesai || "#22C55E";
       default: return "#6b7280";
     }
   };
@@ -598,58 +543,46 @@ export const AdminCaseDetail = () => {
   };
 
   const tabs = [
-    { id: "detail" as TabType, label: "Ringkasan" },
-    { id: "history" as TabType, label: "Riwayat Audit" },
-    { id: "ai_assessment" as TabType, label: "AI Assessment" },
-    { id: "documents" as TabType, label: "Dokumen" },
-    { id: "activity" as TabType, label: "Aktivitas" },
+    { id: "ringkasan" as TabType, label: "Ringkasan" },
+    { id: "bukti" as TabType, label: "Bukti & Laporan" },
+    { id: "verifikasi" as TabType, label: "Verifikasi" },
+    { id: "tugas" as TabType, label: "Tugas & Progres" },
+    { id: "audit" as TabType, label: "Riwayat Audit" },
   ];
 
   return (
-    <div className="min-h-screen bg-neutral-100">
-      {/* Header */}
-      <header className="bg-white border-b border-neutral-200 px-6 py-4">
-        <div className="flex items-center justify-between">
+    <div className="min-h-screen bg-sigap-background">
+
+      <div className="bg-white border-b border-sigap-border px-6 py-3">
+        <div className="max-w-7xl mx-auto">
           <div className="flex items-center gap-3">
-            <Link
-              to="/admin/cases"
-              className="w-8 h-8 rounded-lg bg-primary-500 flex items-center justify-center text-white font-bold text-sm"
-            >
-              P
-            </Link>
-            <div>
-              <div className="flex items-center gap-2 text-xs">
-                <span className="text-primary-600 font-semibold">PantauDesa</span>
-                <span className="text-neutral-400">/</span>
-                <span className="font-mono text-neutral-500">{report.id.slice(0, 8)}</span>
+            <div className="flex items-center gap-1.5">
+              <div className="w-3 h-3 rounded-full bg-[#ff5f57]"></div>
+              <div className="w-3 h-3 rounded-full bg-[#febc2e]"></div>
+              <div className="w-3 h-3 rounded-full bg-[#28c840]"></div>
+            </div>
+            <div className="flex-1 max-w-md bg-neutral-100 rounded-md px-3 py-1.5 flex items-center gap-2">
+              <div className="w-3.5 h-3.5 rounded-full bg-sigap-primary flex items-center justify-center">
+                <span className="text-[6px] font-bold text-white">P</span>
               </div>
-              <h1 className="text-lg font-bold tracking-tight text-neutral-900">
-                {report.category?.name ?? report.category_id}
-              </h1>
+              <span className="text-xs font-mono text-neutral-500">app.pantaudesa.id/kasus/{report.id}</span>
             </div>
           </div>
-          <div className="flex items-center gap-3">
-            <Link
-              to="/admin/cases"
-              className="text-sm font-medium text-primary-600 hover:underline"
-            >
-              Daftar
-            </Link>
-            <button
-              onClick={() => useAuthStore.getState().clear()}
-              className="text-sm text-danger-500 hover:underline"
-            >
-              Keluar
-            </button>
-          </div>
         </div>
-      </header>
+      </div>
 
-      {/* Case Info Bar */}
-      <div className="bg-white border-b border-neutral-200 px-6 py-4">
-        <div className="flex items-start gap-4">
-          <div className="flex-1">
-            <div className="flex items-center gap-3 mb-2">
+      <div className="bg-white border-b border-sigap-border px-6 py-4">
+        <div className="max-w-7xl mx-auto">
+          <div className="flex items-center gap-2 text-xs text-neutral-500 mb-3">
+            <Link to="/admin/cases" className="hover:text-sigap-primary">Peta & Kasus</Link>
+            <span>/</span>
+            <span className="font-mono text-neutral-700">{report.id}</span>
+          </div>
+          <div className="flex items-start justify-between gap-4">
+            <div className="flex items-center gap-3">
+              <span className="inline-flex items-center px-2.5 py-1 rounded-md text-xs font-bold bg-sigap-primary text-white">
+                {report.category?.name ?? report.category_id}
+              </span>
               <StatusBadge status={report.status} />
               {priority && (
                 <span className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md text-xs font-semibold ${getPriorityBgColor(priority.level)} ${getPriorityTextColor(priority.level)}`}>
@@ -657,63 +590,28 @@ export const AdminCaseDetail = () => {
                   Prioritas {priority.level}
                 </span>
               )}
-              {report.assignee ? (
-                <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md text-xs font-semibold bg-purple-100 text-purple-700">
-                  <span className="w-1.5 h-1.5 rounded-full bg-purple-500"></span>
-                  {report.assignee.name}
-                </span>
-              ) : (
-                <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md text-xs font-semibold bg-neutral-100 text-neutral-500">
-                  <span className="w-1.5 h-1.5 rounded-full bg-neutral-400"></span>
-                  Belum ditugaskan
-                </span>
-              )}
             </div>
-            <p className="text-sm text-neutral-600 whitespace-pre-wrap">{report.description}</p>
-            <div className="flex items-center gap-6 mt-3 text-xs text-neutral-500">
-              <span>
-                Dibuat: {new Date(report.created_at).toLocaleDateString("id-ID", {
-                  day: "2-digit",
-                  month: "short",
-                  year: "numeric",
-                  hour: "2-digit",
-                  minute: "2-digit",
-                })}
-              </span>
-              {report.severity != null && (
-                <span>Severity: {report.severity}%</span>
-              )}
-              {report.assignee && (
-                <span>Ditugaskan: {report.assignee.name}</span>
-              )}
+            <div className="flex items-center gap-2">
+              <button className="text-sm px-4 py-2 rounded-lg font-semibold border border-sigap-primary text-sigap-primary hover:bg-sigap-primary hover:text-white transition-colors">
+                Gabungkan
+              </button>
+              <button className="text-sm px-4 py-2 rounded-lg font-semibold text-white transition-colors" style={{ backgroundColor: colors.diproses }}>
+                Verifikasi kasus
+              </button>
             </div>
           </div>
-          {!isTerminal && availableTransitions.length > 0 && (
-            <div className="flex flex-wrap gap-2">
-              {availableTransitions.map((t, i) => (
-                <button
-                  key={i}
-                  onClick={t.action}
-                  disabled={updatingStatus || actionLoading}
-                  className="text-xs px-3 py-1.5 rounded font-medium text-white disabled:opacity-50 transition-opacity"
-                  style={getVariantStyle(t.variant)}
-                >
-                  {actionLoading ? "Memproses..." : t.label}
-                </button>
-              ))}
-            </div>
-          )}
         </div>
+      </div>
 
-        {/* Tabs */}
-        <div className="flex gap-6 mt-4 border-t border-neutral-200 pt-4">
+      <div className="bg-white border-b border-sigap-border px-6">
+        <div className="max-w-7xl mx-auto flex gap-0">
           {tabs.map((tab) => (
             <button
               key={tab.id}
               onClick={() => setActiveTab(tab.id)}
-              className={`text-sm font-semibold pb-3 border-b-2 transition-colors ${
+              className={`text-sm font-semibold pb-3 px-1 mx-4 border-b-2 transition-colors ${
                 activeTab === tab.id
-                  ? "text-primary-600 border-primary-600"
+                  ? "text-sigap-primary border-sigap-primary"
                   : "text-neutral-500 border-transparent hover:text-neutral-700"
               }`}
             >
@@ -723,12 +621,9 @@ export const AdminCaseDetail = () => {
         </div>
       </div>
 
-      {/* Main Content */}
-      <main className="p-6">
+      <main className="p-6 max-w-7xl mx-auto">
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-          {/* Left Column - Main Content */}
           <div className="lg:col-span-2 space-y-6">
-            {/* Error Alert */}
             {error && (
               <div className="bg-danger-100 border border-danger-500/30 text-danger-600 px-4 py-3 rounded-lg text-sm">
                 {error}
@@ -736,27 +631,22 @@ export const AdminCaseDetail = () => {
               </div>
             )}
 
-            {/* Tab Content */}
-            {activeTab === "detail" && (
+            {activeTab === "ringkasan" && (
               <>
-                {/* Location & Impact Grid */}
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  {/* Location Card */}
                   {report.lat != null && report.lng != null && (
-                    <div className="bg-white rounded-xl border border-neutral-200 overflow-hidden">
-                      <div className="h-36 relative bg-neutral-100">
-                        <div className="absolute inset-0 opacity-30">
-                          <div className="w-full h-full" style={{
-                            backgroundImage: "linear-gradient(#dfe4de 1px, transparent 1px), linear-gradient(90deg, #dfe4de 1px, transparent 1px)",
-                            backgroundSize: "30px 30px"
-                          }}></div>
-                        </div>
+                    <div className="bg-white rounded-xl border border-sigap-border overflow-hidden">
+                      <div className="h-36 relative" style={{ backgroundColor: "#eaeee9" }}>
+                        <div className="absolute inset-0 opacity-40" style={{
+                          backgroundImage: "linear-gradient(#dfe4de 1px, transparent 1px), linear-gradient(90deg, #dfe4de 1px, transparent 1px)",
+                          backgroundSize: "30px 30px"
+                        }}></div>
                         <a
                           href={openStreetMapUrl || "#"}
                           target="_blank"
                           rel="noopener noreferrer"
-                          className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-full w-4 h-4 rounded-full bg-danger-500 border-2 border-white rotate-45"
-                          style={{ transform: "translate(-50%, -100%) rotate(-45deg)" }}
+                          className="absolute left-1/2 top-1/2 w-4 h-4 rounded-full bg-danger-500 border-2 border-white"
+                          style={{ transform: "translate(-50%, -50%)" }}
                         ></a>
                       </div>
                       <div className="p-3 flex justify-between items-center">
@@ -767,7 +657,7 @@ export const AdminCaseDetail = () => {
                           href={openStreetMapUrl || "#"}
                           target="_blank"
                           rel="noopener noreferrer"
-                          className="text-xs text-primary-600 font-semibold hover:underline"
+                          className="text-xs text-sigap-primary font-semibold hover:underline"
                         >
                           Buka peta penuh
                         </a>
@@ -775,8 +665,7 @@ export const AdminCaseDetail = () => {
                     </div>
                   )}
 
-                  {/* Impact Card */}
-                  <div className="bg-white rounded-xl border border-neutral-200 p-4">
+                  <div className="bg-white rounded-xl border border-sigap-border p-4">
                     <h4 className="text-xs font-bold text-neutral-500 uppercase tracking-wider mb-3">Dampak</h4>
                     <div className="space-y-2">
                       <div className="flex items-center gap-2">
@@ -796,9 +685,8 @@ export const AdminCaseDetail = () => {
                   </div>
                 </div>
 
-                {/* Score Panel */}
                 {priority && (
-                  <div className="bg-white rounded-xl border border-neutral-200 p-5">
+                  <div className="bg-white rounded-xl border border-sigap-border p-5">
                     <div className="flex justify-between items-start mb-4">
                       <div className="flex items-center gap-4">
                         <div>
@@ -815,13 +703,11 @@ export const AdminCaseDetail = () => {
                         <div className="font-mono text-xs text-neutral-500">model v{priority.version}</div>
                       </div>
                     </div>
-
-                    {/* Score Breakdown Bars */}
                     <div className="space-y-3">
                       {[
-                        { label: "Severity", value: priority.breakdown.severity, color: "bg-primary-500" },
-                        { label: "Residents", value: priority.breakdown.affected_residents, color: "bg-primary-500" },
-                        { label: "Vulnerability", value: priority.breakdown.region_vulnerability, color: "bg-primary-500" },
+                        { label: "Severity", value: priority.breakdown.severity, color: "bg-sigap-primary" },
+                        { label: "Residents", value: priority.breakdown.affected_residents, color: "bg-sigap-primary" },
+                        { label: "Vulnerability", value: priority.breakdown.region_vulnerability, color: "bg-sigap-primary" },
                         { label: "SLA", value: priority.breakdown.sla_pressure, color: "bg-warning-500" },
                       ].map((factor) => (
                         <div key={factor.label} className="flex items-center gap-3">
@@ -839,9 +725,16 @@ export const AdminCaseDetail = () => {
                   </div>
                 )}
 
-                {/* Photos */}
+                <SupportingGallery
+                  reportId={id ?? ""}
+                />
+              </>
+            )}
+
+            {activeTab === "bukti" && (
+              <div className="space-y-6">
                 {report.photo_urls.length > 0 && (
-                  <div className="bg-white rounded-xl border border-neutral-200 p-5">
+                  <div className="bg-white rounded-xl border border-sigap-border p-5">
                     <h3 className="text-sm font-bold mb-3">Foto Bukti</h3>
                     <div className="grid grid-cols-3 gap-3">
                       {report.photo_urls.map((url, i) => (
@@ -855,39 +748,31 @@ export const AdminCaseDetail = () => {
                     </div>
                   </div>
                 )}
-
-                {/* Supporting Gallery */}
                 <SupportingGallery
-                  photos={supportingReports.flatMap((r) => r.photo_urls)}
-                  totalCount={supportingReports.length}
-                  loading={supportingLoading}
-                  error={supportingError}
-                  onRetry={loadSupporting}
+                  reportId={id ?? ""}
                 />
-
-                {/* AI Assessment Button */}
-                {report.photo_urls.length > 0 && (
-                  <div className="bg-white rounded-xl border border-neutral-200 p-5">
-                    <button
-                      onClick={handleAssess}
-                      disabled={assessing}
-                      className="w-full text-sm px-4 py-2.5 rounded-lg font-semibold text-white disabled:opacity-50 transition-opacity"
-                      style={{ backgroundColor: colors.primary }}
-                    >
-                      {assessing ? "Menjalankan AI Penilaian..." : "Jalankan AI Penilaian"}
-                    </button>
-                  </div>
-                )}
-              </>
+              </div>
             )}
 
-            {activeTab === "history" && (
-              <div className="bg-white rounded-xl border border-neutral-200 p-5">
+            {activeTab === "verifikasi" && (
+              <div className="bg-white rounded-xl border border-sigap-border p-5">
+                <p className="text-sm text-neutral-500">Verifikasi akan ditampilkan di sini.</p>
+              </div>
+            )}
+
+            {activeTab === "tugas" && (
+              <div className="bg-white rounded-xl border border-sigap-border p-5">
+                <p className="text-sm text-neutral-500">Tugas dan progres akan ditampilkan di sini.</p>
+              </div>
+            )}
+
+            {activeTab === "audit" && (
+              <div className="bg-white rounded-xl border border-sigap-border p-5">
                 <h3 className="text-sm font-bold mb-4">Riwayat Audit</h3>
                 <div className="space-y-4">
                   <div className="flex gap-3">
                     <div className="flex flex-col items-center">
-                      <span className="w-3 h-3 rounded-full bg-primary-500"></span>
+                      <span className="w-3 h-3 rounded-full bg-sigap-primary"></span>
                       <span className="w-0.5 h-8 bg-neutral-200"></span>
                     </div>
                     <div className="pb-4">
@@ -906,7 +791,7 @@ export const AdminCaseDetail = () => {
                   {report.status !== "submitted" && (
                     <div className="flex gap-3">
                       <div className="flex flex-col items-center">
-                        <span className="w-3 h-3 rounded-full bg-primary-500"></span>
+                        <span className="w-3 h-3 rounded-full bg-sigap-primary"></span>
                       </div>
                       <div>
                         <div className="text-sm font-semibold">Status: {report.status}</div>
@@ -925,74 +810,50 @@ export const AdminCaseDetail = () => {
                 </div>
               </div>
             )}
-
-            {activeTab === "ai_assessment" && (
-              <div className="space-y-6">
-                {assessments.length > 0 ? (
-                  <AIAssessmentViewer assessment={assessments[0] ?? null} loading={false} />
-                ) : (
-                  <div className="bg-white rounded-xl border border-neutral-200 p-8 text-center">
-                    <p className="text-sm text-neutral-500">Belum ada penilaian AI untuk laporan ini.</p>
-                    {report.photo_urls.length > 0 && (
-                      <button
-                        onClick={handleAssess}
-                        disabled={assessing}
-                        className="mt-4 text-sm px-4 py-2 rounded-lg font-semibold text-white disabled:opacity-50"
-                        style={{ backgroundColor: colors.primary }}
-                      >
-                        {assessing ? "Menjalankan..." : "Jalankan AI Penilaian"}
-                      </button>
-                    )}
-                  </div>
-                )}
-              </div>
-            )}
-
-            {activeTab === "documents" && (
-              <div className="bg-white rounded-xl border border-neutral-200 p-8 text-center">
-                <p className="text-sm text-neutral-500">Tidak ada dokumen untuk laporan ini.</p>
-              </div>
-            )}
-
-            {activeTab === "activity" && (
-              <div className="bg-white rounded-xl border border-neutral-200 p-8 text-center">
-                <p className="text-sm text-neutral-500">Riwayat aktivitas akan ditampilkan di sini.</p>
-              </div>
-            )}
           </div>
 
-          {/* Right Column - Timeline Sidebar */}
           <div className="space-y-6">
-            {/* Timeline */}
-            <TimelineRail
-              events={timelineEvents}
-              loading={timelineLoading}
-              error={timelineError}
-              onRetry={loadTimeline}
-            />
+            <TimelineRail reportId={id ?? ""} />
 
-            {/* RT/RW Verification */}
-            <div className="bg-white rounded-xl border border-neutral-200 p-5">
-              <h4 className="text-xs font-bold text-neutral-500 uppercase tracking-wider mb-3">Verifikasi RT/RW</h4>
-              <button
-                onClick={() => setShowRtRwModal(true)}
-                className="w-full text-sm px-4 py-2 rounded-lg font-semibold text-white transition-opacity"
-                style={{ backgroundColor: colors.diproses }}
-              >
-                Kirim Verifikasi RT/RW
-              </button>
+            <div className="bg-white rounded-xl border border-sigap-border p-5">
+              <h4 className="text-xs font-bold text-neutral-500 uppercase tracking-wider mb-3">Keputusan</h4>
+              <div className="space-y-2">
+                <button
+                  onClick={() => {
+                    setDecideDecision("valid");
+                    setShowDecideModal(true);
+                  }}
+                  className="w-full text-sm px-4 py-2 rounded-lg font-semibold text-white text-left transition-opacity"
+                  style={{ backgroundColor: colors.primary }}
+                >
+                  Validasi
+                </button>
+                <button
+                  onClick={() => setShowCombineModal(true)}
+                  className="w-full text-sm px-4 py-2 rounded-lg font-semibold border border-sigap-primary text-sigap-primary text-left hover:bg-sigap-primary hover:text-white transition-colors"
+                >
+                  Gabungkan
+                </button>
+                <button
+                  onClick={() => handleStatusChange("in_progress")}
+                  disabled={updatingStatus}
+                  className="w-full text-sm px-4 py-2 rounded-lg font-semibold text-white text-left transition-opacity disabled:opacity-50"
+                  style={{ backgroundColor: colors.diproses }}
+                >
+                  {updatingStatus ? "Memproses..." : "Tugaskan ke Petugas"}
+                </button>
+              </div>
             </div>
           </div>
         </div>
       </main>
 
-      {/* Sticky Action Bar */}
-      <div className="sticky bottom-0 z-50 bg-white border-t border-gray-200 flex gap-2 p-4">
-        <button className="flex-1 bg-blue-600 text-white rounded-lg py-2 px-4 text-sm font-medium">Gabungkan</button>
-        <button className="flex-1 bg-green-600 text-white rounded-lg py-2 px-4 text-sm font-medium">Verifikasi</button>
-        <button className="flex-1 bg-gray-600 text-white rounded-lg py-2 px-4 text-sm font-medium">Tutup</button>
-        <button className="flex-1 bg-orange-500 text-white rounded-lg py-2 px-4 text-sm font-medium">Buka Kembali</button>
-        <button className="flex-1 bg-gray-400 text-white rounded-lg py-2 px-4 text-sm font-medium">Lainnya</button>
+      <div className="sticky bottom-0 z-50 bg-white border-t border-sigap-border px-6 py-4">
+        <div className="max-w-7xl mx-auto flex items-center justify-end">
+          <button className="text-sm px-5 py-2.5 rounded-lg font-semibold text-white transition-colors" style={{ backgroundColor: colors.primary }}>
+            Verifikasi &amp; prioritaskan
+          </button>
+        </div>
       </div>
 
       {/* Modals - Same as original */}

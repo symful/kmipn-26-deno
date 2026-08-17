@@ -14,7 +14,7 @@ export async function sendNotification(
   try {
     await withClient(env, async (client) => {
       await client.query(
-        `INSERT INTO notifications (user_id, type, message, related_report_id) VALUES ($1, $2, $3, $4)`,
+        `INSERT INTO notifications (user_id, kind, body, related_report_id) VALUES ($1, $2, $3, $4)`,
         [userId, kind, message, relatedReportId ?? null]
       );
     });

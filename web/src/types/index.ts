@@ -141,9 +141,8 @@ export interface LoginResponse {
 }
 
 export interface PaginatedReports {
-  reports: Report[];
-  total: number;
-  page: number;
+  items: Report[];
+  pagination: { page: number; limit: number; total: number; total_pages: number };
 }
 
 export interface KategoriListResponse {
@@ -374,4 +373,159 @@ export interface QueueCounts {
   sla_breached: number;
   high_priority: number;
   needs_completion: number;
+}
+
+export interface ExecutiveDashboard {
+  total_reports: number;
+  verified_reports: number;
+  resolved_reports: number;
+  avg_resolution_days: number;
+  sla_breach_rate: number;
+  reports_by_status: Record<string, number>;
+  reports_by_category: Array<{ category_id: string; count: number }>;
+}
+
+export interface RegionalStats {
+  regions: Array<{
+    wilayah_id: string;
+    name: string;
+    total: number;
+    verified: number;
+    resolved: number;
+  }>;
+}
+
+export interface TrendData {
+  trend: Array<{
+    date: string;
+    submitted: number;
+    verified: number;
+    resolved: number;
+  }>;
+}
+
+export interface WargaStats {
+  total: number;
+  by_status: Record<string, number>;
+}
+
+export interface Impact {
+  affected_area_km2: number;
+  estimated_people_affected: number;
+  risk_level: "low" | "medium" | "high" | "critical";
+}
+
+export interface HeatmapData {
+  points: Array<{
+    lat: number;
+    lng: number;
+    intensity: number;
+  }>;
+}
+
+export interface NearbyReports {
+  reports: Array<{
+    id: string;
+    distance_m: number;
+    category_id: string;
+    status: string;
+    created_at: string;
+  }>;
+}
+
+export interface Duplicates {
+  duplicates: Array<{
+    id: string;
+    similarity: number;
+    distance_m: number;
+  }>;
+}
+
+export interface ShareLink {
+  share_url: string;
+  expires_at: string;
+}
+
+export interface AdminDashboard {
+  total_cases: number;
+  active_cases: number;
+  resolved_today: number;
+  sla_at_risk: number;
+  by_status: Record<string, number>;
+}
+
+export interface Cases {
+  cases: Array<{
+    id: string;
+    status: string;
+    category_id: string;
+    created_at: string;
+  }>;
+  total: number;
+  page: number;
+}
+
+export interface Operators {
+  operators: Array<{
+    id: string;
+    name: string;
+    active_cases: number;
+  }>;
+}
+
+export interface Petugas {
+  petugas: Array<{
+    id: string;
+    name: string;
+    active_tasks: number;
+  }>;
+}
+
+export interface SLA {
+  sla_stats: Array<{
+    status: string;
+    within_sla: number;
+    breached: number;
+  }>;
+}
+
+export interface Geocode {
+  address: string;
+  latitude: number;
+  longitude: number;
+}
+
+export interface Boundary {
+  wilayah_id: string;
+  name: string;
+  boundary: GeoJSONFeatureCollection;
+}
+
+export interface PublicReport {
+  id: string;
+  category: {
+    id: string;
+    short_code: string | null;
+    name: string | null;
+    icon: string | null;
+  };
+  wilayah: {
+    kecamatan: string | null;
+    desa: string;
+  };
+  general_wilayah: string;
+  status: string;
+  last_updated: string;
+  public_progress: number;
+  moderated_photo_url: string | null;
+  share_token: string | null;
+  generalized_location: { lat: number; lng: number };
+  supporting_count: number;
+}
+
+export interface PublicReportsResponse {
+  reports: PublicReport[];
+  total: number;
+  page: number;
+  limit: number;
 }

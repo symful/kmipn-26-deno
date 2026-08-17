@@ -286,7 +286,7 @@ export const AdminDaerahSla = () => {
         </div>
 
         {error && (
-          <div className="mb-4 p-4 rounded bg-red-50 border border-red-200 text-sm text-red-700 flex items-center justify-between">
+          <div className="mb-4 p-4 rounded bg-danger-100 border border-danger-200 text-sm text-danger-500 flex items-center justify-between">
             <span>{error}</span>
             <button
               onClick={() => {
@@ -338,7 +338,7 @@ export const AdminDaerahSla = () => {
                       <td className="px-4 py-3">
                         <span
                           className={`inline-block px-2 py-0.5 rounded text-xs font-medium ${
-                            PRIORITAS_COLORS[rule.prioritas] ?? "bg-gray-100 text-gray-700"
+                            PRIORITAS_COLORS[rule.prioritas] ?? "bg-neutral-100 text-neutral-700"
                           }`}
                         >
                           {rule.prioritas.charAt(0).toUpperCase() + rule.prioritas.slice(1)}
@@ -349,11 +349,11 @@ export const AdminDaerahSla = () => {
                       </td>
                       <td className="px-4 py-3">
                         {rule.is_active ? (
-                          <span className="inline-block px-2 py-0.5 rounded text-xs font-medium bg-green-100 text-green-700">
+                          <span className="inline-block px-2 py-0.5 rounded text-xs font-medium bg-selesai-100 text-selesai-700">
                             Aktif
                           </span>
                         ) : (
-                          <span className="inline-block px-2 py-0.5 rounded text-xs font-medium bg-gray-100 text-gray-500">
+                          <span className="inline-block px-2 py-0.5 rounded text-xs font-medium bg-neutral-100 text-neutral-500">
                             Nonaktif
                           </span>
                         )}
@@ -424,14 +424,14 @@ export const AdminDaerahSla = () => {
 
             <form onSubmit={handleSubmit} className="p-6 space-y-4">
               {formErrors.general && (
-                <div className="p-3 rounded bg-red-50 border border-red-200 text-sm text-red-700">
+                <div className="p-3 rounded bg-danger-100 border border-danger-200 text-sm text-danger-500">
                   {formErrors.general}
                 </div>
               )}
 
               <div className="space-y-1">
                 <label className="block text-sm font-medium text-sigap-textMuted">
-                  Kategori <span className="text-red-500">*</span>
+                  Kategori <span className="text-danger-500">*</span>
                 </label>
                 <select
                   value={formData.kategori_id}
@@ -448,13 +448,13 @@ export const AdminDaerahSla = () => {
                   ))}
                 </select>
                 {formErrors.kategori_id && (
-                  <p className="text-xs text-red-500">{formErrors.kategori_id}</p>
+                  <p className="text-xs text-danger-500">{formErrors.kategori_id}</p>
                 )}
               </div>
 
               <div className="space-y-1">
                 <label className="block text-sm font-medium text-sigap-textMuted">
-                  Prioritas <span className="text-red-500">*</span>
+                  Prioritas <span className="text-danger-500">*</span>
                 </label>
                 <select
                   value={formData.prioritas}
@@ -473,13 +473,13 @@ export const AdminDaerahSla = () => {
                   ))}
                 </select>
                 {formErrors.prioritas && (
-                  <p className="text-xs text-red-500">{formErrors.prioritas}</p>
+                  <p className="text-xs text-danger-500">{formErrors.prioritas}</p>
                 )}
               </div>
 
               <div className="space-y-1">
                 <label className="block text-sm font-medium text-sigap-textMuted">
-                  SLA (jam) <span className="text-red-500">*</span>
+                  SLA (jam) <span className="text-danger-500">*</span>
                 </label>
                 <input
                   type="number"
@@ -491,7 +491,7 @@ export const AdminDaerahSla = () => {
                   placeholder="Contoh: 24"
                   className="w-full px-3 py-2 rounded-lg border border-sigap-border bg-sigap-background text-sm focus:outline-none focus:ring-2 focus:ring-sigap-primary/40"
                 />
-                {formErrors.jam && <p className="text-xs text-red-500">{formErrors.jam}</p>}
+                {formErrors.jam && <p className="text-xs text-danger-500">{formErrors.jam}</p>}
               </div>
 
               <div className="flex items-center gap-2">
@@ -558,7 +558,7 @@ export const AdminDaerahSla = () => {
                 <button
                   onClick={handleDelete}
                   disabled={deleting}
-                  className="px-4 py-2 rounded-lg text-sm font-medium text-white bg-red-500 hover:bg-red-600 transition-colors disabled:opacity-50"
+                  className="px-4 py-2 rounded-lg text-sm font-medium text-white bg-danger-500 hover:bg-danger-600 transition-colors disabled:opacity-50"
                 >
                   {deleting ? "Menghapus..." : "Hapus"}
                 </button>

@@ -9,26 +9,7 @@ export interface PriorityConfig {
   slaPressureWeight: number;
 }
 
-interface CacheEntry {
-  config: PriorityConfig;
-  fetchedAt: number;
-}
-
-const TTL_MS = 60_000;
-
-const cache = new Map<string, CacheEntry>();
-
-export function invalidatePriorityConfigCache(): void {
-  cache.clear();
-}
-
 export async function getPriorityConfig(env: Env): Promise<PriorityConfig | null> {
-  const now = Date.now();
-  const cached = cache.get("active");
-  if (cached && now - cached.fetchedAt < TTL_MS) {
-    return cached.config;
-  }
-
   return await withClient(env, async (client) => {
     const result = await client.query(
       `SELECT version, severity_weight, population_weight, vulnerability_weight, sla_pressure_weight
@@ -45,7 +26,6 @@ export async function getPriorityConfig(env: Env): Promise<PriorityConfig | null
       regionVulnerabilityWeight: Number(row.vulnerability_weight),
       slaPressureWeight: Number(row.sla_pressure_weight),
     };
-    cache.set("active", { config, fetchedAt: now });
     return config;
   });
 }

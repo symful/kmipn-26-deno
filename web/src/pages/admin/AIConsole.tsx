@@ -116,7 +116,7 @@ export const AdminAIConsole = () => {
       .reports(params)
       .then(async (data) => {
         const items: AssessmentWithReport[] = [];
-        const assessmentPromises = data.reports.map(async (report) => {
+        const assessmentPromises = data.items.map(async (report) => {
           try {
             const res = await api.reportAssessments(report.id);
             if (res.assessments && res.assessments.length > 0) {
@@ -145,7 +145,7 @@ export const AdminAIConsole = () => {
             new Date(a.assessment.created_at).getTime()
         );
         setAssessments(items);
-        setTotal(data.total);
+        setTotal(data.pagination.total);
       })
       .catch((e) => { logger.error("Failed to fetch assessments", { error: e }); setError("Gagal memuat data assessment"); })
       .finally(() => setLoading(false));

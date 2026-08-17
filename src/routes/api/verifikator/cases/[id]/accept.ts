@@ -1,5 +1,6 @@
 import { Hono } from "hono";
 import type { Env } from "@/types/bindings";
+import { TERMINAL_STATES } from "@/types/case-states";
 import { requireAuth, type AuthVariables } from "@/lib/auth";
 import { requireRole } from "@/middleware/roles";
 import { withClient } from "@/lib/db";
@@ -11,7 +12,6 @@ import { runAssessment } from "@/lib/agent/orchestrator";
 import { evaluatePriority } from "@/lib/priority/calculator";
 
 const ALLOWED_STATES = ["submitted", "under_review", "needs_survey"] as const;
-const TERMINAL_STATES = ["closed", "resolved", "rejected", "merged", "separated", "verified"] as const;
 const UUID_REGEX = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
 
 export const acceptRoute = new Hono<{ Bindings: Env; Variables: AuthVariables }>();
@@ -85,7 +85,7 @@ acceptRoute.post("/:id", requireAuth, requireRole("VERIFIKATOR", "ADMIN", "OPERA
     if (notifRow?.reporter_id) {
       await withClient(c.env, async (client) => {
         await client.query(
-          `INSERT INTO notifications (user_id, type, message, related_report_id) VALUES ($1, $2, $3, $4)`,
+          `INSERT INTO notifications (user_id, kind, body, related_report_id) VALUES ($1, $2, $3, $4)`,
           [notifRow.reporter_id, "report_accepted", "Laporan Anda telah diterima dan diverifikasi.", id]
         );
       });

@@ -183,9 +183,9 @@ export const RtRwTraining = () => {
           <h2 className="text-2xl font-bold mb-4">4. Best Practice</h2>
           <div className="bg-white rounded-lg p-6 border border-sigap-border">
             <div className="grid grid-cols-2 gap-4">
-              <div className="bg-green-50 p-4 rounded-lg border border-green-200">
-                <h3 className="font-semibold text-green-800 mb-2">✓ Lakukan</h3>
-                <ul className="text-sm text-green-700 space-y-1">
+              <div className="bg-success-50 p-4 rounded-lg border border-success-100">
+                <h3 className="font-semibold text-success-700 mb-2">✓ Lakukan</h3>
+                <ul className="text-sm text-success-600 space-y-1">
                   <li>• Verifikasi laporan dalam 1x24 jam</li>
                   <li>• Datang langsung ke lokasi</li>
                   <li>• Berikan alasan yang detail</li>
@@ -193,9 +193,9 @@ export const RtRwTraining = () => {
                   <li>• Laporkan jika ada kendala</li>
                 </ul>
               </div>
-              <div className="bg-red-50 p-4 rounded-lg border border-red-200">
-                <h3 className="font-semibold text-red-800 mb-2">✗ Hindari</h3>
-                <ul className="text-sm text-red-700 space-y-1">
+              <div className="bg-danger-50 p-4 rounded-lg border border-danger-100">
+                <h3 className="font-semibold text-danger-700 mb-2">✗ Hindari</h3>
+                <ul className="text-sm text-danger-600 space-y-1">
                   <li>• Memverifikasi tanpa ke lokasi</li>
                   <li>• Memberikan alasan kosong</li>
                   <li>• Menunda verifikasi terlalu lama</li>

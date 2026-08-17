@@ -21,13 +21,13 @@ interface SyncQueueItem {
 
 function SyncBadge({ status }: { status: "synced" | "pending" | "failed" | "downloaded" | "offline" }) {
   const map: Record<string, { label: string; cls: string }> = {
-    synced: { label: "Tersinkron", cls: "bg-emerald-100 text-emerald-800" },
-    pending: { label: "Menunggu Sync", cls: "bg-amber-100 text-amber-800" },
-    failed: { label: "Gagal Sync", cls: "bg-red-100 text-red-800" },
-    downloaded: { label: "Diunduh", cls: "bg-blue-100 text-blue-800" },
-    offline: { label: "Offline", cls: "bg-gray-100 text-gray-600" },
+    synced: { label: "Tersinkron", cls: "bg-green-100 text-green-800" },
+    pending: { label: "Menunggu Sync", cls: "bg-warning-100 text-warning-800" },
+    failed: { label: "Gagal Sync", cls: "bg-danger-100 text-danger-800" },
+    downloaded: { label: "Diunduh", cls: "bg-info-100 text-info-800" },
+    offline: { label: "Offline", cls: "bg-neutral-100 text-neutral-600" },
   };
-  const { label, cls } = map[status] ?? { label: status, cls: "bg-gray-100 text-gray-600" };
+  const { label, cls } = map[status] ?? { label: status, cls: "bg-neutral-100 text-neutral-600" };
   return <span className={`text-xs px-2 py-0.5 rounded-full font-medium ${cls}`}>{label}</span>;
 }
 
@@ -42,30 +42,30 @@ function SyncQueuePanel({
 }) {
   if (items.length === 0) return null;
   return (
-    <div className="mb-6 border border-amber-300 bg-amber-50 rounded-lg p-4">
-      <h2 className="text-sm font-semibold text-amber-800 mb-3">
+    <div className={`mb-6 border border-warning-300 bg-warning-50 rounded-lg p-4`}>
+      <h2 className={`text-sm font-semibold text-warning-800 mb-3`}>
         Antrean Sinkronisasi ({items.length})
       </h2>
       <div className="space-y-2">
         {items.map((item) => (
           <div
             key={item.taskId}
-            className="flex items-center justify-between bg-white rounded p-3 border border-amber-200"
+            className={`flex items-center justify-between bg-white rounded p-3 border border-warning-200`}
           >
             <div className="min-w-0">
               <p className="text-sm font-medium truncate">Task {item.taskId.slice(0, 8)}</p>
-              <p className="text-xs text-gray-500">
+              <p className={`text-xs text-neutral-500`}>
                 Dikirim: {new Date(item.submittedAt).toLocaleString("id-ID")}
               </p>
               {item.error && (
-                <p className="text-xs text-red-600 mt-1 truncate">{item.error}</p>
+                <p className={`text-xs text-danger-600 mt-1 truncate`}>{item.error}</p>
               )}
             </div>
             <div className="flex items-center gap-2 ml-4 shrink-0">
               {item.status === "failed" && (
                 <button
                   onClick={() => onRetry(item.taskId)}
-                  className="text-xs px-3 py-1 bg-amber-200 text-amber-900 rounded hover:bg-amber-300 transition-colors"
+                  className={`text-xs px-3 py-1 bg-warning-200 text-warning-900 rounded hover:bg-warning-300 transition-colors`}
                 >
                   Coba Lagi
                 </button>
@@ -73,7 +73,7 @@ function SyncQueuePanel({
               {item.status !== "synced" && (
                 <button
                   onClick={() => onRemove(item.taskId)}
-                  className="text-xs px-3 py-1 bg-gray-100 text-gray-600 rounded hover:bg-gray-200 transition-colors"
+                  className={`text-xs px-3 py-1 bg-neutral-100 text-neutral-600 rounded hover:bg-neutral-200 transition-colors`}
                 >
                   Hapus
                 </button>
@@ -155,7 +155,7 @@ export default function TaskList() {
   if (loading) {
     return (
       <div className="p-4 min-h-[200px] flex items-center justify-center">
-        <p className="text-sm text-gray-500">Memuat tugas...</p>
+        <p className={`text-sm text-neutral-500`}>Memuat tugas...</p>
       </div>
     );
   }
@@ -163,7 +163,7 @@ export default function TaskList() {
   if (error) {
     return (
       <div className="p-4 min-h-[200px] flex items-center justify-center">
-        <p className="text-sm text-red-600">{error}</p>
+        <p className={`text-sm text-danger-600`}>{error}</p>
       </div>
     );
   }
@@ -177,15 +177,15 @@ export default function TaskList() {
             onClick={() => setShowSyncQueue((v) => !v)}
             className={`relative flex items-center gap-2 px-3 py-1.5 rounded-lg text-sm font-medium transition-colors ${
               showSyncQueue
-                ? "bg-amber-100 text-amber-900 border border-amber-300"
-                : "bg-amber-200 text-amber-900 border border-amber-300 hover:bg-amber-300"
+                ? `bg-warning-100 text-warning-900 border border-warning-300`
+                : `bg-warning-200 text-warning-900 border border-warning-300 hover:bg-warning-300`
             }`}
           >
             <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
             </svg>
             Sync
-            <span className="bg-amber-500 text-white text-xs rounded-full w-5 h-5 flex items-center justify-center">
+            <span className={`bg-warning-500 text-white text-xs rounded-full w-5 h-5 flex items-center justify-center`}>
               {pendingItems.length}
             </span>
           </button>
@@ -201,7 +201,7 @@ export default function TaskList() {
       )}
 
       {tasks.length === 0 ? (
-        <p className="text-sm text-gray-500">Tidak ada tugas survei.</p>
+        <p className={`text-sm text-neutral-500`}>Tidak ada tugas survei.</p>
       ) : (
         <div className="space-y-3">
           {tasks.map((t) => {
@@ -212,10 +212,10 @@ export default function TaskList() {
                 key={t.id}
                 className={`bg-white rounded-lg border p-4 transition-colors ${
                   syncStatus === "pending" || syncStatus === "failed"
-                    ? "border-amber-300"
+                    ? `border-warning-300`
                     : syncStatus === "downloaded"
-                    ? "border-blue-200"
-                    : "border-gray-200"
+                    ? `border-info-200`
+                    : `border-neutral-200`
                 }`}
               >
                 <div className="flex items-start justify-between gap-3">
@@ -223,17 +223,17 @@ export default function TaskList() {
                     <div className="flex items-center gap-2 mb-1">
                       <Link
                         to={`/surveyor/tasks/${t.id}`}
-                        className="font-semibold text-sm hover:text-teal-700 transition-colors"
+                        className="font-semibold text-sm hover:text-primary-700 transition-colors"
                       >
                         Task {t.id.slice(0, 8)}
                       </Link>
                       <SyncBadge status={syncStatus} />
                     </div>
-                    <p className="text-sm text-gray-600 line-clamp-2">
+                    <p className={`text-sm text-neutral-600 line-clamp-2`}>
                       {t.instructions ?? "Tidak ada instruksi"}
                     </p>
                     {t.deadline && (
-                      <p className="text-xs text-gray-400 mt-1">
+                      <p className={`text-xs text-neutral-400 mt-1`}>
                         Tenggat: {new Date(t.deadline).toLocaleDateString("id-ID")}
                       </p>
                     )}
@@ -246,8 +246,8 @@ export default function TaskList() {
                       title={isDownloaded(t.id) ? "Hapus dari offline" : "Unduh untuk offline"}
                       className={`p-2 rounded-lg transition-colors disabled:opacity-50 ${
                         isDownloaded(t.id)
-                          ? "bg-blue-100 text-blue-700 hover:bg-blue-200"
-                          : "bg-gray-100 text-gray-600 hover:bg-gray-200"
+                          ? `bg-info-100 text-info-700 hover:bg-info-200`
+                          : `bg-neutral-100 text-neutral-600 hover:bg-neutral-200`
                       }`}
                     >
                       {isSyncing ? (

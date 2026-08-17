@@ -76,7 +76,7 @@ const DeleteConfirmModal = ({ unit, onConfirm, onCancel, isDeleting }: DeleteMod
         <button
           onClick={onConfirm}
           disabled={isDeleting}
-          className="px-4 py-2 bg-red-500 text-white text-sm font-medium rounded hover:bg-red-600 disabled:opacity-50"
+          className="px-4 py-2 bg-danger-500 text-white text-sm font-medium rounded hover:bg-danger-600 disabled:opacity-50"
         >
           {isDeleting ? "Menghapus..." : "Hapus"}
         </button>
@@ -150,12 +150,12 @@ const UnitFormModal = ({
               value={formData.nama}
               onChange={handleChange}
               className={`w-full px-3 py-2 border rounded text-sm bg-sigap-background ${
-                formErrors.nama ? "border-red-500" : "border-sigap-border"
+                formErrors.nama ? "border-danger-500" : "border-sigap-border"
               }`}
               placeholder="Contoh: Unit Penanganan Cepat"
             />
-            {formErrors.nama && (
-              <p className="text-xs text-red-500 mt-1">{formErrors.nama}</p>
+              {formErrors.nama && (
+              <p className="text-xs text-danger-500 mt-1">{formErrors.nama}</p>
             )}
           </div>
 
@@ -166,7 +166,7 @@ const UnitFormModal = ({
               value={formData.wilayah_id}
               onChange={handleChange}
               className={`w-full px-3 py-2 border rounded text-sm bg-sigap-background ${
-                formErrors.wilayah_id ? "border-red-500" : "border-sigap-border"
+                formErrors.wilayah_id ? "border-danger-500" : "border-sigap-border"
               }`}
             >
               <option value="">-- Pilih Wilayah --</option>
@@ -176,8 +176,8 @@ const UnitFormModal = ({
                 </option>
               ))}
             </select>
-            {formErrors.wilayah_id && (
-              <p className="text-xs text-red-500 mt-1">{formErrors.wilayah_id}</p>
+              {formErrors.wilayah_id && (
+              <p className="text-xs text-danger-500 mt-1">{formErrors.wilayah_id}</p>
             )}
           </div>
 
@@ -210,7 +210,7 @@ const UnitFormModal = ({
           </div>
 
           {submitError && (
-            <p className="text-sm text-red-500">{submitError}</p>
+            <p className="text-sm text-danger-500">{submitError}</p>
           )}
 
           <div className="flex gap-3 pt-2">
@@ -433,7 +433,7 @@ export const AdminDaerahUnits = () => {
 
           {!loading && error && (
             <div className="p-4">
-              <div className="p-4 rounded bg-red-50 border border-red-200 text-sm text-red-700 flex items-center justify-between">
+              <div className="p-4 rounded bg-danger-100 border border-danger-200 text-sm text-danger-500 flex items-center justify-between">
                 <span>{error}</span>
                 <button
                   onClick={() => fetchUnits(pagination.page)}
@@ -513,8 +513,8 @@ export const AdminDaerahUnits = () => {
                           <span
                             className={`inline-flex items-center px-2 py-0.5 rounded text-xs font-medium ${
                               unit.is_active
-                                ? "bg-green-100 text-green-800"
-                                : "bg-gray-100 text-gray-600"
+                                ? "bg-selesai-100 text-selesai-700"
+                                : "bg-neutral-100 text-neutral-600"
                             }`}
                           >
                             {unit.is_active ? "Aktif" : "Nonaktif"}
@@ -530,7 +530,7 @@ export const AdminDaerahUnits = () => {
                             </button>
                             <button
                               onClick={() => setDeleteUnit(unit)}
-                              className="text-xs text-red-500 hover:underline"
+                              className="text-xs text-danger-500 hover:underline"
                             >
                               Hapus
                             </button>

@@ -1,5 +1,6 @@
 import { withClient } from "@/lib/db";
 import type { Env } from "@/types/bindings";
+import { TERMINAL_STATES } from "@/types/case-states";
 import { allTools, type ToolName } from "@/lib/agent/tools";
 import { saveAssessment } from "@/lib/agent/store";
 import { getConfig } from "@/config/env";

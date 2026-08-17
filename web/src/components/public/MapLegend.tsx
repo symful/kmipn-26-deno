@@ -1,49 +1,45 @@
 import { colors } from "../../theme/tokens";
 
-const legendItems = [
-  { label: "Terverifikasi", color: colors.primary },
-  { label: "Menunggu", color: "#FBBF24" },
-  { label: "Sedang ditangani", color: "#3B82F6" },
-] as const;
+export const MapLegend = () => {
+  const items = [
+    { color: colors.diproses, label: "Terverifikasi" },
+    { color: colors.warning, label: "Menunggu verifikasi" },
+    { color: colors.primary, label: "Sedang ditangani" },
+  ];
 
-interface MapLegendProps {
-  className?: string;
-}
-
-export function MapLegend({ className = "" }: MapLegendProps) {
   return (
     <div
-      className={`bg-white rounded-xl border p-3 ${className}`}
+      className="rounded-xl p-3"
       style={{
-        borderColor: colors.border,
-        boxShadow: "0 1px 3px rgba(0,0,0,0.08)",
+        backgroundColor: colors.bgCard,
+        border: `1px solid ${colors.border}`,
+        boxShadow: "0 6px 16px -8px rgba(0,0,0,.3)",
       }}
     >
-      <div
-        className="text-xs font-semibold mb-2"
+      <h4
+        className="mb-1.5 uppercase"
         style={{
           fontSize: 11,
-          fontWeight: 600,
-          color: colors.textPrimary,
+          fontWeight: 700,
+          color: colors.textTertiary,
+          letterSpacing: "0.04em",
         }}
       >
-        Status kasus
-      </div>
-
+        Status Kasus
+      </h4>
       <div className="flex flex-col gap-1.5">
-        {legendItems.map((item) => (
+        {items.map((item) => (
           <div key={item.label} className="flex items-center gap-2">
             <span
-              className="w-2.5 h-2.5 rounded-full flex-shrink-0"
-              style={{ backgroundColor: item.color }}
-            />
-            <span
-              className="text-xs font-medium"
+              className="flex-shrink-0"
               style={{
-                fontSize: 11,
-                color: colors.textSecondary,
+                width: 11,
+                height: 11,
+                borderRadius: "50%",
+                backgroundColor: item.color,
               }}
-            >
+            />
+            <span style={{ fontSize: 12, color: colors.textSecondary }}>
               {item.label}
             </span>
           </div>
@@ -51,4 +47,4 @@ export function MapLegend({ className = "" }: MapLegendProps) {
       </div>
     </div>
   );
-}
+};

@@ -75,22 +75,22 @@ const OutboxRow = ({ entry, onRetry, actionLoading }: OutboxRowProps) => {
     : "-";
 
   return (
-    <tr className="border-b border-[#e4e7e2] hover:bg-[#f4f5f3] transition-colors">
+    <tr className="border-b border-sigap-border hover:bg-sigap-background transition-colors">
       <td className="px-4 py-3">
-        <span className="font-mono text-xs text-[#616770]">
+        <span className="font-mono text-xs text-sigap-textTertiary">
           {entry.id.slice(0, 8)}...
         </span>
       </td>
-      <td className="px-4 py-3 text-sm font-medium text-[#17191c]">
+      <td className="px-4 py-3 text-sm font-medium text-sigap-textPrimary">
         {entry.target_system ?? "-"}
       </td>
       <td className="px-4 py-3">
         <StatusPill status={entry.status} />
       </td>
-      <td className="px-4 py-3 text-sm text-center text-[#616770]">
+      <td className="px-4 py-3 text-sm text-center text-sigap-textTertiary">
         {entry.retry_count}
       </td>
-      <td className="px-4 py-3 text-xs text-[#c0392b] max-w-[180px] truncate">
+      <td className="px-4 py-3 text-xs text-danger-500 max-w-[180px] truncate">
         {entry.error_message ?? "-"}
       </td>
       <td className="px-4 py-3">
@@ -99,7 +99,7 @@ const OutboxRow = ({ entry, onRetry, actionLoading }: OutboxRowProps) => {
             <button
               onClick={() => onRetry(entry.id)}
               disabled={actionLoading === entry.id}
-              className="text-xs px-3 py-1.5 rounded-lg bg-[#0f7a6b] text-white font-medium hover:bg-[#0a5c50] transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+              className="text-xs px-3 py-1.5 rounded-lg bg-sigap-primary text-white font-medium hover:bg-primary-600 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
             >
               {actionLoading === entry.id ? "..." : "Retry"}
             </button>
@@ -107,7 +107,7 @@ const OutboxRow = ({ entry, onRetry, actionLoading }: OutboxRowProps) => {
           {!!entry.payload && (
             <button
               onClick={() => setExpanded(!expanded)}
-              className="text-xs text-[#0f7a6b] hover:underline font-medium"
+              className="text-xs text-sigap-primary hover:underline font-medium"
             >
               {expanded ? "Sembunyikan" : "Detail"}
             </button>
@@ -115,7 +115,7 @@ const OutboxRow = ({ entry, onRetry, actionLoading }: OutboxRowProps) => {
         </div>
         {expanded && !!entry.payload && (
           <div className="mt-2">
-            <pre className="text-xs font-mono bg-[#e4e7e2] p-3 rounded-lg overflow-x-auto max-w-[400px] text-[#3a3f45]">
+            <pre className="text-xs font-mono bg-sigap-border p-3 rounded-lg overflow-x-auto max-w-[400px] text-sigap-textSecondary">
               {JSON.stringify(entry.payload, null, 2)}
             </pre>
           </div>
@@ -133,22 +133,22 @@ interface DlqRowProps {
 
 const DlqRow = ({ entry, onReset, actionLoading }: DlqRowProps) => {
   return (
-    <tr className="border-b border-[#e4e7e2] hover:bg-[#f4f5f3] transition-colors">
+    <tr className="border-b border-sigap-border hover:bg-sigap-background transition-colors">
       <td className="px-4 py-3">
-        <span className="font-mono text-xs text-[#616770]">
+        <span className="font-mono text-xs text-sigap-textTertiary">
           {entry.id.slice(0, 8)}...
         </span>
       </td>
-      <td className="px-4 py-3 text-sm font-medium text-[#17191c]">
+      <td className="px-4 py-3 text-sm font-medium text-sigap-textPrimary">
         {entry.target_system ?? "-"}
       </td>
-      <td className="px-4 py-3 text-sm text-center text-[#616770]">
+      <td className="px-4 py-3 text-sm text-center text-sigap-textTertiary">
         {entry.retry_count}
       </td>
-      <td className="px-4 py-3 text-xs text-[#c0392b] max-w-[180px] truncate">
+      <td className="px-4 py-3 text-xs text-danger-500 max-w-[180px] truncate">
         {entry.last_error ?? "-"}
       </td>
-      <td className="px-4 py-3 text-xs text-[#616770]">
+      <td className="px-4 py-3 text-xs text-sigap-textTertiary">
         {entry.next_retry_at
           ? new Date(entry.next_retry_at).toLocaleString("id-ID")
           : "-"}
@@ -157,7 +157,7 @@ const DlqRow = ({ entry, onReset, actionLoading }: DlqRowProps) => {
         <button
           onClick={() => onReset(entry.id)}
           disabled={actionLoading === entry.id}
-          className="text-xs px-3 py-1.5 rounded-lg border border-[#e4e7e2] bg-white text-[#17191c] font-medium hover:bg-[#f4f5f3] transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+          className="text-xs px-3 py-1.5 rounded-lg border border-sigap-border bg-white text-sigap-textPrimary font-medium hover:bg-sigap-background transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
         >
           {actionLoading === entry.id ? "..." : "Reset"}
         </button>
@@ -355,11 +355,11 @@ export const AdminOutbox = () => {
   const setCurrentPage = activeTab === "dlq" ? setDlqPage : setPage;
 
   return (
-    <div className="flex min-h-[100dvh] bg-[#f9faf8]">
+    <div className="flex min-h-[100dvh] bg-sigap-surface">
       {/* Sidebar */}
-      <aside className="w-[220px] bg-[#16302b] text-[#cfe4df] flex flex-col shrink-0">
+      <aside className="w-[220px] bg-surface-sidebar text-sigap-textMuted flex flex-col shrink-0">
         <div className="flex items-center gap-2.5 px-4 py-4 pb-5">
-          <div className="w-8 h-8 rounded-lg bg-[#0f7a6b] flex items-center justify-center text-white font-bold text-base">
+          <div className="w-8 h-8 rounded-lg bg-sigap-primary flex items-center justify-center text-white font-bold text-base">
             P
           </div>
           <span className="text-base font-bold text-white">PantauDesa</span>
@@ -372,8 +372,8 @@ export const AdminOutbox = () => {
               href={item.path}
               className={`flex items-center gap-2.5 px-3 py-2.5 rounded-lg text-sm font-medium transition-colors ${
                 item.active
-                  ? "bg-[#0f7a6b] text-white"
-                  : "hover:bg-[#234a43] text-[#cfe4df]"
+                  ? "bg-sigap-primary text-white"
+                  : "hover:bg-[#234A43] text-sigap-textMuted"
               }`}
             >
               <NavIcon type={item.icon} />
@@ -382,14 +382,14 @@ export const AdminOutbox = () => {
           ))}
         </nav>
 
-        <div className="mt-auto px-3 pt-4 border-t border-[#234a43]">
-          <div className="flex items-center gap-2.5 px-3 py-2.5 text-sm text-[#9dc0b9]">
-            <span className="w-8 h-8 rounded-full bg-[#0f7a6b] flex items-center justify-center text-xs font-bold text-white">
+        <div className="mt-auto px-3 pt-4 border-t border-[#234A43]">
+          <div className="flex items-center gap-2.5 px-3 py-2.5 text-sm text-[#9DC0B9]">
+            <span className="w-8 h-8 rounded-full bg-sigap-primary flex items-center justify-center text-xs font-bold text-white">
               {user?.name?.slice(0, 2).toUpperCase() ?? "AD"}
             </span>
             <div className="flex-1 min-w-0">
               <div className="text-xs font-semibold truncate text-white">{user?.name ?? "Admin"}</div>
-              <div className="text-[10px] text-[#9dc0b9] truncate">{user?.role ?? "ADMIN"}</div>
+              <div className="text-[10px] text-[#9DC0B9] truncate">{user?.role ?? "ADMIN"}</div>
             </div>
           </div>
         </div>
@@ -398,9 +398,9 @@ export const AdminOutbox = () => {
       {/* Main Content */}
       <div className="flex-1 flex flex-col min-w-0">
         {/* Header */}
-        <header className="h-14 border-b border-[#e4e7e2] flex items-center gap-4 px-6 shrink-0 bg-white">
+        <header className="h-14 border-b border-sigap-border flex items-center gap-4 px-6 shrink-0 bg-white">
           <div className="ml-auto flex items-center gap-3">
-            <span className="w-8 h-8 rounded-full bg-[#eef0ec] flex items-center justify-center text-xs font-bold text-[#0a5c50]">
+            <span className="w-8 h-8 rounded-full bg-neutral-100 flex items-center justify-center text-xs font-bold text-primary-600">
               {user?.name?.slice(0, 2).toUpperCase() ?? "AD"}
             </span>
           </div>
@@ -411,13 +411,13 @@ export const AdminOutbox = () => {
           {/* Page Title */}
           <div className="flex items-center justify-between">
             <div>
-              <h2 className="text-xl font-bold text-[#17191c]">Outbox</h2>
-              <p className="text-xs text-[#616770] mt-0.5">Kelola event keluar dan dead letter queue</p>
+              <h2 className="text-xl font-bold text-sigap-textPrimary">Outbox</h2>
+              <p className="text-xs text-sigap-textTertiary mt-0.5">Kelola event keluar dan dead letter queue</p>
             </div>
             <button
               onClick={handleReconcile}
               disabled={reconcileLoading}
-              className="text-sm font-medium px-4 py-2 rounded-lg bg-[#0f7a6b] text-white hover:bg-[#0a5c50] transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+              className="text-sm font-medium px-4 py-2 rounded-lg bg-sigap-primary text-white hover:bg-primary-600 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
             >
               {reconcileLoading ? "Memproses..." : "Reconcile"}
             </button>
@@ -425,22 +425,22 @@ export const AdminOutbox = () => {
 
           {/* Stats Row */}
           <div className="grid grid-cols-3 gap-4">
-            <div className="bg-white border border-[#e4e7e2] border-t-[3px] border-t-[#b8730a] rounded-xl p-4">
-              <div className="text-2xl font-bold text-[#8a5808]">{pending}</div>
-              <div className="text-xs text-[#616770] mt-0.5">Pending</div>
+            <div className="bg-white border border-sigap-border border-t-[3px] border-t-warning-500 rounded-xl p-4">
+              <div className="text-2xl font-bold text-warning-600">{pending}</div>
+              <div className="text-xs text-sigap-textTertiary mt-0.5">Pending</div>
             </div>
-            <div className="bg-white border border-[#e4e7e2] border-t-[3px] border-t-[#c0392b] rounded-xl p-4">
-              <div className="text-2xl font-bold text-[#a5271a]">{failed}</div>
-              <div className="text-xs text-[#616770] mt-0.5">Failed</div>
+            <div className="bg-white border border-sigap-border border-t-[3px] border-t-danger-500 rounded-xl p-4">
+              <div className="text-2xl font-bold text-danger-600">{failed}</div>
+              <div className="text-xs text-sigap-textTertiary mt-0.5">Failed</div>
             </div>
-            <div className="bg-white border border-[#e4e7e2] border-t-[3px] border-t-[#0f7a6b] rounded-xl p-4">
-              <div className="text-2xl font-bold text-[#0a5c50]">{success}</div>
-              <div className="text-xs text-[#616770] mt-0.5">Success</div>
+            <div className="bg-white border border-sigap-border border-t-[3px] border-t-sigap-primary rounded-xl p-4">
+              <div className="text-2xl font-bold text-primary-600">{success}</div>
+              <div className="text-xs text-sigap-textTertiary mt-0.5">Success</div>
             </div>
           </div>
 
           {/* Tabs */}
-          <div className="flex items-center border-b border-[#e4e7e2]">
+          <div className="flex items-center border-b border-sigap-border">
             {tabs.map((tab) => (
               <button
                 key={tab.key}
@@ -451,13 +451,13 @@ export const AdminOutbox = () => {
                 }}
                 className={`px-4 py-2.5 text-sm font-medium transition-colors relative ${
                   activeTab === tab.key
-                    ? "text-[#0f7a6b] border-b-2 border-[#0f7a6b]"
-                    : "text-[#8a9099] hover:text-[#616770]"
+                    ? "text-sigap-primary border-b-2 border-sigap-primary"
+                    : "text-sigap-textMuted hover:text-sigap-textTertiary"
                 }`}
               >
                 {tab.label}
                 {tab.key === "dlq" && failed > 0 && (
-                  <span className="ml-1.5 bg-[#c0392b] text-white text-[10px] font-bold rounded-full px-1.5 py-0.5">
+                  <span className="ml-1.5 bg-danger-500 text-white text-[10px] font-bold rounded-full px-1.5 py-0.5">
                     {failed}
                   </span>
                 )}
@@ -466,7 +466,7 @@ export const AdminOutbox = () => {
           </div>
 
           {error && (
-            <div className="p-4 rounded-xl bg-[#fef2f2] border border-[#fecaca] text-sm text-[#c0392b]">
+            <div className="p-4 rounded-xl bg-danger-100 border border-danger-200 text-sm text-danger-600">
               {error}
             </div>
           )}
@@ -474,35 +474,35 @@ export const AdminOutbox = () => {
           {activeTab === "events" && (
             <>
               {loading ? (
-                <div className="bg-white rounded-xl border border-[#e4e7e2] p-8 text-center">
-                  <p className="text-[#8a9099]">Memuat...</p>
+                <div className="bg-white rounded-xl border border-sigap-border p-8 text-center">
+                  <p className="text-sigap-textMuted">Memuat...</p>
                 </div>
               ) : entries.length === 0 ? (
-                <div className="bg-white rounded-xl border border-[#e4e7e2] p-8 text-center">
-                  <p className="text-[#8a9099]">Tidak ada event.</p>
+                <div className="bg-white rounded-xl border border-sigap-border p-8 text-center">
+                  <p className="text-sigap-textMuted">Tidak ada event.</p>
                 </div>
               ) : (
                 <>
-                  <div className="bg-white rounded-xl border border-[#e4e7e2] overflow-hidden">
+                  <div className="bg-white rounded-xl border border-sigap-border overflow-hidden">
                     <table className="w-full text-sm min-w-[800px]">
                       <thead>
-                        <tr className="bg-[#f4f5f3] border-b border-[#e4e7e2]">
-                          <th className="text-left px-4 py-3 text-xs font-semibold text-[#616770]">
+                        <tr className="bg-sigap-background border-b border-sigap-border">
+                          <th className="text-left px-4 py-3 text-xs font-semibold text-sigap-textTertiary">
                             ID
                           </th>
-                          <th className="text-left px-4 py-3 text-xs font-semibold text-[#616770]">
+                          <th className="text-left px-4 py-3 text-xs font-semibold text-sigap-textTertiary">
                             Target
                           </th>
-                          <th className="text-left px-4 py-3 text-xs font-semibold text-[#616770]">
+                          <th className="text-left px-4 py-3 text-xs font-semibold text-sigap-textTertiary">
                             Status
                           </th>
-                          <th className="text-center px-4 py-3 text-xs font-semibold text-[#616770]">
+                          <th className="text-center px-4 py-3 text-xs font-semibold text-sigap-textTertiary">
                             Attempts
                           </th>
-                          <th className="text-left px-4 py-3 text-xs font-semibold text-[#616770]">
+                          <th className="text-left px-4 py-3 text-xs font-semibold text-sigap-textTertiary">
                             Last Error
                           </th>
-                          <th className="text-left px-4 py-3 text-xs font-semibold text-[#616770]">
+                          <th className="text-left px-4 py-3 text-xs font-semibold text-sigap-textTertiary">
                             Actions
                           </th>
                         </tr>
@@ -525,17 +525,17 @@ export const AdminOutbox = () => {
                       <button
                         onClick={() => setCurrentPage((p) => Math.max(1, p - 1))}
                         disabled={currentPage === 1}
-                        className="px-3 py-1.5 rounded-lg border border-[#e4e7e2] text-sm bg-white text-[#616770] disabled:opacity-50 hover:bg-[#f4f5f3] transition-colors"
+                        className="px-3 py-1.5 rounded-lg border border-sigap-border text-sm bg-white text-sigap-textTertiary disabled:opacity-50 hover:bg-sigap-background transition-colors"
                       >
                         Prev
                       </button>
-                      <span className="text-sm text-[#616770]">
+                      <span className="text-sm text-sigap-textTertiary">
                         Halaman {currentPage} dari {Math.ceil(currentTotal / limit)}
                       </span>
                       <button
                         onClick={() => setCurrentPage((p) => p + 1)}
                         disabled={currentPage * limit >= currentTotal}
-                        className="px-3 py-1.5 rounded-lg border border-[#e4e7e2] text-sm bg-white text-[#616770] disabled:opacity-50 hover:bg-[#f4f5f3] transition-colors"
+                        className="px-3 py-1.5 rounded-lg border border-sigap-border text-sm bg-white text-sigap-textTertiary disabled:opacity-50 hover:bg-sigap-background transition-colors"
                       >
                         Next
                       </button>
@@ -549,35 +549,35 @@ export const AdminOutbox = () => {
           {activeTab === "dlq" && (
             <>
               {loading ? (
-                <div className="bg-white rounded-xl border border-[#e4e7e2] p-8 text-center">
-                  <p className="text-[#8a9099]">Memuat...</p>
+                <div className="bg-white rounded-xl border border-sigap-border p-8 text-center">
+                  <p className="text-sigap-textMuted">Memuat...</p>
                 </div>
               ) : dlqEntries.length === 0 ? (
-                <div className="bg-white rounded-xl border border-[#e4e7e2] p-8 text-center">
-                  <p className="text-[#8a9099]">Tidak ada entri dead letter.</p>
+                <div className="bg-white rounded-xl border border-sigap-border p-8 text-center">
+                  <p className="text-sigap-textMuted">Tidak ada entri dead letter.</p>
                 </div>
               ) : (
                 <>
-                  <div className="bg-white rounded-xl border border-[#e4e7e2] overflow-hidden">
+                  <div className="bg-white rounded-xl border border-sigap-border overflow-hidden">
                     <table className="w-full text-sm min-w-[800px]">
                       <thead>
-                        <tr className="bg-[#f4f5f3] border-b border-[#e4e7e2]">
-                          <th className="text-left px-4 py-3 text-xs font-semibold text-[#616770]">
+                        <tr className="bg-sigap-background border-b border-sigap-border">
+                          <th className="text-left px-4 py-3 text-xs font-semibold text-sigap-textTertiary">
                             ID
                           </th>
-                          <th className="text-left px-4 py-3 text-xs font-semibold text-[#616770]">
+                          <th className="text-left px-4 py-3 text-xs font-semibold text-sigap-textTertiary">
                             Target
                           </th>
-                          <th className="text-center px-4 py-3 text-xs font-semibold text-[#616770]">
+                          <th className="text-center px-4 py-3 text-xs font-semibold text-sigap-textTertiary">
                             Retry Count
                           </th>
-                          <th className="text-left px-4 py-3 text-xs font-semibold text-[#616770]">
+                          <th className="text-left px-4 py-3 text-xs font-semibold text-sigap-textTertiary">
                             Last Error
                           </th>
-                          <th className="text-left px-4 py-3 text-xs font-semibold text-[#616770]">
+                          <th className="text-left px-4 py-3 text-xs font-semibold text-sigap-textTertiary">
                             Next Retry
                           </th>
-                          <th className="text-left px-4 py-3 text-xs font-semibold text-[#616770]">
+                          <th className="text-left px-4 py-3 text-xs font-semibold text-sigap-textTertiary">
                             Actions
                           </th>
                         </tr>
@@ -600,17 +600,17 @@ export const AdminOutbox = () => {
                       <button
                         onClick={() => setDlqPage((p) => Math.max(1, p - 1))}
                         disabled={dlqPage === 1}
-                        className="px-3 py-1.5 rounded-lg border border-[#e4e7e2] text-sm bg-white text-[#616770] disabled:opacity-50 hover:bg-[#f4f5f3] transition-colors"
+                        className="px-3 py-1.5 rounded-lg border border-sigap-border text-sm bg-white text-sigap-textTertiary disabled:opacity-50 hover:bg-sigap-background transition-colors"
                       >
                         Prev
                       </button>
-                      <span className="text-sm text-[#616770]">
+                      <span className="text-sm text-sigap-textTertiary">
                         Halaman {dlqPage} dari {Math.ceil(dlqTotal / limit)}
                       </span>
                       <button
                         onClick={() => setDlqPage((p) => p + 1)}
                         disabled={dlqPage * limit >= dlqTotal}
-                        className="px-3 py-1.5 rounded-lg border border-[#e4e7e2] text-sm bg-white text-[#616770] disabled:opacity-50 hover:bg-[#f4f5f3] transition-colors"
+                        className="px-3 py-1.5 rounded-lg border border-sigap-border text-sm bg-white text-sigap-textTertiary disabled:opacity-50 hover:bg-sigap-background transition-colors"
                       >
                         Next
                       </button>

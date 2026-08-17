@@ -23,7 +23,7 @@ export const AdminDaerahDashboard = () => {
           api.reports(),
           api.reportsStats(),
         ]);
-        setReports(reportsData.reports);
+        setReports(reportsData.items);
         setStats(statsData);
       } catch (err) {
         logger.error("Failed to fetch dashboard data", { error: err });
@@ -105,15 +105,15 @@ export const AdminDaerahDashboard = () => {
             </div>
             <div className="bg-white rounded-lg p-4 border border-sigap-border">
               <p className="text-xs text-sigap-textMuted">SLA Breach</p>
-              <p className="text-2xl font-bold text-red-600">{stats.sla_breached}</p>
+              <p className="text-2xl font-bold text-danger-500">{stats.sla_breached}</p>
             </div>
             <div className="bg-white rounded-lg p-4 border border-sigap-border">
               <p className="text-xs text-sigap-textMuted">SLA At Risk</p>
-              <p className="text-2xl font-bold text-yellow-600">{stats.sla_at_risk}</p>
+              <p className="text-2xl font-bold text-warning-500">{stats.sla_at_risk}</p>
             </div>
             <div className="bg-white rounded-lg p-4 border border-sigap-border">
               <p className="text-xs text-sigap-textMuted">Sedang Diproses</p>
-              <p className="text-2xl font-bold text-blue-600">{inProgressCount}</p>
+              <p className="text-2xl font-bold text-info-500">{inProgressCount}</p>
             </div>
           </div>
         )}

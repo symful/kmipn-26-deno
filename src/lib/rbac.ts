@@ -1,10 +1,46 @@
-/**
- * RBAC helpers for wilayah_id scoping.
- *
- * All routes that list/report data MUST call applyWilayahFilter before query
- * execution to ensure users only see data from their own wilayah.
- * Users with wilayah_id = null (admin_global) see all data.
- */
+import type { MiddlewareHandler } from "hono";
+import type { Env } from "@/types/bindings";
+import { type AuthVariables } from "@/lib/auth";
+
+export type Role =
+  | "ADMIN"
+  | "VERIFIKATOR"
+  | "SURVEYOR"
+  | "OPERATOR"
+  | "RT_RW"
+  | "PETUGAS"
+  | "ADMIN_DAERAH"
+  | "AUDITOR"
+  | "PENGAMBIL_KEPUTUSAN"
+  | "PUBLIC"
+  | "SYSTEM";
+
+export const ROLE_PERMISSIONS: Record<string, Role[]> = {
+  "/api/auth/login": ["PUBLIC"],
+  "/api/auth/refresh": ["PUBLIC"],
+  "/api/auth/logout": ["ADMIN", "VERIFIKATOR", "SURVEYOR", "OPERATOR", "RT_RW", "PETUGAS", "ADMIN_DAERAH", "AUDITOR", "PENGAMBIL_KEPUTUSAN"],
+  "/api/auth/register-verifikator": ["ADMIN"],
+  "/api/reports": ["ADMIN", "OPERATOR", "VERIFIKATOR", "SURVEYOR", "PETUGAS", "ADMIN_DAERAH", "PENGAMBIL_KEPUTUSAN"],
+  "/api/reports/stats": ["ADMIN", "ADMIN_DAERAH", "PENGAMBIL_KEPUTUSAN"],
+  "/api/reports/heatmap": ["ADMIN", "OPERATOR", "VERIFIKATOR", "PENGAMBIL_KEPUTUSAN", "ADMIN_DAERAH"],
+  "/api/verifikator/queue": ["VERIFIKATOR"],
+  "/api/public/reports": ["PUBLIC"],
+  "/api/public/geojson": ["PUBLIC"],
+  "/api/health": ["PUBLIC"],
+};
+
+export const requireRole = (...allowedRoles: Role[]): MiddlewareHandler<{ Bindings: Env; Variables: AuthVariables }> => {
+  return async (c, next) => {
+    const user = c.get("user");
+    if (!user) {
+      return c.json({ error: "unauthorized" }, 401);
+    }
+    if (!allowedRoles.includes(user.role as Role)) {
+      return c.json({ error: "forbidden", required_roles: allowedRoles }, 403);
+    }
+    return await next();
+  };
+};
 
 interface ApplyWilayahFilterResult {
   sql: string;

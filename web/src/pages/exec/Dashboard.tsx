@@ -4,7 +4,7 @@ import type { DashboardStats, Report, QueueCounts } from "../../types";
 import { StatusBadge } from "../../components/StatusBadge";
 import { api } from "../../api/client";
 import { useAuthStore } from "../../stores/auth";
-import { colors, statusLabel } from "../../theme/tokens";
+import { colors, fontFamilies, statusLabel } from "../../theme/tokens";
 import { toast } from "../../components/Toast";
 import { logger } from "@/lib/logger";
 import { QueueStatsRow, type QueueStatItem, type QueueStatTrend } from "../../components/operator/QueueStatsRow";
@@ -75,7 +75,7 @@ function TrendChart({ series, height = 180 }: TrendChartProps) {
               x={padding.left - 6} y={gl.y + 4}
               textAnchor="end" fontSize={10}
               fill={colors.textMuted}
-              style={{ fontFamily: "'IBM Plex Sans', system-ui, sans-serif" }}
+              style={{ fontFamily: fontFamilies.sans }}
             >
               {gl.label}
             </text>
@@ -103,7 +103,7 @@ function TrendChart({ series, height = 180 }: TrendChartProps) {
             x={toX(i)} y={height - 6}
             textAnchor="middle" fontSize={10}
             fill={colors.textMuted}
-            style={{ fontFamily: "'IBM Plex Sans', system-ui, sans-serif" }}
+            style={{ fontFamily: fontFamilies.sans }}
           >
             {p.label}
           </text>
@@ -173,7 +173,7 @@ export const ExecDashboard = () => {
     api
       .reports(params)
       .then((data) => {
-        let filtered = data.reports;
+        let filtered = data.items;
         if (drillCategory) {
           filtered = filtered.filter((r) => r.category_id === drillCategory);
         }
@@ -297,28 +297,6 @@ export const ExecDashboard = () => {
     }
   };
 
-  const handleExportPdf = async () => {
-    setExporting(true);
-    try {
-      const params: { status?: string; category_id?: string; wilayah_id?: string } = {};
-      if (drillStatus) params.status = drillStatus;
-      if (drillCategory) params.category_id = drillCategory;
-      if (drillWilayah) params.wilayah_id = drillWilayah;
-      const blob = await api.exportPdf(params);
-      const url = URL.createObjectURL(blob);
-      const a = document.createElement("a");
-      a.href = url;
-      a.download = `exec-export-${new Date().toISOString().slice(0, 10)}.pdf`;
-      a.click();
-      URL.revokeObjectURL(url);
-      toast.success("PDF exported successfully");
-    } catch {
-      toast.error("Failed to export PDF");
-    } finally {
-      setExporting(false);
-    }
-  };
-
   const handleExportGeoJSON = async () => {
     setExporting(true);
     try {
@@ -389,7 +367,7 @@ export const ExecDashboard = () => {
               Export CSV
             </button>
             <button
-              onClick={handleExportPdf}
+              onClick={handleExportCsv}
               disabled={exporting}
               className="px-3 py-1.5 text-xs font-medium border border-sigap-border rounded-md hover:bg-sigap-border transition-colors disabled:opacity-50"
             >
@@ -466,7 +444,7 @@ export const ExecDashboard = () => {
             </div>
             <CriticalCasesList
               cases={criticalCases}
-              onCaseClick={(id) => drillByCategory(id)}
+              onCaseClick={(id: string) => drillByCategory(id)}
             />
           </div>
         </div>
@@ -525,15 +503,16 @@ export const ExecDashboard = () => {
             <div className="flex flex-col">
               <div className="flex items-center justify-between mb-1">
                 <span className="text-xs text-sigap-textMuted">At Risk</span>
-                <span className="text-sm font-semibold text-yellow-600">{slaAtRisk}</span>
+                <span className="text-sm font-semibold" style={{ color: colors.offlineText }}>{slaAtRisk}</span>
               </div>
               <div className="h-3 bg-sigap-surface rounded-full overflow-hidden">
                 <div
-                  className="h-full rounded-full bg-yellow-500"
+                  className="h-full rounded-full"
                   style={{
                     width: `${
                       totalReports > 0 ? Math.round((slaAtRisk / totalReports) * 100) : 0
                     }%`,
+                    backgroundColor: colors.warning,
                   }}
                 />
               </div>

@@ -1,145 +1,144 @@
-import { colors } from "../../theme/tokens";
+import { colors, extendedColors } from "../../theme/tokens";
 
-export interface FilterOption {
-  value: string;
-  label: string;
+interface FilterBarProps {
+  wilayahOptions: { value: string; label: string }[];
+  kategoriOptions: { value: string; label: string }[];
+  selectedWilayah: string;
+  selectedKategori: string;
+  viewMode: "peta" | "daftar";
+  activeFilters: string[];
+  onWilayahChange: (value: string) => void;
+  onKategoriChange: (value: string) => void;
+  onViewModeChange: (value: "peta" | "daftar") => void;
+  onRemoveFilter: (filter: string) => void;
+  onResetFilters: () => void;
+  totalCount: number;
 }
 
-export interface ActiveFilter {
-  id: string;
-  label: string;
-}
-
-export interface FilterBarProps {
-  wilayahOptions?: FilterOption[];
-  kategoriOptions?: FilterOption[];
-  selectedWilayah?: string;
-  selectedKategori?: string;
-  activeFilters?: ActiveFilter[];
-  totalCount?: number;
-  viewMode?: "peta" | "daftar";
-  onWilayahChange?: (value: string) => void;
-  onKategoriChange?: (value: string) => void;
-  onRemoveFilter?: (id: string) => void;
-  onReset?: () => void;
-  onViewModeChange?: (mode: "peta" | "daftar") => void;
-}
-
-export function FilterBar({
-  wilayahOptions = [],
-  kategoriOptions = [],
-  selectedWilayah = "",
-  selectedKategori = "",
-  activeFilters = [],
-  totalCount = 0,
-  viewMode = "daftar",
+export const FilterBar = ({
+  wilayahOptions,
+  kategoriOptions,
+  selectedWilayah,
+  selectedKategori,
+  viewMode,
+  activeFilters,
   onWilayahChange,
   onKategoriChange,
-  onRemoveFilter,
-  onReset,
   onViewModeChange,
-}: FilterBarProps) {
-  const hasActiveFilters = activeFilters.length > 0;
-
+  onRemoveFilter,
+  onResetFilters,
+  totalCount,
+}: FilterBarProps) => {
   return (
     <div
-      className="flex items-center gap-3 px-4 bg-white border-b border-sigap-border"
-      style={{ height: 56, borderBottom: `1px solid ${colors.border}` }}
+      className="border-b border-neutral-200 flex items-center gap-2.5 px-7"
+      style={{ height: 56, backgroundColor: extendedColors.bgScreen }}
     >
-      <div className="flex items-center gap-2 flex-1 min-w-0">
+      <div
+        className="flex items-center gap-2 px-3 py-2 rounded-lg border text-sm font-semibold cursor-pointer"
+        style={{
+          borderColor: colors.border,
+          color: colors.textSecondary,
+          backgroundColor: colors.bgCard,
+        }}
+      >
         <select
           value={selectedWilayah}
-          onChange={(e) => onWilayahChange?.(e.target.value)}
-          className="h-8 px-2 text-sm bg-white border border-sigap-border rounded-sm text-sigap-textPrimary focus:outline-none focus:border-sigap-primary cursor-pointer"
-          style={{ minWidth: 120 }}
+          onChange={(e) => onWilayahChange(e.target.value)}
+          className="bg-transparent focus:outline-none cursor-pointer"
+          style={{ color: colors.textSecondary, fontWeight: 600, fontSize: 12.5 }}
         >
-          <option value="">Wilayah</option>
+          <option value="">Semua Wilayah</option>
           {wilayahOptions.map((opt) => (
             <option key={opt.value} value={opt.value}>
               {opt.label}
             </option>
           ))}
         </select>
+      </div>
 
+      <div
+        className="flex items-center gap-2 px-3 py-2 rounded-lg border text-sm cursor-pointer"
+        style={{
+          borderColor: colors.border,
+          color: colors.textSecondary,
+          backgroundColor: colors.bgCard,
+        }}
+      >
         <select
           value={selectedKategori}
-          onChange={(e) => onKategoriChange?.(e.target.value)}
-          className="h-8 px-2 text-sm bg-white border border-sigap-border rounded-sm text-sigap-textPrimary focus:outline-none focus:border-sigap-primary cursor-pointer"
-          style={{ minWidth: 120 }}
+          onChange={(e) => onKategoriChange(e.target.value)}
+          className="bg-transparent focus:outline-none cursor-pointer"
+          style={{ color: colors.textSecondary, fontSize: 12.5 }}
         >
-          <option value="">Kategori</option>
+          <option value="">Semua Kategori</option>
           {kategoriOptions.map((opt) => (
             <option key={opt.value} value={opt.value}>
               {opt.label}
             </option>
           ))}
         </select>
-
-        {hasActiveFilters && (
-          <div
-            className="w-px h-5 bg-sigap-border mx-1"
-            style={{ backgroundColor: colors.border }}
-          />
-        )}
-
-        {activeFilters.map((filter) => (
-          <div
-            key={filter.id}
-            className="flex items-center h-7 px-2 gap-1 rounded-sm bg-sigap-primary text-white text-xs font-medium"
-            style={{ backgroundColor: colors.primary }}
-          >
-            <span>{filter.label}</span>
-            <button
-              onClick={() => onRemoveFilter?.(filter.id)}
-              className="flex items-center justify-center w-4 h-4 rounded-full hover:bg-white/20 transition-colors cursor-pointer"
-              aria-label={`Remove ${filter.label} filter`}
-            >
-              <span style={{ fontSize: 10, lineHeight: 1 }}>x</span>
-            </button>
-          </div>
-        ))}
-
-        {hasActiveFilters && (
-          <button
-            onClick={onReset}
-            className="text-xs text-sigap-primary hover:underline cursor-pointer bg-transparent border-none p-0"
-            style={{ color: colors.primary }}
-          >
-            Reset
-          </button>
-        )}
       </div>
 
-      <div className="flex items-center gap-3">
-        <span
-          className="text-sm font-semibold text-sigap-textPrimary whitespace-nowrap"
-          style={{ color: colors.textPrimary }}
+      {activeFilters.map((filter) => (
+        <div
+          key={filter}
+          className="flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-semibold"
+          style={{
+            backgroundColor: colors.primaryLight,
+            border: `1px solid #bfe0d9`,
+            color: colors.primaryDark,
+          }}
         >
-          {totalCount} kasus
+          <span>{filter}</span>
+          <button
+            onClick={() => onRemoveFilter(filter)}
+            className="cursor-pointer hover:opacity-70"
+            style={{ fontSize: 10 }}
+          >
+            ✕
+          </button>
+        </div>
+      ))}
+
+      {(selectedWilayah || selectedKategori || activeFilters.length > 0) && (
+        <button
+          onClick={onResetFilters}
+          className="text-xs font-semibold cursor-pointer hover:underline"
+          style={{ color: colors.primary }}
+        >
+          Reset
+        </button>
+      )}
+
+      <div className="flex items-center gap-3 ml-auto">
+        <span className="text-xs" style={{ color: colors.textTertiary }}>
+          <b style={{ color: colors.textPrimary }}>{totalCount}</b> kasus
         </span>
 
         <div
-          className="flex items-center rounded-sm overflow-hidden border"
-          style={{ borderColor: colors.border, height: 32 }}
+          className="flex overflow-hidden rounded-lg"
+          style={{ border: `1px solid ${colors.border}` }}
         >
           <button
-            onClick={() => onViewModeChange?.("peta")}
-            className="px-3 h-full text-xs font-medium transition-colors cursor-pointer"
-            style={{
-              backgroundColor: viewMode === "peta" ? colors.primary : "white",
-              color: viewMode === "peta" ? "white" : colors.textSecondary,
-            }}
+            onClick={() => onViewModeChange("peta")}
+            className="px-3.5 py-1.5 text-xs font-semibold transition-colors"
+            style={
+              viewMode === "peta"
+                ? { backgroundColor: colors.primary, color: "#fff" }
+                : { backgroundColor: colors.bgCard, color: colors.textTertiary }
+            }
           >
             Peta
           </button>
           <button
-            onClick={() => onViewModeChange?.("daftar")}
-            className="px-3 h-full text-xs font-medium transition-colors cursor-pointer"
-            style={{
-              backgroundColor: viewMode === "daftar" ? colors.primary : "white",
-              color: viewMode === "daftar" ? "white" : colors.textSecondary,
-              borderLeft: `1px solid ${colors.border}`,
-            }}
+            onClick={() => onViewModeChange("daftar")}
+            className="px-3.5 py-1.5 text-xs font-semibold transition-colors"
+            style={
+              viewMode === "daftar"
+                ? { backgroundColor: colors.primary, color: "#fff" }
+                : { backgroundColor: colors.bgCard, color: colors.textTertiary }
+            }
           >
             Daftar
           </button>
@@ -147,4 +146,4 @@ export function FilterBar({
       </div>
     </div>
   );
-}
+};

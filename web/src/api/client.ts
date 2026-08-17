@@ -25,6 +25,23 @@ import type {
   PaginatedUsers,
   FacilityCluster,
   QueueCounts,
+  ExecutiveDashboard,
+  RegionalStats,
+  TrendData,
+  WargaStats,
+  Impact,
+  HeatmapData,
+  NearbyReports,
+  Duplicates,
+  ShareLink,
+  AdminDashboard,
+  Cases,
+  Operators,
+  Petugas,
+  SLA,
+  Geocode,
+  Boundary,
+  PublicReportsResponse,
 } from "../types";
 import { API_BASE } from "../types";
 import { useAuthStore } from "../stores/auth";
@@ -284,7 +301,7 @@ export const api = {
 
   reportsStats: () => request<DashboardStats>("/reports/stats", { token: true }),
 
-  publicStats: () => request<DashboardStats>("/reports/stats"),
+  publicStats: () => request<DashboardStats>("/public/stats"),
 
   reportsClose: (id: string) =>
     request<{ status: string }>(`/reports/${id}/close`, {
@@ -308,10 +325,7 @@ export const api = {
     const query = qs.toString();
     return request<{
       items: Array<{ id: string; category_id: string; description: string; lng: number; lat: number; status: string; severity: number | null; photo_urls: string[]; created_at: string }>;
-      total: number;
-      page: number;
-      limit: number;
-      total_pages: number;
+      pagination: { page: number; limit: number; total: number; total_pages: number };
     }>(`/verifikator/queue${query ? `?${query}` : ""}`, { token: true });
   },
 
@@ -470,18 +484,6 @@ export const api = {
       token: true,
     }),
 
-  uploadEvidenceFile: (file: File, folder: string, purpose: string) => {
-    const formData = new FormData();
-    formData.append("file", file);
-    formData.append("folder", folder);
-    formData.append("purpose", purpose);
-    return request<{ url: string }>("/api/upload", {
-      method: "POST",
-      body: formData,
-      token: true,
-    });
-  },
-
   petugasComplete: (id: string, body: { summary: string; completion_proof?: string | null }) =>
     request<{ status: string; completed_at: string }>(`/petugas/tasks/${id}/complete`, {
       method: "POST",
@@ -536,16 +538,6 @@ export const api = {
           : ""
       }`,
       { token: true, responseType: "text" }
-    ),
-
-  exportPdf: (params?: { status?: string; category_id?: string }) =>
-    request<Blob>(
-      `/export/pdf${
-        params
-          ? `?${Object.entries(params).filter(([, v]) => v != null).map(([k, v]) => `${k}=${encodeURIComponent(String(v))}`).join("&")}`
-          : ""
-      }`,
-      { token: true, responseType: "blob" }
     ),
 
   exportGeojson: (params?: { status?: string; category_id?: string; wilayah_id?: string }) =>
@@ -909,4 +901,48 @@ export const api = {
       `/public/reports/cluster${query ? `?${query}` : ""}`
     );
   },
+
+  publicReports: (params?: {
+    status?: string;
+    category_id?: string;
+    bbox?: string;
+    month?: string;
+    page?: number;
+    limit?: number;
+  }) => {
+    const qs = new URLSearchParams();
+    if (params?.status) qs.set("status", params.status);
+    if (params?.category_id) qs.set("category_id", params.category_id);
+    if (params?.bbox) qs.set("bbox", params.bbox);
+    if (params?.month) qs.set("month", params.month);
+    if (params?.page) qs.set("page", String(params.page));
+    if (params?.limit) qs.set("limit", String(params.limit));
+    const query = qs.toString();
+    return request<PublicReportsResponse>(
+      `/public/reports${query ? `?${query}` : ""}`
+    );
+  },
+
+  execDashboard: () => request<ExecutiveDashboard>("/executive/dashboard"),
+  execRegionalStats: () => request<RegionalStats>("/executive/regional-stats"),
+  execTrendAnalysis: () => request<TrendData>("/executive/trend"),
+
+  wargaStats: () => request<WargaStats>("/warga/stats"),
+
+  reportImpact: (id: string) => request<Impact>(`/reports/${id}/impact`),
+  reportsHeatmap: () => request<HeatmapData>("/reports/heatmap"),
+  reportsNearby: (lat: number, lng: number) => request<NearbyReports>(`/reports/nearby?lat=${lat}&lng=${lng}`),
+  reportDuplicates: (id: string) => request<Duplicates>(`/reports/${id}/duplicates`),
+  reportShare: (id: string, token: string) => request<ShareLink>(`/reports/${id}/share?token=${token}`),
+  escalateReport: (id: string, reason: string) => request<Report>(`/reports/${id}/escalate`, { method: "POST", body: JSON.stringify({ reason }), token: true }),
+  resolveReport: (id: string, resolution: string) => request<Report>(`/reports/${id}/resolve`, { method: "POST", body: JSON.stringify({ resolution }), token: true }),
+
+  adminDaerahDashboard: () => request<AdminDashboard>("/admin-daerah/dashboard"),
+  adminDaerahCases: () => request<Cases>("/admin-daerah/cases"),
+  adminDaerahOperators: () => request<Operators>("/admin-daerah/operators"),
+  adminDaerahPetugas: () => request<Petugas>("/admin-daerah/petugas"),
+  adminDaerahSla: () => request<SLA>("/admin-daerah/sla"),
+
+  geocodeReverse: (lat: number, lng: number) => request<Geocode>(`/geocode/reverse?lat=${lat}&lng=${lng}`),
+  wilayahBoundary: (id: string) => request<Boundary>(`/wilayah/${id}/boundary`),
 };

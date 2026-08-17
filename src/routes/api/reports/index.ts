@@ -152,6 +152,14 @@ reportsIndexRoute.get(
       return { reports: r.rows, total: countR.rows[0]?.total ?? 0 };
     });
 
-    return c.json({ ...rows, page, limit });
+    return c.json({
+      items: rows.reports,
+      pagination: {
+        page,
+        limit,
+        total: rows.total,
+        total_pages: Math.ceil(rows.total / limit),
+      },
+    });
   }),
 );

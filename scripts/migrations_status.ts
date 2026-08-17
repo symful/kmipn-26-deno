@@ -1,12 +1,12 @@
 import pg from "pg";
-import { existsSync } from "node:fs";
+import { existsSync, readdirSync } from "node:fs";
 import { join, dirname } from "node:path";
 import { fileURLToPath } from "node:url";
 
 const { Client } = pg;
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
-const SCHEMA_SQL_PATH = join(__dirname, "..", "migrations", "schema.sql");
+const MIGRATIONS_DIR = join(__dirname, "..", "migrations");
 
 const POSTGRESQL_URI = process.env.POSTGRESQL_URI!;
 if (!POSTGRESQL_URI) {
@@ -30,9 +30,18 @@ async function withClient<T>(fn: (client: pg.Client) => Promise<T>): Promise<T> 
 }
 
 async function main() {
-  if (!existsSync(SCHEMA_SQL_PATH)) {
-    console.error("schema.sql not found");
+  const migrationFiles = readdirSync(MIGRATIONS_DIR)
+    .filter((f) => f.endsWith(".sql"))
+    .sort();
+
+  if (migrationFiles.length === 0) {
+    console.log("No migration files found in migrations/");
     process.exit(1);
+  }
+
+  console.log(`Migrations discoverable: ${migrationFiles.length}`);
+  for (const f of migrationFiles) {
+    console.log(`  - ${f}`);
   }
 
   await withClient(async (client) => {

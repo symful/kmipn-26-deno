@@ -1,5 +1,6 @@
 import { Component, ErrorInfo, ReactNode } from "react";
 import { logger } from "../lib/logger";
+import { colors } from "../theme/tokens";
 
 interface Props {
   children: ReactNode;
@@ -37,7 +38,7 @@ export class ErrorBoundary extends Component<Props, State> {
               type="button"
               onClick={() => window.location.reload()}
               className="px-4 py-2 rounded text-white"
-              style={{ backgroundColor: "#c0392b" }}
+              style={{ backgroundColor: colors.perluTindakan }}
             >
               Muat ulang
             </button>

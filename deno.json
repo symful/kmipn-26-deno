@@ -1,0 +1,7 @@
+{
+  "ignoreDeprecations": "6.0",
+  "imports": {
+    "@/": "./src/"
+  },
+  "exclude": ["node_modules", "dist", "web", "_fresh"]
+}

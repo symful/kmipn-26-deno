@@ -93,7 +93,7 @@ petugasClarificationRoute.post("/:id", requireAuth, requireRole("PETUGAS", "ADMI
       const reportId = reportIdR.rows[0]?.report_id;
       if (reportId) {
         await client.query(
-          `INSERT INTO notifications (user_id, type, message, related_report_id)
+          `INSERT INTO notifications (user_id, kind, body, related_report_id)
            SELECT assigned_to, 'clarification_requested', $1, $2
            FROM reports WHERE id = $3`,
           [`Permintaan klarifikasi: ${message.substring(0, 100)}`, reportId, reportId]

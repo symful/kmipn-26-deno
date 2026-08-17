@@ -10,8 +10,6 @@ export const analyzeImageVisionInputSchema = z.object({
 
 export const analyzeImageVisionOutputSchema = z.object({
   description: z.string(),
-  pii_detected: z.boolean().default(false),
-  tags: z.array(z.string()).default([]),
 });
 
 export type AnalyzeImageVisionInput = z.infer<typeof analyzeImageVisionInputSchema>;
@@ -29,8 +27,6 @@ Analysis request: ${typedInput.prompt}
 
 Return a JSON with:
 - description (string): detailed description of what you see
-- pii_detected (boolean): true if any personally identifiable information is visible
-- tags (array string): relevant tags for the image content
 
 Return ONLY valid JSON without markdown or additional text.`;
   },
@@ -45,8 +41,6 @@ const analyzeImageVisionTool = {
       const result = await assessWithVision(env, input.image_source, { description: input.prompt, category_name: "general" });
       return {
         description: result.description ?? "",
-        pii_detected: false, // assessWithVision does not provide PII detection
-        tags: [], // assessWithVision does not provide tags
       };
     } catch (error) {
       // Return error shape - the loop will catch this via Promise.allSettled

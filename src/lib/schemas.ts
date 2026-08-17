@@ -22,6 +22,7 @@ export const ReportCreateSchema = z.object({
   description: z.string().min(1).max(2000),
   lng: z.number().min(-180).max(180),
   lat: z.number().min(-90).max(90),
+  device_id: z.string().uuid().optional(),
   photo_urls: z.array(z.string().url()).max(10).optional(),
   reported_at: z.string().datetime().optional(),
   title: z.string().max(255).optional(),

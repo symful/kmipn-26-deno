@@ -21,17 +21,23 @@ async function main() {
   await c.query("DELETE FROM case_events WHERE report_id IN (SELECT id FROM reports WHERE description LIKE 'SEED-KPI:%')");
   await c.query("DELETE FROM reports WHERE description LIKE 'SEED-KPI:%'");
 
-  // Get 5 kabupaten wilayah for diversity
+  // Get 5 kabupaten wilayah for diversity with real coordinates and population
   const kabupatens = await c.query(`
-    SELECT id, name FROM wilayah WHERE level = 'KABUPATEN' LIMIT 5
+    SELECT 
+      id, 
+      name, 
+      COALESCE(ST_X(ST_Centroid(geom)), 107.61) as lng,
+      COALESCE(ST_Y(ST_Centroid(geom)), -6.86) as lat,
+      COALESCE(population, 0) as population
+    FROM wilayah WHERE level = 'KABUPATEN' LIMIT 5
   `);
   const kabList = kabupatens.rows;
   console.log(`Found ${kabList.length} kabupaten for seeding`);
 
   if (kabList.length === 0) {
     // Fallback: create a dummy kabupaten
-    const prov = await c.query(`INSERT INTO wilayah (level, name) VALUES ('PROVINSI', 'SEED-Provinsi') RETURNING id`);
-    const kab = await c.query(`INSERT INTO wilayah (level, name, parent_id) VALUES ('KABUPATEN', 'SEED-Kabupaten', $1) RETURNING id`, [prov.rows[0].id]);
+    const prov = await c.query(`INSERT INTO wilayah (level, name) VALUES ('PROVINSI', 'Jawa Barat') ON CONFLICT DO NOTHING RETURNING id`);
+    const kab = await c.query(`INSERT INTO wilayah (level, name, parent_id) VALUES ('KABUPATEN', 'Bandung', $1) ON CONFLICT DO NOTHING RETURNING id`, [prov.rows[0]?.id]);
     kabList.push(kab.rows[0]);
   }
 
@@ -49,12 +55,12 @@ async function main() {
     const kabId = kabList[kabIdx]!.id;
     const catId = catIds[i % Math.max(catIds.length, 1)]!;
 
-    const rand = Math.random();
+    const rand = (i * 7) % 100;
     let cumWeight = 0;
     let status = statuses[0]!;
     for (let j = 0; j < statuses.length; j++) {
       cumWeight += statusWeights[j]!;
-      if (rand < cumWeight) {
+      if (rand < cumWeight * 100) {
         status = statuses[j]!;
         break;
       }
@@ -62,17 +68,17 @@ async function main() {
 
     const inserted = await c.query<{ id: string }>(
       `INSERT INTO reports (idempotency_key, category_id, description, location, lat, lng, photo_urls, status, created_at, reported_at, title, wilayah_id, population_affected, reporter_id)
-       VALUES (gen_random_uuid(), $1, $2, ST_MakePoint(107.61 + $3, -6.86 + $4)::geography, -6.86 + $4, 107.61 + $3, '{}', $5, NOW() - interval '${Math.floor(Math.random() * 30)} days', NOW() - interval '${Math.floor(Math.random() * 30)} days', $6, $7, $8, gen_random_uuid())
+       VALUES (gen_random_uuid(), $1, $2, ST_MakePoint($3, $4)::geography, $4, $3, '{}', $5, NOW() - interval '${7 * ((i + 1) % 5)} days', NOW() - interval '${7 * ((i + 2) % 5)} days', $6, $7, $8, gen_random_uuid())
        RETURNING id`,
       [
         catId,
         `SEED-KPI: Laporan ${i + 1}`,
-        (Math.random() * 0.2 - 0.1).toFixed(4),
-        (Math.random() * 0.2 - 0.1).toFixed(4),
+        kabList[kabIdx]!.lng,
+        kabList[kabIdx]!.lat,
         status,
         `Laporan KPI ${i + 1}`,
         kabId,
-        Math.floor(Math.random() * 5000) + 100,
+        kabList[kabIdx]!.population,
       ]
     );
     reportIds.push(inserted.rows[0]!.id);
@@ -87,9 +93,10 @@ async function main() {
   for (const reportId of reportIds) {
     const reportStatus = await c.query(`SELECT status FROM reports WHERE id = $1`, [reportId]);
     if (reportStatus.rows[0]?.status === "verified" || reportStatus.rows[0]?.status === "resolved") {
+      const reportHash = (reportId.charCodeAt(0) * 31 + reportId.charCodeAt(1) * 7) % 48;
       await c.query(
         `INSERT INTO case_events (report_id, event_type, actor_id, occurred_at)
-         VALUES ($1, 'verifikator_accept', $2, NOW() - interval '${Math.floor(Math.random() * 48)} hours')`,
+         VALUES ($1, 'verifikator_accept', $2, NOW() - interval '${7 * ((reportHash + 3) % 5)} hours')`,
         [reportId, verifikatorId ?? null]
       );
       eventCount++;
@@ -102,12 +109,12 @@ async function main() {
   const batchSizes = [5, 10, 15, 20];
   for (let i = 0; i < 20; i++) {
     const batchSize = batchSizes[i % batchSizes.length]!;
-    const accepted = Math.floor(batchSize * (0.7 + Math.random() * 0.25));
+    const accepted = Math.floor((70 + (i % 26)) * batchSize / 100);
     const rejected = batchSize - accepted;
 
     await c.query(
       `INSERT INTO sync_outcomes (batch_id, attempt_count, accepted_count, rejected_count, reason, created_at)
-       VALUES ($1, $2, $3, $4, $5, NOW() - interval '${Math.floor(Math.random() * 30)} days')`,
+       VALUES ($1, $2, $3, $4, $5, NOW() - interval '${7 * ((i + 4) % 5)} days')`,
       [
         `SEED-batch-${i + 1}`,
         1,

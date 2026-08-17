@@ -2,7 +2,7 @@ import { useEffect, useState, useCallback } from "react";
 import { api } from "../../api/client";
 import type { AuditLogEntry } from "../../types";
 import { useAuthStore } from "../../stores/auth";
-import { colors, sidebarBg, sidebarText, sidebarTextHover, sidebarTextMuted, sidebarDivider, sidebarAccent } from "../../theme/tokens";
+import { colors, sidebarBg, sidebarText, sidebarTextHover, sidebarTextMuted, sidebarDivider, sidebarAccent, bgSoft } from "../../theme/tokens";
 import { logger } from "@/lib/logger";
 
 interface AuditFilters {
@@ -770,7 +770,7 @@ export const AuditLog = () => {
               className="w-full px-3 py-1.5 rounded-lg border border-sigap-border bg-sigap-surface text-sm text-sigap-textPrimary placeholder:text-sigap-textMuted focus:outline-none focus:border-sigap-primary focus:ring-1 focus:ring-sigap-primary transition-colors"
               style={{
                 borderColor: colors.border,
-                backgroundColor: "#F9FAF8",
+                backgroundColor: bgSoft,
               }}
             />
           </div>
@@ -803,7 +803,7 @@ export const AuditLog = () => {
           style={{
             flex: 1,
             padding: 24,
-            backgroundColor: "#F9FAF8",
+            backgroundColor: bgSoft,
             maxWidth: 1400,
           }}
         >

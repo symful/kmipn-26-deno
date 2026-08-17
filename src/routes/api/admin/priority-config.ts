@@ -5,7 +5,6 @@ import { requireRole } from "@/middleware/roles";
 import { safeHandler } from "@/lib/safeHandler";
 import { withClient, type PgClient } from "@/lib/db";
 import { appendAudit } from "@/lib/audit";
-import { invalidatePriorityConfigCache } from "@/lib/priority/config-store";
 import { logger } from "@/lib/logger";
 import { z } from "zod";
 
@@ -348,8 +347,6 @@ priorityConfigRoute.post(
     if (result.notFound) {
       return c.json({ error: { code: "NOT_FOUND", message: "Priority formula version not found" } }, 404);
     }
-
-    invalidatePriorityConfigCache();
 
     await appendAudit(c.env, {
       actor: admin.sub,
