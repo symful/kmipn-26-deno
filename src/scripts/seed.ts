@@ -22,7 +22,7 @@ async function main() {
   // Categories are seeded by initial_schema.sql; don't delete them here
 
   const provR = await c.query(
-    "INSERT INTO wilayah (level, name) VALUES ('PROVINSI', 'Jawa Barat') ON CONFLICT DO NOTHING RETURNING id"
+    "INSERT INTO wilayah (level, name, geom) VALUES ('PROVINSI', 'Jawa Barat', ST_GeomFromText('POLYGON((106.0 -7.5, 108.5 -7.5, 108.5 -6.0, 106.0 -6.0, 106.0 -7.5))', 4326)) ON CONFLICT DO NOTHING RETURNING id"
   );
   let provId = provR.rows[0]?.id;
   if (!provId) {
@@ -30,7 +30,7 @@ async function main() {
     provId = existing.rows[0]?.id;
   }
   const kabR = await c.query(
-    "INSERT INTO wilayah (parent_id, level, name) VALUES ($1, 'KABUPATEN', 'Bandung') ON CONFLICT DO NOTHING RETURNING id",
+    "INSERT INTO wilayah (parent_id, level, name, geom) VALUES ($1, 'KABUPATEN', 'Bandung', ST_GeomFromText('POLYGON((106.5 -7.0, 108.0 -7.0, 108.0 -6.3, 106.5 -6.3, 106.5 -7.0))', 4326)) ON CONFLICT DO NOTHING RETURNING id",
     [provId]
   );
   let kabId = kabR.rows[0]?.id;
@@ -39,7 +39,7 @@ async function main() {
     kabId = existing.rows[0]?.id;
   }
   const kecR = await c.query(
-    "INSERT INTO wilayah (parent_id, level, name) VALUES ($1, 'KECAMATAN', 'Cisarua') ON CONFLICT DO NOTHING RETURNING id",
+    "INSERT INTO wilayah (parent_id, level, name, geom) VALUES ($1, 'KECAMATAN', 'Cisarua', ST_GeomFromText('POLYGON((106.5 -7.0, 108.0 -7.0, 108.0 -6.3, 106.5 -6.3, 106.5 -7.0))', 4326)) ON CONFLICT DO NOTHING RETURNING id",
     [kabId]
   );
   let kecId = kecR.rows[0]?.id;
@@ -48,7 +48,7 @@ async function main() {
     kecId = existing.rows[0]?.id;
   }
   const desR = await c.query(
-    "INSERT INTO wilayah (parent_id, level, name) VALUES ($1, 'DESA', 'Ciburuy') ON CONFLICT DO NOTHING RETURNING id",
+    "INSERT INTO wilayah (parent_id, level, name, geom) VALUES ($1, 'DESA', 'Ciburuy', ST_GeomFromText('POLYGON((106.5 -7.0, 108.0 -7.0, 108.0 -6.3, 106.5 -6.3, 106.5 -7.0))', 4326)) ON CONFLICT DO NOTHING RETURNING id",
     [kecId]
   );
   const desaId = desR.rows[0]?.id ?? kecId;

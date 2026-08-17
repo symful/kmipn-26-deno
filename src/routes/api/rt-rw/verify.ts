@@ -104,7 +104,7 @@ rtRwVerifyRoute.post("/", safeHandler(async (c) => {
       );
     });
 
-    await appendAudit(c.env, {
+    await appendAudit(c.env, { activeRole: c.get("user").role,
       actor: payload.sub,
       action: "rt_rw_verify",
       objectType: "report",

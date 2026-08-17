@@ -12,7 +12,7 @@ const UUID_REGEX = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12
 
 export const operatorAssignRoute = new Hono<{ Bindings: Env; Variables: AuthVariables }>();
 
-operatorAssignRoute.post("/:id", requireAuth, requireRole("OPERATOR", "ADMIN"), safeHandler(async (c) => {
+operatorAssignRoute.post("/", requireAuth, requireRole("OPERATOR", "ADMIN"), safeHandler(async (c) => {
   const user = c.get("user");
   const id = c.req.param("id");
   if (!id) return c.json({ error: { code: "MISSING_ID", message: "ID is required" } }, 400);

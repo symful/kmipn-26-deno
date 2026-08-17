@@ -16,7 +16,7 @@ const SanggahanSchema = z.object({
 
 export const wargaSanggahanRoute = new Hono<{ Bindings: Env; Variables: AuthVariables }>();
 
-wargaSanggahanRoute.post("/:id", requireAuth, safeHandler(async (c) => {
+wargaSanggahanRoute.post("/", requireAuth, safeHandler(async (c) => {
   const user = c.get("user");
   const reportId = c.req.param("id");
 
@@ -99,7 +99,7 @@ wargaSanggahanRoute.post("/:id", requireAuth, safeHandler(async (c) => {
     return c.json({ error: { code: "ALREADY_EXISTS", message: "Sanggahan sudah pernah diajukan untuk laporan ini" } }, 409);
   }
 
-  await appendAudit(c.env, {
+  await appendAudit(c.env, { activeRole: c.get("user").role,
     actor: user.sub,
     action: "warga_sanggahan_filed",
     objectType: "report",

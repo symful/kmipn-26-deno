@@ -69,6 +69,6 @@ meDataRoute.delete("/", requireAuth, safeHandler(async (c) => {
     await client.query("DELETE FROM consent_records WHERE user_id = $1", [user.sub]);
     await client.query("UPDATE audit_log SET actor = NULL WHERE actor = $1", [user.sub]);
   });
-  await appendAudit(c.env, { actor: user.sub, action: "right_to_delete", objectType: "user", objectId: user.sub });
+  await appendAudit(c.env, { activeRole: c.get("user").role, actor: user.sub, action: "right_to_delete", objectType: "user", objectId: user.sub });
   return c.json({ status: "deleted" });
 }));

@@ -6,6 +6,7 @@ import { PublicCaseDetail } from "./pages/public/CaseDetail";
 import { Methodology } from "./pages/public/Methodology";
 import { PublicCaseList } from "./pages/public/CaseList";
 import { PublicStatistics } from "./pages/public/Statistics";
+import { SubmitReport } from "./pages/public/SubmitReport";
 import { AdminLogin } from "./pages/admin/Login";
 import { AdminDashboard } from "./pages/admin/Dashboard";
 import { AdminCaseList } from "./pages/admin/CaseList";
@@ -18,6 +19,7 @@ import CaseReview from "./pages/verifikator/CaseReview";
 import TaskList from "./pages/surveyor/TaskList";
 import TaskDetail from "./pages/surveyor/TaskDetail";
 import VerifyReport from "./pages/verify/VerifyReport";
+import TokenVerify from "./pages/verify/TokenVerify";
 import VerifyTraining from "./pages/verify/Training";
 import { WargaCreateReport } from "./pages/warga/CreateReport";
 import { OperatorDashboard } from "./pages/operator/Dashboard";
@@ -39,6 +41,8 @@ import { AdminDaerahCaseList } from "./pages/admin-daerah/CaseList";
 import { AuditorDashboard } from "./pages/auditor/Dashboard";
 import { AuditLog } from "./pages/auditor/AuditLog";
 import { RtRwTraining } from "./pages/rt-rw/Training";
+import { NotificationList } from "./pages/notifications/NotificationList";
+import { Settings } from "./pages/settings/Settings";
 
 export const App = () => {
   return (
@@ -51,6 +55,7 @@ export const App = () => {
         <Route path="/case/:id" element={<PublicCaseDetail />} />
           <Route path="/peta" element={<PublicCaseList />} />
           <Route path="/statistics" element={<PublicStatistics />} />
+          <Route path="/public/submit" element={<SubmitReport />} />
           <Route path="/admin/login" element={<AdminLogin />} />
           <Route
             path="admin"
@@ -69,7 +74,9 @@ export const App = () => {
             <Route path="audit" element={<AdminAudit />} />
             <Route path="priority" element={<AdminPriorityConfig />} />
             <Route path="outbox" element={<AdminOutbox />} />
+            <Route path="settings" element={<Settings />} />
             <Route path="ai-console" element={<AdminAIConsole />} />
+            <Route path="notifications" element={<NotificationList />} />
             <Route
               path="executive"
               element={
@@ -99,6 +106,7 @@ export const App = () => {
               </ProtectedRoute>
             }
           />
+          <Route path="/verify/public" element={<TokenVerify />} />
           <Route
             path="/verify"
             element={

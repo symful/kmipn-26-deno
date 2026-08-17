@@ -55,10 +55,18 @@
     "crons": ["*/5 * * * *", "0 2 * * *"]
   },
   "vars": {
+    "CAPTCHA_SITE_KEY": "0x4AAAAAAETN7DX4_59Jd9Xw",
     "PGPASSWORD": "SKIP_PGPASS",
     "HOME": "/tmp",
     "DISABLE_LOGIN_AUDIT": "true",
-    "ENVIRONMENT": "production"
+    "ENVIRONMENT": "production",
+    "ENABLE_TEST_RESET": "true",
+    "MAX_ITERATIONS": "10",
+    "OUTBOX_BATCH_LIMIT": "100",
+    "DEFAULT_PAGE_SIZE": "20",
+    "MAX_PAGE_SIZE": "100",
+    "RATE_LIMIT_BYPASS": "false",
+    "ALLOWED_IMAGE_HOSTS": ""
   },
   "env": {
     "pilot-kabupaten-a": {

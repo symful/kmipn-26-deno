@@ -245,7 +245,7 @@ adminFailedAssessmentsRoute.post(
           result: toolResult.value as Record<string, unknown>,
         });
 
-        appendAudit(c.env, {
+        appendAudit(c.env, { activeRole: c.get("user").role,
           actor: user.sub,
           action: "failed_assessment_retry_success",
           objectType: "failed_assessment",
@@ -277,7 +277,7 @@ adminFailedAssessmentsRoute.post(
           ]
         );
 
-        appendAudit(c.env, {
+        appendAudit(c.env, { activeRole: c.get("user").role,
           actor: user.sub,
           action: "failed_assessment_retry_failed",
           objectType: "failed_assessment",
@@ -347,7 +347,7 @@ adminFailedAssessmentsRoute.delete(
 
       await client.query(`DELETE FROM failed_assessments WHERE id = $1`, [id]);
 
-      appendAudit(c.env, {
+      appendAudit(c.env, { activeRole: c.get("user").role,
         actor: user.sub,
         action: "failed_assessment_deleted",
         objectType: "failed_assessment",

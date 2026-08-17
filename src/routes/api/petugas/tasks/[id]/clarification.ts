@@ -11,7 +11,7 @@ const UUID_REGEX = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12
 
 export const petugasClarificationRoute = new Hono<{ Bindings: Env; Variables: AuthVariables }>();
 
-petugasClarificationRoute.post("/:id", requireAuth, requireRole("PETUGAS", "ADMIN"), safeHandler(async (c) => {
+petugasClarificationRoute.post("/", requireAuth, requireRole("PETUGAS", "ADMIN"), safeHandler(async (c) => {
   const user = c.get("user");
   const taskId = c.req.param("id");
   if (!taskId) return c.json({ error: { code: "MISSING_TASK_ID", message: "Task ID is required" } }, 400);
@@ -78,7 +78,7 @@ petugasClarificationRoute.post("/:id", requireAuth, requireRole("PETUGAS", "ADMI
     return c.json({ error: { code: "INVALID_STATUS", message: `Cannot request clarification for completed task` } }, 409);
   }
 
-  await appendAudit(c.env, {
+  await appendAudit(c.env, { activeRole: c.get("user").role,
     actor: user.sub,
     action: "petugas_task_clarification",
     objectType: "petugas_task",

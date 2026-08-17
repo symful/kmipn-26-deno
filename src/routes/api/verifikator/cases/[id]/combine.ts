@@ -13,7 +13,7 @@ const UUID_REGEX = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
 
 export const combineRoute = new Hono<{ Bindings: Env; Variables: AuthVariables }>();
 
-combineRoute.post("/:id", requireAuth, requireRole("VERIFIKATOR", "ADMIN", "OPERATOR"), safeHandler(async (c) => {
+combineRoute.post("/", requireAuth, requireRole("VERIFIKATOR", "ADMIN", "OPERATOR"), safeHandler(async (c) => {
   const user = c.get("user");
   const id = c.req.param("id");
   const body = await c.req.json();

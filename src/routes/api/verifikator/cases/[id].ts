@@ -8,7 +8,7 @@ import { flattenAssessment } from "@/lib/agent/store";
 
 export const verifikatorCaseRoute = new Hono<{ Bindings: Env }>();
 
-verifikatorCaseRoute.get("/:id", requireAuth, requireRole("VERIFIKATOR", "ADMIN"), safeHandler(async (c) => {
+verifikatorCaseRoute.get("/", requireAuth, requireRole("VERIFIKATOR", "ADMIN"), safeHandler(async (c) => {
   const id = c.req.param("id");
   if (!id) return c.json({ error: { code: "MISSING_ID", message: "ID is required" } }, 400);
 

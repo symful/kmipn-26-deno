@@ -11,18 +11,20 @@ CREATE EXTENSION IF NOT EXISTS postgis;
 -- PHASE 0: Base tables (from initial_schema)
 -- ============================================================
 
--- Users (VERIFIKATOR + ADMIN; WARGA is anonymous, no user row)
+-- Users (VERIFIKATOR + ADMIN + WARGA for self-registration)
 CREATE TABLE IF NOT EXISTS users (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
   email TEXT UNIQUE NOT NULL,
   password_hash TEXT NOT NULL,
-  role TEXT NOT NULL CHECK (role IN ('VERIFIKATOR', 'ADMIN')),
+  role TEXT NOT NULL CHECK (role IN ('VERIFIKATOR', 'ADMIN', 'WARGA', 'SURVEYOR', 'OPERATOR', 'PETUGAS', 'ADMIN_DAERAH', 'AUDITOR', 'PENGAMBIL_KEPUTUSAN')),
   name TEXT NOT NULL,
+  wilayah_id UUID,
   created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
   updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
   deleted_at TIMESTAMPTZ
 );
 CREATE INDEX IF NOT EXISTS idx_users_email ON users(email);
+ALTER TABLE users ADD COLUMN IF NOT EXISTS wilayah_id UUID;
 
 -- Refresh tokens
 CREATE TABLE IF NOT EXISTS refresh_tokens (

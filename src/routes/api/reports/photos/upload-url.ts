@@ -178,7 +178,7 @@ photosUploadUrlRoute.put(
     });
 
     try {
-      await appendAudit(c.env, {
+      await appendAudit(c.env, { activeRole: c.get("user").role,
         actor: c.get("user").sub,
         action: "photo_uploaded",
         objectType: "report",

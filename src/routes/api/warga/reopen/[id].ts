@@ -16,7 +16,7 @@ const ReopenSchema = z.object({
 
 export const wargaReopenRoute = new Hono<{ Bindings: Env; Variables: AuthVariables }>();
 
-wargaReopenRoute.post("/:id", requireAuth, safeHandler(async (c) => {
+wargaReopenRoute.post("/", requireAuth, safeHandler(async (c) => {
   const user = c.get("user");
   const reportId = c.req.param("id");
 
@@ -91,7 +91,7 @@ wargaReopenRoute.post("/:id", requireAuth, safeHandler(async (c) => {
     return c.json({ error: { code: "ALREADY_EXISTS", message: "Permintaan buka ulang sudah ada untuk laporan ini" } }, 409);
   }
 
-  await appendAudit(c.env, {
+  await appendAudit(c.env, { activeRole: c.get("user").role,
     actor: user.sub,
     action: "warga_reopen_requested",
     objectType: "report",

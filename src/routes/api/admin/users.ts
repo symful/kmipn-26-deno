@@ -130,7 +130,7 @@ adminUsersRoute.post(
         return r.rows[0];
       });
 
-      await appendAudit(c.env, {
+      await appendAudit(c.env, { activeRole: c.get("user").role,
         actor: admin.sub,
         action: "user_create",
         objectType: "user",
@@ -207,7 +207,7 @@ adminUsersRoute.patch(
       return r.rows[0];
     });
 
-    await appendAudit(c.env, {
+    await appendAudit(c.env, { activeRole: c.get("user").role,
       actor: admin.sub,
       action: "user_update",
       objectType: "user",
@@ -247,7 +247,7 @@ adminUsersRoute.delete(
       );
     });
 
-    await appendAudit(c.env, {
+    await appendAudit(c.env, { activeRole: c.get("user").role,
       actor: admin.sub,
       action: "user_disable",
       objectType: "user",
@@ -287,7 +287,7 @@ adminUsersRoute.patch(
       );
     });
 
-    await appendAudit(c.env, {
+    await appendAudit(c.env, { activeRole: c.get("user").role,
       actor: admin.sub,
       action: "user_deactivate",
       objectType: "user",
@@ -327,7 +327,7 @@ adminUsersRoute.patch(
       );
     });
 
-    await appendAudit(c.env, {
+    await appendAudit(c.env, { activeRole: c.get("user").role,
       actor: admin.sub,
       action: "user_reactivate",
       objectType: "user",

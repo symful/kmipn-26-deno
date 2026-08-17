@@ -138,7 +138,7 @@ adminChecklistTemplatesRoute.post(
         return r.rows[0];
       });
 
-      await appendAudit(c.env, {
+      await appendAudit(c.env, { activeRole: c.get("user").role,
         actor: admin.sub,
         action: "checklist_template_create",
         objectType: "checklist_template",
@@ -217,7 +217,7 @@ adminChecklistTemplatesRoute.put(
       return r.rows[0];
     });
 
-    await appendAudit(c.env, {
+    await appendAudit(c.env, { activeRole: c.get("user").role,
       actor: admin.sub,
       action: "checklist_template_update",
       objectType: "checklist_template",
@@ -261,7 +261,7 @@ adminChecklistTemplatesRoute.delete(
       await client.query(`DELETE FROM surveyor_checklist_templates WHERE id = $1`, [templateId]);
     });
 
-    await appendAudit(c.env, {
+    await appendAudit(c.env, { activeRole: c.get("user").role,
       actor: admin.sub,
       action: "checklist_template_delete",
       objectType: "checklist_template",

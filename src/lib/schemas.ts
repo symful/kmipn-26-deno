@@ -2,7 +2,14 @@ import { z } from "zod";
 
 export const LoginSchema = z.object({
   email: z.string().email().max(255),
-  password: z.string().min(6).max(128),
+  password: z.string().min(8).max(128),
+});
+
+export const RegisterSchema = z.object({
+  email: z.string().email().max(255),
+  password: z.string().min(8).max(128),
+  name: z.string().min(1).max(255),
+  wilayah_id: z.string().uuid().nullable().optional(),
 });
 
 export const RegisterVerifikatorSchema = z.object({

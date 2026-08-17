@@ -13,7 +13,8 @@ function getSecret(env: Env): Uint8Array {
 
 export interface JwtPayload {
   sub: string;
-  role: "ADMIN" | "VERIFIKATOR" | "SURVEYOR" | "OPERATOR" | "RT_RW" | "PETUGAS" | "ADMIN_DAERAH" | "AUDITOR" | "PENGAMBIL_KEPUTUSAN";
+  role: "ADMIN" | "VERIFIKATOR" | "SURVEYOR" | "OPERATOR" | "RT_RW" | "PETUGAS" | "ADMIN_DAERAH" | "AUDITOR" | "PENGAMBIL_KEPUTUSAN" | "WARGA";
+  roles?: string[];
   wilayah_id?: string | null;
   email?: string;
   type: "access" | "refresh";
@@ -99,6 +100,21 @@ export const requireAuth: MiddlewareHandler<{ Bindings: Env; Variables: AuthVari
   const token = auth.slice("Bearer ".length).trim();
   try {
     const payload = await verifyToken(c.env, token, "access");
+
+    const activeRole = c.req.header("X-Active-Role");
+    if (activeRole) {
+      const userRoles = payload.roles ?? [payload.role];
+      if (userRoles.includes(activeRole)) {
+        payload.role = activeRole as JwtPayload["role"];
+      } else {
+        return c.json({
+          error: "active_role_not_granted",
+          current_role: payload.role,
+          requested_role: activeRole
+        }, 403);
+      }
+    }
+
     c.set("user", payload);
     return await next();
   } catch {

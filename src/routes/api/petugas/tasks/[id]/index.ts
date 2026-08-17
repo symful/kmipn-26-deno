@@ -7,7 +7,7 @@ import { safeHandler } from "@/lib/safeHandler";
 
 export const petugasTaskDetailRoute = new Hono<{ Bindings: Env; Variables: AuthVariables }>();
 
-petugasTaskDetailRoute.get("/:id", requireAuth, requireRole("PETUGAS", "ADMIN"), safeHandler(async (c) => {
+petugasTaskDetailRoute.get("/", requireAuth, requireRole("PETUGAS", "ADMIN"), safeHandler(async (c) => {
   const user = c.get("user");
   const taskId = c.req.param("id");
   if (!taskId) return c.json({ error: { code: "MISSING_TASK_ID", message: "Task ID is required" } }, 400);

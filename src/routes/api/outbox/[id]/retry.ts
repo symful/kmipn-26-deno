@@ -47,7 +47,7 @@ outboxRetryRoute.post(
         [id]
       );
 
-      await appendAudit(c.env, {
+      await appendAudit(c.env, { activeRole: c.get("user").role,
         actor: user.sub,
         action: "outbox_retry",
         objectType: "outbox",

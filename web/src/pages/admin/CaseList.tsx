@@ -106,6 +106,19 @@ export const AdminCaseList = () => {
     }
   };
 
+  const handleExportPdf = async () => {
+    try {
+      const params: { status?: string } = {};
+      if (statusFilter) params.status = statusFilter;
+      const blob = await api.exportPdf(params);
+      const timestamp = new Date().toISOString().replace(/[:.]/g, "-").slice(0, 19);
+      downloadBlob(blob, `sigap-reports-${timestamp}.pdf`);
+    } catch (err) {
+      logger.error("PDF export failed: " + (err instanceof Error ? err.message : String(err)), { error: err });
+      alert("Gagal mengekspor PDF");
+    }
+  };
+
   const handleMerge = async () => {
     if (!modal || !mergeTargetId.trim()) return;
     setActionLoading(true);
@@ -242,10 +255,10 @@ export const AdminCaseList = () => {
               Export CSV
             </button>
             <button
-              onClick={handleExportCsv}
+              onClick={handleExportPdf}
               className="text-sm font-medium px-3 py-1.5 rounded-lg border border-white/20 bg-white/10 hover:bg-white/20 text-white transition-colors"
             >
-              Export PDF
+              Ekspor PDF
             </button>
             <button
               onClick={handleExportGeoJSON}

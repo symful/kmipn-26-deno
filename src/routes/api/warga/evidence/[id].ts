@@ -16,7 +16,7 @@ const EvidenceSchema = z.object({
 
 export const wargaEvidenceRoute = new Hono<{ Bindings: Env; Variables: AuthVariables }>();
 
-wargaEvidenceRoute.post("/:id", requireAuth, safeHandler(async (c) => {
+wargaEvidenceRoute.post("/", requireAuth, safeHandler(async (c) => {
   const user = c.get("user");
   const reportId = c.req.param("id");
 
@@ -114,7 +114,7 @@ wargaEvidenceRoute.post("/:id", requireAuth, safeHandler(async (c) => {
     return c.json({ error: { code: "STORAGE_ERROR", message: "Gagal mengunggah foto ke storage" } }, 500);
   }
 
-  await appendAudit(c.env, {
+  await appendAudit(c.env, { activeRole: c.get("user").role,
     actor: user.sub,
     action: "warga_evidence_submitted",
     objectType: "report",

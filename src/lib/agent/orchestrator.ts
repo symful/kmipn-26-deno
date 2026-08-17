@@ -420,7 +420,7 @@ When you have gathered sufficient information, respond with a final summary.
 
 Always respond with valid JSON or a text summary.`;
 
-  const photoUrls = meta.photo_urls ?? [];
+  const photoUrls = meta.photo_urls || [];
   const photoInfo = photoUrls.length > 0
     ? `Photos available: ${photoUrls.length} image(s)\nFirst photo: ${photoUrls[0]}`
     : "No photos available";
@@ -490,7 +490,7 @@ async function finalizeAssessment(
   toolResults: Record<string, ToolResult>,
   finalText: string
 ): Promise<AssessmentSummary> {
-  const photoUrls = meta.photo_urls ?? [];
+  const photoUrls = meta.photo_urls || [];
 
   const results: Record<string, ToolResult> = { ...toolResults };
   let hasFailure = false;
@@ -594,7 +594,7 @@ export async function runAssessment(env: Env, reportId: string): Promise<Assessm
   const toolResults: Record<string, ToolResult> = {};
 
   for (let i = 0; i < maxIterations; i++) {
-    const photoUrls = meta.photo_urls ?? [];
+  const photoUrls = (meta.photo_urls || []);
     const toolChoice = (i === 0 && photoUrls.length > 0)
       ? { type: "function" as const, function: { name: "extract_damage_indicators" } }
       : "auto";

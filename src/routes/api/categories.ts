@@ -74,7 +74,7 @@ categoriesRoute.post(
     });
 
     const user = c.get("user");
-    await appendAudit(c.env, {
+    await appendAudit(c.env, { activeRole: c.get("user").role,
       actor: user.sub,
       action: "category_create",
       objectType: "category",
@@ -162,7 +162,7 @@ categoriesRoute.patch(
       );
       const after = r.rows[0];
 
-      await appendAudit(c.env, {
+      await appendAudit(c.env, { activeRole: c.get("user").role,
         actor: user.sub,
         action: "category_update",
         objectType: "category",
@@ -206,7 +206,7 @@ categoriesRoute.delete(
       const deleted = r.rows[0];
 
       if (deleted) {
-        await appendAudit(c.env, {
+        await appendAudit(c.env, { activeRole: c.get("user").role,
           actor: user.sub,
           action: "category_delete",
           objectType: "category",

@@ -12,7 +12,7 @@ const UUID_REGEX = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12
 
 export const petugasCompleteRoute = new Hono<{ Bindings: Env; Variables: AuthVariables }>();
 
-petugasCompleteRoute.post("/:id", requireAuth, requireRole("PETUGAS", "ADMIN"), safeHandler(async (c) => {
+petugasCompleteRoute.post("/", requireAuth, requireRole("PETUGAS", "ADMIN"), safeHandler(async (c) => {
   const user = c.get("user");
   const taskId = c.req.param("id");
   if (!taskId) return c.json({ error: { code: "MISSING_TASK_ID", message: "Task ID is required" } }, 400);
@@ -85,7 +85,7 @@ petugasCompleteRoute.post("/:id", requireAuth, requireRole("PETUGAS", "ADMIN"), 
     return c.json({ error: { code: "INVALID_STATUS", message: `Cannot complete task in '${result.current}' status` } }, 409);
   }
 
-  await appendAudit(c.env, {
+  await appendAudit(c.env, { activeRole: c.get("user").role,
     actor: user.sub,
     action: "petugas_task_complete",
     objectType: "petugas_task",

@@ -267,8 +267,8 @@ publicReportsRoute.post(
         return { id: existing.rows[0].id as string, duplicate: true };
       }
       const inserted = await client.query<{ id: string }>(
-        `INSERT INTO reports (idempotency_key, category_id, description, geom, photo_urls, status, created_at, updated_at)
-         VALUES ($1, $2, $3, ST_MakePoint($4, $5)::geography, $6, 'submitted', NOW(), NOW()) RETURNING id`,
+        `INSERT INTO reports (idempotency_key, category_id, description, geom, location, photo_urls, status, created_at, updated_at)
+         VALUES ($1, $2, $3, ST_SetSRID(ST_MakePoint($4, $5), 4326)::geometry, ST_SetSRID(ST_MakePoint($4, $5), 4326)::geography, $6, 'submitted', NOW(), NOW()) RETURNING id`,
         [
           parsed.data.idempotency_key,
           parsed.data.category_id,
@@ -286,7 +286,7 @@ publicReportsRoute.post(
         await withClient(c.env, async (client) => {
           await client.query(
             `INSERT INTO outbox (event_type, target_system, payload, related_report_id, next_retry_at)
-             VALUES ($1, 'internal', $2, $3, NOW())`,
+             VALUES ($1, 'sipd', $2, $3, NOW())`,
             ["report_created", JSON.stringify({ report_id: result.id, action: "report_created" }), result.id]
           );
         });

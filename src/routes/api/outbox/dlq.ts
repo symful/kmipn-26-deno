@@ -135,7 +135,7 @@ outboxDlqRoute.post(
       actor: user.sub,
     });
 
-    appendAudit(c.env, {
+    appendAudit(c.env, { activeRole: c.get("user").role,
       actor: user.sub,
       action: "outbox_dlq_reconcile",
       objectType: "outbox",

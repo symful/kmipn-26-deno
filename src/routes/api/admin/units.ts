@@ -120,7 +120,7 @@ unitsRoute.post(
         return r.rows[0];
       });
 
-      await appendAudit(c.env, {
+      await appendAudit(c.env, { activeRole: c.get("user").role,
         actor: admin.sub,
         action: "unit_create",
         objectType: "unit",
@@ -206,7 +206,7 @@ unitsRoute.patch(
       return r.rows[0];
     });
 
-    await appendAudit(c.env, {
+    await appendAudit(c.env, { activeRole: c.get("user").role,
       actor: admin.sub,
       action: "unit_update",
       objectType: "unit",
@@ -254,7 +254,7 @@ unitsRoute.delete(
       );
     });
 
-    await appendAudit(c.env, {
+    await appendAudit(c.env, { activeRole: c.get("user").role,
       actor: admin.sub,
       action: "unit_delete",
       objectType: "unit",

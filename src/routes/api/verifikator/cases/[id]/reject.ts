@@ -12,7 +12,7 @@ import { evaluatePriority } from "@/lib/priority/calculator";
 
 export const rejectRoute = new Hono<{ Bindings: Env; Variables: AuthVariables }>();
 
-rejectRoute.post("/:id", requireAuth, requireRole("VERIFIKATOR", "ADMIN", "OPERATOR"), safeHandler(async (c) => {
+rejectRoute.post("/", requireAuth, requireRole("VERIFIKATOR", "ADMIN", "OPERATOR"), safeHandler(async (c) => {
   const user = c.get("user");
   const id = c.req.param("id");
   const body = await c.req.json();

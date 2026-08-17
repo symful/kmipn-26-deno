@@ -32,7 +32,7 @@ registerVerifikatorRoute.post(
         );
         return r.rows[0];
       });
-      await appendAudit(c.env, {
+      await appendAudit(c.env, { activeRole: c.get("user").role,
         actor: user.sub,
         action: "user_create",
         objectType: "user",

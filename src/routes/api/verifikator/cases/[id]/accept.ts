@@ -16,11 +16,14 @@ const UUID_REGEX = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12
 
 export const acceptRoute = new Hono<{ Bindings: Env; Variables: AuthVariables }>();
 
-acceptRoute.post("/:id", requireAuth, requireRole("VERIFIKATOR", "ADMIN", "OPERATOR"), safeHandler(async (c) => {
+acceptRoute.post("/", requireAuth, requireRole("VERIFIKATOR", "ADMIN", "OPERATOR"), safeHandler(async (c) => {
   const user = c.get("user");
   const id = c.req.param("id");
   if (!id) return c.json({ error: { code: "MISSING_ID", message: "ID is required" } }, 400);
-  const body = await c.req.json();
+  let body: Record<string, unknown> = {};
+  try {
+    body = await c.req.json();
+  } catch {}
   const reason = String(body.reason ?? "");
   const assignedUnitId = body.assigned_unit_id ? String(body.assigned_unit_id) : null;
   if (assignedUnitId && !UUID_REGEX.test(assignedUnitId)) {
@@ -65,7 +68,11 @@ acceptRoute.post("/:id", requireAuth, requireRole("VERIFIKATOR", "ADMIN", "OPERA
     return c.json({ error: { code: "INVALID_TRANSITION", message: `Cannot accept a report in '${result.current}' state` } }, 409);
   }
 
-  await auditReportChange(c.env, user.sub, id, "verifikator_accept", result.before, result.after, reason);
+  try {
+    await auditReportChange(c.env, user.sub, id, "verifikator_accept", result.before, result.after, reason);
+  } catch (e) {
+    logger.error({ route: c.req.path, method: c.req.method, error: e as Error, context: "audit_failed" });
+  }
   try {
     await withClient(c.env, async (client) => {
       await client.query(
@@ -111,7 +118,18 @@ acceptRoute.post("/:id", requireAuth, requireRole("VERIFIKATOR", "ADMIN", "OPERA
     assessments = await getAssessments(c.env, id);
   } catch (e) {
     logger.error({ route: c.req.path, method: c.req.method, error: e as Error, context: "assessments_fetch_failed" });
+    assessments = [];
   }
 
-  return c.json({ status: "verified", ...result.after, assessments });
+  const afterStatus = result.after?.status ?? null;
+  const afterSeverity = result.after?.severity ?? null;
+  const afterAssignedTo = result.after?.assigned_to ?? null;
+
+  return c.json({
+    id,
+    status: afterStatus,
+    severity: afterSeverity,
+    assigned_to: afterAssignedTo,
+    assessments,
+  });
 }));

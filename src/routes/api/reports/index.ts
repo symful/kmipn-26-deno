@@ -42,20 +42,42 @@ reportsIndexRoute.post(
       });
     }
 
-    const result = await withClient(c.env, async (client: PgClient) => {
-      const existing = await client.query(
-        "SELECT id FROM reports WHERE idempotency_key = $1",
-        [parsed.data.idempotency_key]
+    // Check idempotency first
+    const existingReport = await withClient(c.env, async (client: PgClient) => {
+      return client.query("SELECT id FROM reports WHERE idempotency_key = $1", [parsed.data.idempotency_key]);
+    });
+    if (existingReport.rows[0]?.id) {
+      return c.json({ id: existingReport.rows[0].id as string, duplicate: true }, 200);
+    }
+
+    // Lookup wilayah - return error if outside service area
+    const wilayahResult = await withClient(c.env, async (client: PgClient) => {
+      return client.query<{ id: string }>(
+        `SELECT w.id FROM wilayah w
+         WHERE w.geom IS NOT NULL
+           AND ST_Contains(w.geom, ST_SetSRID(ST_MakePoint($1, $2), 4326)::geometry)
+         ORDER BY w.level ASC LIMIT 1`,
+        [parsed.data.lng, parsed.data.lat]
       );
-      if (existing.rows[0]) {
-        return { id: existing.rows[0].id as string, duplicate: true };
-      }
-      const reportedAt = parsed.data.reported_at ? new Date(parsed.data.reported_at) : new Date();
-      const inserted = await client.query<{ id: string }>(
-        `INSERT INTO reports (idempotency_key, category_id, description, location, photo_urls, status, created_at, updated_at, reported_at, title, wilayah_id, population_affected, vulnerability_index)
-         VALUES ($1, $2, $3, ST_MakePoint($4, $5)::geography, $6, 'submitted', NOW(), NOW(), $7, $8,
-           (SELECT w.id FROM wilayah w WHERE w.geom IS NOT NULL AND ST_Contains(w.geom, ST_MakePoint($4, $5)::geometry) ORDER BY w.level ASC LIMIT 1),
-           $9, $10) RETURNING id`,
+    });
+    let wilayahId = wilayahResult.rows[0]?.id;
+    if (!wilayahId) {
+      return c.json(
+        { error: { code: "OUTSIDE_SERVICE_AREA", message: "Report location is outside our service area. Please submit from within an active wilayah." } },
+        400
+      );
+    }
+    if (typeof wilayahId !== "string") {
+      logger.error({ route: c.req.path, method: c.req.method, context: "wilayahid_invalid_type", wilayahId });
+      return c.json({ error: { code: "INVALID_WILAYAH", message: "Invalid wilayah configuration" } }, 500);
+    }
+
+    // Insert report
+    const reportedAt = parsed.data.reported_at ? new Date(parsed.data.reported_at) : new Date();
+    const inserted = await withClient(c.env, async (client: PgClient) => {
+      return client.query<{ id: string }>(
+        `INSERT INTO reports (idempotency_key, category_id, description, geom, location, lat, lng, photo_urls, status, created_at, updated_at, reported_at, title, wilayah_id, population_affected, vulnerability_index)
+         VALUES ($1, $2, $3, ST_SetSRID(ST_MakePoint($4, $5), 4326)::geometry, ST_SetSRID(ST_MakePoint($4, $5), 4326)::geography, $5, $4, $6, 'submitted', NOW(), NOW(), $7, $8, $9, $10, $11) RETURNING id`,
         [
           parsed.data.idempotency_key,
           parsed.data.category_id,
@@ -65,46 +87,65 @@ reportsIndexRoute.post(
           parsed.data.photo_urls ?? [],
           reportedAt,
           parsed.data.title ?? null,
+          wilayahId,
           parsed.data.population_affected ?? 0,
           parsed.data.vulnerability_index ?? 0.5,
         ]
       );
-      return { id: inserted.rows[0]!.id, duplicate: false };
     });
-
-    if (!result.duplicate) {
-      const user = c.get("user");
-      await appendAudit(c.env, {
-        actor: user.sub,
-        action: "report_create",
-        objectType: "report",
-        objectId: result.id,
-        after: parsed.data,
-      }).catch((e) => logger.error({ route: c.req.path, method: c.req.method, audit_failure: true, action: "report_create", err: e }));
-      try {
-        await withClient(c.env, async (client) => {
-          await client.query(
-            `INSERT INTO outbox (event_type, target_system, payload, related_report_id, next_retry_at)
-             VALUES ($1, 'internal', $2, $3, NOW())`,
-            ["report_created", JSON.stringify({ report_id: result.id, action: "report_created" }), result.id]
-          );
-        });
-      } catch (e) {
-        logger.error({ route: c.req.path, method: c.req.method, error: e as Error, context: "outbox_insert_failed" });
-      }
-      c.executionCtx.waitUntil(
-        Promise.all([
-          runAssessment(c.env, result.id).catch((e) =>
-            logger.error({ route: c.req.path, method: c.req.method, error: e, context: "ai_assessment_failed" })
-          ),
-          evaluatePriority(c.env, result.id).catch((e) =>
-            logger.error({ route: c.req.path, method: c.req.method, error: e, context: "priority_calc_failed" })
-          ),
-        ])
-      );
+    if (!inserted || !inserted.rows || !inserted.rows[0]) {
+      logger.error({ route: c.req.path, method: c.req.method, context: "insert_returned_no_rows", inserted });
+      return c.json({ error: { code: "INSERT_FAILED", message: "Failed to create report" } }, 500);
+    }
+    const reportId = inserted.rows[0].id;
+    if (!reportId) {
+      logger.error({ route: c.req.path, method: c.req.method, context: "reportId_null", reportId });
+      return c.json({ error: { code: "INSERT_FAILED", message: "Failed to create report - no ID returned" } }, 500);
     }
 
-    return c.json(result, result.duplicate ? 200 : 201);
+    // Post-insert: audit, outbox, async AI
+    const authUser = c.get("user");
+    if (!authUser) {
+      logger.error({ route: c.req.path, method: c.req.method, context: "authUser_missing" });
+      return c.json({ error: { code: "UNAUTHORIZED", message: "User not authenticated" } }, 401);
+    }
+    if (!authUser.role || !authUser.sub) {
+      logger.error({ route: c.req.path, method: c.req.method, context: "authUser_incomplete", authUser });
+      return c.json({ error: { code: "UNAUTHORIZED", message: "User not authenticated" } }, 401);
+    }
+    await appendAudit(c.env, {
+      activeRole: authUser.role,
+      actor: authUser.sub,
+      action: "report_create",
+      objectType: "report",
+      objectId: reportId,
+      after: parsed.data,
+    }).catch((e) => logger.error({ route: c.req.path, method: c.req.method, audit_failure: true, action: "report_create", err: e }));
+
+    try {
+      await withClient(c.env, async (client) => {
+        await client.query(
+           `INSERT INTO outbox (event_type, target_system, payload, related_report_id, next_retry_at)
+            VALUES ($1, 'sipd', $2, $3, NOW())`,
+          ["report_created", JSON.stringify({ report_id: reportId, action: "report_created" }), reportId]
+        );
+      });
+    } catch (e) {
+      logger.error({ route: c.req.path, method: c.req.method, error: e as Error, context: "outbox_insert_failed" });
+    }
+
+    c.executionCtx.waitUntil(
+      Promise.all([
+        runAssessment(c.env, reportId).catch((e) =>
+          logger.error({ route: c.req.path, method: c.req.method, error: e, context: "ai_assessment_failed" })
+        ),
+        evaluatePriority(c.env, reportId).catch((e) =>
+          logger.error({ route: c.req.path, method: c.req.method, error: e, context: "priority_calc_failed" })
+        ),
+      ])
+    );
+
+    return c.json({ id: reportId, duplicate: false }, 201);
   }),
 );
 

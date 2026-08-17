@@ -184,7 +184,7 @@ adminOutboxRoute.post(
       };
     });
 
-    appendAudit(c.env, {
+    appendAudit(c.env, { activeRole: c.get("user").role,
       actor: user.sub,
       action: "outbox_reconcile",
       objectType: "outbox",
@@ -264,7 +264,7 @@ adminOutboxRoute.post(
     }
 
     // Audit log
-    appendAudit(c.env, {
+    appendAudit(c.env, { activeRole: c.get("user").role,
       actor: user.sub,
       action: "outbox_reset",
       objectType: "outbox",

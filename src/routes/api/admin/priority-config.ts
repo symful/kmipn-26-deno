@@ -162,7 +162,7 @@ priorityConfigRoute.post(
       }
     });
 
-    await appendAudit(c.env, {
+    await appendAudit(c.env, { activeRole: c.get("user").role,
       actor: admin.sub,
       actorRole: admin.role,
       action: "priority_formula_version_create",
@@ -274,7 +274,7 @@ priorityConfigRoute.patch(
       }, 403);
     }
 
-    await appendAudit(c.env, {
+    await appendAudit(c.env, { activeRole: c.get("user").role,
       actor: admin.sub,
       actorRole: admin.role,
       action: "priority_formula_version_update",
@@ -348,7 +348,7 @@ priorityConfigRoute.post(
       return c.json({ error: { code: "NOT_FOUND", message: "Priority formula version not found" } }, 404);
     }
 
-    await appendAudit(c.env, {
+    await appendAudit(c.env, { activeRole: c.get("user").role,
       actor: admin.sub,
       actorRole: admin.role,
       action: "priority_formula_version_activate",

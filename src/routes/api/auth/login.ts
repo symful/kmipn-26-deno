@@ -31,21 +31,33 @@ authLoginRoute.post(
     }
 
     if (c.env.DISABLE_LOGIN_AUDIT !== "true") {
-      await appendAudit(c.env, { actor: user.id as string, actorRole: user.role as string, action: "login", objectType: "user", objectId: user.id as string, after: { email: user.email, role: user.role } }).catch((e) => logger.error({ route: "/api/auth/login", method: "POST", error: e instanceof Error ? e : new Error(String(e)), context: "audit_write_failed" }));
+      const authUser = c.get("user");
+      await appendAudit(c.env, { activeRole: authUser ? authUser.role : user.role, actor: user.id as string, actorRole: user.role as string, action: "login", objectType: "user", objectId: user.id as string, after: { email: user.email, role: user.role } }).catch((e) => logger.error({ route: "/api/auth/login", method: "POST", error: e instanceof Error ? e : new Error(String(e)), context: "audit_write_failed" }));
     }
 
     const jti = crypto.randomUUID();
+
+    if (!user.id || !user.email || !user.role) {
+      return c.json({
+        error: {
+          code: "INTERNAL_ERROR",
+          message: "User record has NULL field - data corruption",
+          detail: { id: user.id, email: user.email, role: user.role },
+        },
+      }, 500);
+    }
+
     const access_token = await signAccessToken(c.env, {
-      sub: user.id as string,
+      sub: user.id,
       role: user.role as Role,
       wilayah_id: (user.wilayah_id as string | null) ?? null,
-      email: user.email as string,
+      email: user.email,
     });
     const refresh_token = await signRefreshToken(c.env, {
-      sub: user.id as string,
+      sub: user.id,
       role: user.role as Role,
       wilayah_id: (user.wilayah_id as string | null) ?? null,
-      email: user.email as string,
+      email: user.email,
       jti,
     });
 

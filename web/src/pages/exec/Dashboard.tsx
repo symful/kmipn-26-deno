@@ -319,6 +319,28 @@ export const ExecDashboard = () => {
     }
   };
 
+  const handleExportPdf = async () => {
+    setExporting(true);
+    try {
+      const params: { status?: string; category_id?: string; wilayah_id?: string } = {};
+      if (drillStatus) params.status = drillStatus;
+      if (drillCategory) params.category_id = drillCategory;
+      if (drillWilayah) params.wilayah_id = drillWilayah;
+      const blob = await api.exportPdf(params);
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = `sigap-reports-${new Date().toISOString().replace(/[:.]/g, "-").slice(0, 19)}.pdf`;
+      a.click();
+      URL.revokeObjectURL(url);
+      toast.success("PDF exported successfully");
+    } catch {
+      toast.error("Failed to export PDF");
+    } finally {
+      setExporting(false);
+    }
+  };
+
   const drillByStatus = (status: string) => {
     setSearchParams({ status });
   };
@@ -367,11 +389,11 @@ export const ExecDashboard = () => {
               Export CSV
             </button>
             <button
-              onClick={handleExportCsv}
+              onClick={handleExportPdf}
               disabled={exporting}
               className="px-3 py-1.5 text-xs font-medium border border-sigap-border rounded-md hover:bg-sigap-border transition-colors disabled:opacity-50"
             >
-              Export PDF
+              Ekspor PDF
             </button>
             <button
               onClick={handleExportGeoJSON}

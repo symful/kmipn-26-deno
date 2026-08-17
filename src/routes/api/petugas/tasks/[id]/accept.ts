@@ -9,7 +9,7 @@ import { logger } from "@/lib/logger";
 
 export const petugasAcceptRoute = new Hono<{ Bindings: Env; Variables: AuthVariables }>();
 
-petugasAcceptRoute.post("/:id", requireAuth, requireRole("PETUGAS", "ADMIN"), safeHandler(async (c) => {
+petugasAcceptRoute.post("/", requireAuth, requireRole("PETUGAS", "ADMIN"), safeHandler(async (c) => {
   const user = c.get("user");
   const taskId = c.req.param("id");
   if (!taskId) return c.json({ error: { code: "MISSING_TASK_ID", message: "Task ID is required" } }, 400);
@@ -74,7 +74,7 @@ petugasAcceptRoute.post("/:id", requireAuth, requireRole("PETUGAS", "ADMIN"), sa
     return c.json({ error: { code: "INVALID_STATUS", message: `Task is already '${result.current}' and cannot be accepted/rejected` } }, 409);
   }
 
-  await appendAudit(c.env, {
+  await appendAudit(c.env, { activeRole: c.get("user").role,
     actor: user.sub,
     action: accept ? "petugas_task_accept" : "petugas_task_reject",
     objectType: "petugas_task",

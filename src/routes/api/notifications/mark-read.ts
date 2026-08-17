@@ -29,7 +29,7 @@ markReadRoute.post(
           [userId]
         );
       });
-      appendAudit(c.env, {
+      appendAudit(c.env, { activeRole: c.get("user").role,
         actor: userId,
         action: "notification_mark_read",
         objectType: "notification",
@@ -55,7 +55,7 @@ markReadRoute.post(
       return res.rowCount;
     });
 
-    appendAudit(c.env, {
+    appendAudit(c.env, { activeRole: c.get("user").role,
       actor: userId,
       action: "notification_mark_read",
       objectType: "notification",

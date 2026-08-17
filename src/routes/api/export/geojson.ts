@@ -50,7 +50,7 @@ exportGeojsonRoute.get(
     });
 
     const action = "export_geojson";
-    appendAudit(c.env, {
+    appendAudit(c.env, { activeRole: c.get("user").role,
       actor: c.get("user").sub,
       action,
       objectType: "report_export",

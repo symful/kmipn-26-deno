@@ -58,6 +58,14 @@ export interface Env {
   RETRY_MAX_ATTEMPTS?: string;
   /** Batch limit for failed assessments retry */
   RETRY_BATCH_LIMIT?: string;
+  /** Set to "true" to enable the test reset endpoint */
+  ENABLE_TEST_RESET?: string;
+  /** Secret key required to call the test reset endpoint */
+  TEST_RESET_SECRET?: string;
+  /** Secret for Turnstile captcha verification */
+  CAPTCHA_SECRET?: string;
+  /** Site key for Turnstile widget (frontend uses this) */
+  CAPTCHA_SITE_KEY?: string;
 }
 
 declare global {

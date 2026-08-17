@@ -29,7 +29,7 @@ authRefreshRoute.post(
         await revokeRefreshToken(c.env, oldJti, new Date(payload.exp * 1000));
       }
       if (c.env.DISABLE_LOGIN_AUDIT !== "true") {
-        await appendAudit(c.env, { actor: payload.sub, actorRole: payload.role as string, action: "token_refresh", objectType: "user", objectId: payload.sub, after: { role: payload.role } }).catch((e) => logger.error({ route: "/api/auth/refresh", method: "POST", error: e instanceof Error ? e : new Error(String(e)), context: "audit_write_failed" }));
+        await appendAudit(c.env, { activeRole: c.get("user").role, actor: payload.sub, actorRole: payload.role as string, action: "token_refresh", objectType: "user", objectId: payload.sub, after: { role: payload.role } }).catch((e) => logger.error({ route: "/api/auth/refresh", method: "POST", error: e instanceof Error ? e : new Error(String(e)), context: "audit_write_failed" }));
       }
       return c.json({ access_token, refresh_token, expires_in: 900 });
     } catch {

@@ -550,6 +550,16 @@ export const api = {
       { token: true, responseType: "blob" }
     ),
 
+  exportPdf: (params?: { status?: string; category_id?: string; wilayah_id?: string; from?: string; to?: string }) =>
+    request<Blob>(
+      `/export/pdf${
+        params
+          ? `?${Object.entries(params).filter(([, v]) => v != null).map(([k, v]) => `${k}=${encodeURIComponent(String(v))}`).join("&")}`
+          : ""
+      }`,
+      { token: true, responseType: "blob" }
+    ),
+
   outboxList: (params?: { status?: string; target_system?: string; page?: number; limit?: number }) =>
     request<PaginatedOutboxResponse>(
       `/outbox${

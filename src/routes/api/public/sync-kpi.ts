@@ -9,7 +9,9 @@ const SyncKpiSchema = z.object({
   device_id: z.string().min(1).max(255),
   platform: z.string().min(1).max(50),
   reports_count: z.number().int().min(0).default(0),
-  last_sync_at: z.string().datetime().optional(),
+  last_sync_at: z.string().refine((val) => !isNaN(Date.parse(val)), {
+    message: "Invalid ISO 8601 datetime",
+  }).optional(),
 });
 
 export const publicSyncKpiRoute = new Hono<{ Bindings: Env }>();

@@ -39,6 +39,7 @@ import { publicCasesRoute } from "@/routes/api/public/cases/[id]";
 import { publicCategoriesRoute } from "@/routes/api/public/categories";
 import { publicStatsRoute } from "@/routes/api/public/stats";
 import { publicHealthRoute } from "@/routes/api/public/health";
+import { anonymousReportsRoute } from "@/routes/api/public/anonymous-reports";
 import { agentAssessRoute } from "@/routes/api/agent/assess";
 import { agentAssessmentsRoute } from "@/routes/api/agent/assessments";
 import { surveyorTasksRoute } from "@/routes/api/surveyor/tasks";
@@ -115,7 +116,11 @@ import { executiveTrendAnalysisRoute } from "@/routes/api/executive/trend-analys
 import { wargaSanggahanRoute } from "@/routes/api/warga/sanggahan/[id]";
 import { wargaReopenRoute } from "@/routes/api/warga/reopen/[id]";
 import { wargaEvidenceRoute } from "@/routes/api/warga/evidence/[id]";
+import { wargaStatsRoute } from "@/routes/api/warga/stats";
 import { geocodeRoute } from "@/routes/api/geocode/reverse";
+import { testResetRoute } from "@/routes/api/test/reset";
+import { testQueryRoute } from "@/routes/api/test/query";
+import { debugReportRoute } from "@/routes/api/test/debug-report";
 
 const app = new Hono<{ Bindings: Env; Variables: AuthVariables }>();
 
@@ -174,6 +179,7 @@ app.route("/api/public/cases", publicCasesRoute);
 app.route("/api/public/categories", publicCategoriesRoute);
 app.route("/api/public/stats", publicStatsRoute);
 app.route("/api/public/health", publicHealthRoute);
+app.route("/api/public/anonymous-reports", anonymousReportsRoute);
 app.route("/api/agent/assess", agentAssessRoute);
 app.route("/api/agent/assessments", agentAssessmentsRoute);
 
@@ -250,13 +256,19 @@ app.route("/api/executive/trend-analysis", executiveTrendAnalysisRoute);
 app.route("/api/warga/sanggahan/:id", wargaSanggahanRoute);
 app.route("/api/warga/reopen/:id", wargaReopenRoute);
 app.route("/api/warga/evidence/:id", wargaEvidenceRoute);
+app.route("/api/warga/stats", wargaStatsRoute);
 app.route("/api/geocode", geocodeRoute);
+app.route("/api/test/reset", testResetRoute);
+app.route("/api/test/query", testQueryRoute);
+app.route("/api/test/debug-report", debugReportRoute);
 
 app.onError((err, c) => {
+  const errorId = crypto.randomUUID();
   logger.error({
     route: c.req.path,
     method: c.req.method,
     error: err,
+    errorId,
     user_id: c.get("user")?.sub,
   });
   return c.json(
@@ -264,6 +276,8 @@ app.onError((err, c) => {
       error: {
         code: "INTERNAL_ERROR",
         message: err.message || String(err),
+        stack: String(err.stack),
+        errorId,
       },
     },
     500,

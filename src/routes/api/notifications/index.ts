@@ -40,7 +40,7 @@ notificationsRoute.get(
       };
     });
 
-    appendAudit(c.env, {
+    appendAudit(c.env, { activeRole: c.get("user").role,
       actor: userId,
       action: "notification_read",
       objectType: "notification",

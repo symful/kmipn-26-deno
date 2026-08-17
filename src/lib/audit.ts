@@ -5,6 +5,7 @@ import type { Env } from "@/types/bindings";
 export interface AuditEntry {
   actor: string;
   actorRole?: string;
+  activeRole?: string;
   action: string;
   objectType: string;
   objectId: string;
@@ -29,7 +30,7 @@ export async function appendAudit(env: Env, entry: AuditEntry): Promise<void> {
     await c.query(
       `INSERT INTO audit_log (actor, actor_role, action, object_type, object_id, before_data, after_data, reason, created_at)
        VALUES ($1, $2, $3, $4, $5, $6::jsonb, $7::jsonb, $8, NOW())`,
-      [entry.actor, entry.actorRole ?? null, entry.action, entry.objectType, entry.objectId, beforeStr, afterStr, reasonStr]
+      [entry.actor, entry.activeRole ?? entry.actorRole ?? null, entry.action, entry.objectType, entry.objectId, beforeStr, afterStr, reasonStr]
     );
   });
 }

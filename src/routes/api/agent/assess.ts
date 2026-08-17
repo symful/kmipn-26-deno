@@ -53,7 +53,7 @@ agentAssessRoute.post(
 
     const summary = await runAssessment(c.env, parsed.data.report_id);
 
-    await appendAudit(c.env, {
+    await appendAudit(c.env, { activeRole: c.get("user").role,
       actor: user.sub,
       action: "ai_assessment",
       objectType: "report",

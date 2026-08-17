@@ -11,7 +11,7 @@ const UUID_REGEX = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12
 
 export const petugasEvidenceRoute = new Hono<{ Bindings: Env; Variables: AuthVariables }>();
 
-petugasEvidenceRoute.post("/:id", requireAuth, requireRole("PETUGAS", "ADMIN"), safeHandler(async (c) => {
+petugasEvidenceRoute.post("/", requireAuth, requireRole("PETUGAS", "ADMIN"), safeHandler(async (c) => {
   const user = c.get("user");
   const taskId = c.req.param("id");
   if (!taskId) return c.json({ error: { code: "MISSING_TASK_ID", message: "Task ID is required" } }, 400);
@@ -70,7 +70,7 @@ petugasEvidenceRoute.post("/:id", requireAuth, requireRole("PETUGAS", "ADMIN"), 
     return c.json({ error: { code: "INVALID_STATUS", message: `Cannot add evidence to task in '${result.current}' status` } }, 409);
   }
 
-  await appendAudit(c.env, {
+  await appendAudit(c.env, { activeRole: c.get("user").role,
     actor: user.sub,
     action: "petugas_task_evidence",
     objectType: "petugas_task",
