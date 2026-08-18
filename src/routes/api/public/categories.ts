@@ -8,7 +8,7 @@ export const publicCategoriesRoute = new Hono<{ Bindings: Env }>();
 publicCategoriesRoute.get("/", safeHandler(async (c) => {
   const categories = await withClient(c.env, async (client) => {
     const r = await client.query(
-      `SELECT id, name, slug, icon, short_code, parent_id
+      `SELECT id, name, slug, icon, short_code
        FROM categories
        ORDER BY name`
     );

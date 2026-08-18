@@ -80,7 +80,7 @@ testResetRoute.post(
           try {
             const hash = await bcrypt.hash(acct.password, 4);
             await client.query(
-              "INSERT INTO users (email, password_hash, name, role, created_at, updated_at) VALUES ($1, $2, $3, $4, NOW(), NOW())",
+              "INSERT INTO users (email, password_hash, name, role, created_at, updated_at) VALUES ($1, $2, $3, $4, NOW(), NOW()) ON CONFLICT (email) DO UPDATE SET password_hash = EXCLUDED.password_hash, name = EXCLUDED.name, role = EXCLUDED.role, updated_at = NOW()",
               [acct.email, hash, acct.name, acct.role]
             );
             seeded++;

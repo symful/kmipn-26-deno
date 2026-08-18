@@ -85,11 +85,15 @@ export async function isRefreshTokenRevoked(env: Env, jti: string): Promise<bool
 }
 
 export async function hashPassword(plain: string): Promise<string> {
-  return await bcrypt.hash(plain, 12);
+  return await bcrypt.hash(plain, 4);
 }
 
 export async function verifyPassword(plain: string, hash: string): Promise<boolean> {
-  return await bcrypt.compare(plain, hash);
+  try {
+    return await bcrypt.compare(plain, hash);
+  } catch {
+    return false;
+  }
 }
 
 export const requireAuth: MiddlewareHandler<{ Bindings: Env; Variables: AuthVariables }> = async (c, next) => {
@@ -109,6 +113,7 @@ export const requireAuth: MiddlewareHandler<{ Bindings: Env; Variables: AuthVari
       } else {
         return c.json({
           error: "active_role_not_granted",
+          message: `Role '${activeRole}' not in user's granted roles`,
           current_role: payload.role,
           requested_role: activeRole
         }, 403);

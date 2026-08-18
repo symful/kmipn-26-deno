@@ -1,4 +1,4 @@
-import { BrowserRouter, Routes, Route } from "react-router-dom";
+import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import { ErrorBoundary } from "./components/ErrorBoundary";
 import { ToastContainer } from "./components/Toast";
 import { PublicHome } from "./pages/public/Home";
@@ -56,7 +56,9 @@ export const App = () => {
           <Route path="/peta" element={<PublicCaseList />} />
           <Route path="/statistics" element={<PublicStatistics />} />
           <Route path="/public/submit" element={<SubmitReport />} />
+          <Route path="/anon" element={<SubmitReport />} />
           <Route path="/admin/login" element={<AdminLogin />} />
+          <Route path="/login" element={<Navigate to="/admin/login" replace />} />
           <Route
             path="admin"
             element={
@@ -106,15 +108,15 @@ export const App = () => {
               </ProtectedRoute>
             }
           />
-          <Route path="/verify/public" element={<TokenVerify />} />
           <Route
-            path="/verify"
+            path="/verify/auth"
             element={
               <RoleGuard roles={["RT_RW", "ADMIN"]}>
                 <VerifyReport />
               </RoleGuard>
             }
           />
+          <Route path="/verify" element={<TokenVerify />} />
           <Route
             path="/verify/training"
             element={

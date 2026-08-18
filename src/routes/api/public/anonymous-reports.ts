@@ -125,7 +125,7 @@ anonymousReportsRoute.post(
       return client.query<{ id: string }>(
         `SELECT w.id FROM wilayah w
          WHERE w.geom IS NOT NULL
-           AND ST_Contains(w.geom, ST_MakePoint($1, $2)::geometry)
+           AND ST_Contains(w.geom, ST_SetSRID(ST_MakePoint($1, $2), 4326)::geometry)
          ORDER BY w.level ASC LIMIT 1`,
         [parsed.data.lng, parsed.data.lat]
       );
@@ -143,7 +143,7 @@ anonymousReportsRoute.post(
         `INSERT INTO reports
            (idempotency_key, category_id, description, geom, location, lat, lng, photo_urls, status,
             created_at, updated_at, reporter_id, wilayah_id, title, reported_at, population_affected, vulnerability_index)
-          VALUES ($1, $2, $3, ST_SetSRID(ST_MakePoint($4, $5), 4326)::geometry, ST_MakePoint($4, $5)::geography, $5, $4, $6, 'submitted',
+           VALUES ($1, $2, $3, ST_SetSRID(ST_MakePoint($4, $5), 4326)::geometry, ST_SetSRID(ST_MakePoint($4, $5), 4326)::geography, $5, $4, $6, 'submitted',
                   NOW(), NOW(), NULL, $7, $8, NOW(), 0, 0.5)
           RETURNING id`,
         [
@@ -166,6 +166,7 @@ anonymousReportsRoute.post(
       action: "anonymous_report_create",
       objectType: "report",
       objectId: reportId,
+      before: null,
       after: {
         idempotency_key: parsed.data.idempotency_key,
         category_id: parsed.data.category_id,

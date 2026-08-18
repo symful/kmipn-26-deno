@@ -1,12 +1,9 @@
-import { Hono } from "hono";
 import type { Env } from "@/types/bindings";
 import { requireAuth } from "@/lib/auth";
 import { safeHandler } from "@/lib/safeHandler";
 import { withClient } from "@/lib/db";
 
-export const reportTimelineRoute = new Hono<{ Bindings: Env }>();
-
-reportTimelineRoute.get("/", requireAuth, safeHandler(async (c) => {
+export const reportTimelineHandler = safeHandler(async (c) => {
   const reportId = c.req.param("id");
   if (!reportId) {
     return c.json({ error: { code: "MISSING_REPORT_ID", message: "Report ID is required" } }, 400);
@@ -31,4 +28,6 @@ reportTimelineRoute.get("/", requireAuth, safeHandler(async (c) => {
   });
 
   return c.json({ events });
-}));
+});
+
+export const reportTimelineRoute = reportTimelineHandler;

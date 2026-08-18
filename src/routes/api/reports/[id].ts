@@ -11,7 +11,7 @@ import { evaluatePriority } from "@/lib/priority/calculator";
 export const reportByIdRoute = new Hono<{ Bindings: Env }>();
 
 reportByIdRoute.get(
-  "/:id",
+  "/",
   requireAuth,
   safeHandler(async (c) => {
     const id = c.req.param("id");
@@ -39,7 +39,7 @@ reportByIdRoute.get(
 );
 
 reportByIdRoute.patch(
-  "/:id",
+  "/",
   requireAuth,
   safeHandler(async (c) => {
     const id = c.req.param("id");
@@ -50,7 +50,7 @@ reportByIdRoute.patch(
     if (!parsed.success) return c.json({ error: { code: "VALIDATION_ERROR", message: "Invalid request data" }, details: parsed.error.flatten() }, 400);
 
     const updated = await withClient(c.env, async (client) => {
-      let beforeQuery = `SELECT id, status, description, priority, assigned_to FROM reports WHERE id = $1`;
+      let beforeQuery = `SELECT id, status, description, priority, assigned_to, reporter_id FROM reports WHERE id = $1`;
       const beforeParams: unknown[] = [id];
 
       if (!isAdminOrAuditor && user.wilayah_id) {
@@ -60,6 +60,10 @@ reportByIdRoute.patch(
 
       const before = await client.query(beforeQuery, beforeParams);
       if (!before.rows[0]) return null;
+
+      if (!isAdminOrAuditor && before.rows[0].reporter_id !== user.sub) {
+        return { forbidden: true };
+      }
 
       const fields: string[] = [];
       const params: unknown[] = [];
@@ -90,6 +94,7 @@ reportByIdRoute.patch(
     });
 
     if (!updated) return c.json({ error: { code: "NOT_FOUND", message: "Resource not found" } }, 404);
+    if ((updated as { forbidden?: boolean }).forbidden) return c.json({ error: { code: "FORBIDDEN", message: "Not authorized to update this report" } }, 403);
 
     const statusChanged = parsed.data.status !== undefined;
     if (statusChanged) {
@@ -101,5 +106,42 @@ reportByIdRoute.patch(
     }
 
     return c.json(updated);
+  }),
+);
+
+reportByIdRoute.delete(
+  "/",
+  requireAuth,
+  safeHandler(async (c) => {
+    const id = c.req.param("id");
+    const user = c.get("user");
+    const isAdminOrAuditor = user.role === "ADMIN" || user.role === "AUDITOR";
+
+    const deleted = await withClient(c.env, async (client) => {
+      let checkQuery = `SELECT id, reporter_id FROM reports WHERE id = $1`;
+      const checkParams: unknown[] = [id];
+
+      if (!isAdminOrAuditor && user.wilayah_id) {
+        checkQuery += ` AND wilayah_id = $2`;
+        checkParams.push(user.wilayah_id);
+      }
+
+      const check = await client.query(checkQuery, checkParams);
+      if (!check.rows[0]) return null;
+
+      const report = check.rows[0];
+
+      if (!isAdminOrAuditor && report.reporter_id !== user.sub) {
+        return { forbidden: true };
+      }
+
+      await client.query("DELETE FROM reports WHERE id = $1", [id]);
+      return { id };
+    });
+
+    if (!deleted) return c.json({ error: { code: "NOT_FOUND", message: "Resource not found" } }, 404);
+    if ((deleted as { forbidden?: boolean }).forbidden) return c.json({ error: { code: "FORBIDDEN", message: "Not authorized to delete this report" } }, 403);
+
+    return c.json({ success: true, deleted_id: id });
   }),
 );

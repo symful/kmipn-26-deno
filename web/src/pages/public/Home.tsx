@@ -159,7 +159,7 @@ export const PublicHome = () => {
             Masuk
           </Link>
           <Link
-            to="/warga/new"
+            to="/public/submit"
             className="px-3.5 py-2 rounded-lg font-semibold hover:opacity-90 transition-opacity"
             style={{
               fontSize: 12.5,
@@ -169,7 +169,7 @@ export const PublicHome = () => {
               color: "#fff",
             }}
           >
-            Buat Laporan
+            Lapor Tanpa Akun
           </Link>
         </div>
       </header>

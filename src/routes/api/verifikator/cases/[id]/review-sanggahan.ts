@@ -11,7 +11,7 @@ import { VerifikatorReviewSanggahanSchema } from "@/lib/schemas";
 
 export const reviewSanggahanRoute = new Hono<{ Bindings: Env; Variables: AuthVariables }>();
 
-reviewSanggahanRoute.post("/review-sanggahan", requireAuth, requireRole("VERIFIKATOR", "ADMIN"), safeHandler(async (c) => {
+reviewSanggahanRoute.post("/", requireAuth, requireRole("VERIFIKATOR", "ADMIN"), safeHandler(async (c) => {
   const user = c.get("user");
   const id = c.req.param("id");
   if (!id) return c.json({ error: { code: "MISSING_ID", message: "ID is required" } }, 400);

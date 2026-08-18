@@ -71,3 +71,18 @@ agentAssessmentsRoute.get(
     return c.json({ assessment });
   }),
 );
+
+agentAssessmentsRoute.post(
+  "/:id",
+  requireAuth,
+  requireRole("ADMIN", "OPERATOR", "VERIFIKATOR"),
+  safeHandler(async (c) => {
+    const id = c.req.param("id");
+    if (!id) return c.json({ error: { code: "MISSING_ID" } }, 400);
+
+    const { runAssessment } = await import("@/lib/agent/orchestrator");
+    c.executionCtx.waitUntil(runAssessment(c.env, id).catch((e) => console.error(e)));
+
+    return c.json({ status: "assessment_started", report_id: id });
+  }),
+);

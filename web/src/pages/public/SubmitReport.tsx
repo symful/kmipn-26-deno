@@ -47,7 +47,7 @@ export const SubmitReport = () => {
   const [gps, setGps] = useState<GpsState>({ loading: false, error: null, permissionDenied: false });
 
   useEffect(() => {
-    fetch(`${API_BASE}/api/categories`, {
+    fetch(`${API_BASE}/api/public/categories`, {
       headers: { "Content-Type": "application/json" },
     })
       .then((res) => res.json())

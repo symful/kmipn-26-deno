@@ -10,8 +10,49 @@ import { getConfig } from "@/config/env";
 
 export const shareRoute = new Hono<{ Bindings: Env; Variables: AuthVariables }>();
 
+shareRoute.get(
+  "/",
+  requireAuth,
+  safeHandler(async (c) => {
+    const id = c.req.param("id");
+    const user = c.get("user");
+
+    const result = await withClient(c.env, async (client) => {
+      const share = await client.query(
+        `SELECT rs.report_id, rs.share_token, rs.expires_at, rs.created_by, r.reporter_id
+         FROM report_shares rs
+         JOIN reports r ON r.id = rs.report_id
+         WHERE rs.report_id = $1`,
+        [id]
+      );
+      if (!share.rows[0]) return null;
+      return share.rows[0];
+    });
+
+    if (!result) {
+      return c.json({ error: { code: "NOT_FOUND", message: "Share token tidak ditemukan" } }, 404);
+    }
+
+    const elevatedRoles = ["ADMIN", "VERIFIKATOR", "OPERATOR"];
+    if (!elevatedRoles.includes(user.role) && result.reporter_id !== user.sub) {
+      return c.json({ error: { code: "FORBIDDEN", message: "Tidak memiliki akses ke share ini" } }, 403);
+    }
+
+    const baseUrl = c.env.APP_BASE_URL;
+    if (!baseUrl) {
+      throw new Error("APP_BASE_URL is not configured");
+    }
+    const shareUrl = `${baseUrl}/public/report/${result.share_token}`;
+
+    return c.json({
+      share_url: shareUrl,
+      expires_at: result.expires_at.toISOString(),
+    });
+  }),
+);
+
 shareRoute.post(
-  "/:id",
+  "/",
   requireAuth,
   requireRole("VERIFIKATOR", "ADMIN", "OPERATOR"),
   safeHandler(async (c) => {

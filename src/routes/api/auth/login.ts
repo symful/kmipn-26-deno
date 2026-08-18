@@ -18,13 +18,19 @@ authLoginRoute.post(
     const parsed = LoginSchema.safeParse(body);
     if (!parsed.success) return c.json({ error: { code: "VALIDATION_ERROR", message: "Invalid request data" }, details: parsed.error.flatten() }, 400);
 
-    const user = await withClient(c.env, async (client: PgClient) => {
-      const r = await client.query(
-        "SELECT id, email, password_hash, name, role, wilayah_id FROM users WHERE email = $1 AND deleted_at IS NULL",
-        [parsed.data.email]
-      );
-      return r.rows[0];
-    });
+    let user;
+    try {
+      user = await withClient(c.env, async (client: PgClient) => {
+        const r = await client.query(
+          "SELECT id, email, password_hash, name, role, wilayah_id FROM users WHERE email = $1 AND deleted_at IS NULL",
+          [parsed.data.email]
+        );
+        return r.rows[0];
+      });
+    } catch (e) {
+      logger.error({ route: "/api/auth/login", method: "POST", context: "db_error", error: e instanceof Error ? e : new Error(String(e)) });
+      return c.json({ error: { code: "INVALID_CREDENTIALS", message: "Invalid email or password" } }, 401);
+    }
 
     if (!user || !(await verifyPassword(parsed.data.password, user.password_hash as string))) {
       return c.json({ error: { code: "INVALID_CREDENTIALS", message: "Invalid email or password" } }, 401);
@@ -47,19 +53,37 @@ authLoginRoute.post(
       }, 500);
     }
 
-    const access_token = await signAccessToken(c.env, {
-      sub: user.id,
-      role: user.role as Role,
-      wilayah_id: (user.wilayah_id as string | null) ?? null,
-      email: user.email,
-    });
-    const refresh_token = await signRefreshToken(c.env, {
-      sub: user.id,
-      role: user.role as Role,
-      wilayah_id: (user.wilayah_id as string | null) ?? null,
-      email: user.email,
-      jti,
-    });
+    let access_token: string;
+    let refresh_token: string;
+    try {
+      access_token = await signAccessToken(c.env, {
+        sub: user.id,
+        role: user.role as Role,
+        wilayah_id: (user.wilayah_id as string | null) ?? null,
+        email: user.email,
+      });
+      refresh_token = await signRefreshToken(c.env, {
+        sub: user.id,
+        role: user.role as Role,
+        wilayah_id: (user.wilayah_id as string | null) ?? null,
+        email: user.email,
+        jti,
+      });
+    } catch (tokenErr) {
+      logger.error({
+        route: "/api/auth/login",
+        method: "POST",
+        error: tokenErr instanceof Error ? tokenErr : new Error(String(tokenErr)),
+        context: "token_signing_failed",
+        user_id: user.id,
+      });
+      return c.json({
+        error: {
+          code: "TOKEN_ERROR",
+          message: "Failed to generate authentication tokens. Please try again.",
+        },
+      }, 500);
+    }
 
     return c.json({
       access_token,

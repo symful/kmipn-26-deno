@@ -26,6 +26,7 @@ authLogoutRoute.post("/", requireAuth, safeHandler(async (c) => {
         await revokeRefreshToken(c.env, payload.jti, new Date(payload.exp * 1000));
       } catch (e) {
         logger.error({ route: "/api/auth/logout", method: "POST", context: "revoke_token_error", error: e instanceof Error ? e : new Error(String(e)) });
+        return c.json({ error: { code: "REVOCATION_FAILED", message: "Failed to revoke token" } }, 500);
       }
     }
     if (c.env.DISABLE_LOGIN_AUDIT !== "true") {

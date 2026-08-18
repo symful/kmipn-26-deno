@@ -1,4 +1,4 @@
-import { H as Hono, c as cspMiddleware, h as healthRoute, a as clientErrorsRoute, b as categoriesRoute, w as wilayahRoute, d as wilayahBoundaryRoute, e as authLoginRoute, f as authRefreshRoute, g as authLogoutRoute, r as registerVerifikatorRoute, i as reportsIndexRoute, j as reportsStatsRoute, k as reportsHeatmapRoute, s as shareFilterRoute, l as reportsNearbyRoute, m as sharedFilterRoute, n as reportByIdRoute, p as priorityRoute, o as photosUploadUrlRoute, q as closeRoute, t as shareRoute, u as escalateRoute, v as resolveRoute, x as assignRoute, y as reportTimelineRoute, z as reportSupportingRoute, A as reportsDuplicatesRoute, B as exportGeojsonRoute, C as exportCsvRoute, D as publicGeojsonRoute, E as publicReportsGeojsonRoute, F as publicReportsRoute, G as publicReportsClusterRoute, I as publicCasesRoute, J as publicCategoriesRoute, K as publicStatsRoute, L as publicHealthRoute, M as agentAssessRoute, N as agentAssessmentsRoute, O as surveyorTasksRoute, P as surveyorTaskDetailRoute, Q as surveyorVisitRoute, R as surveyorChecklistTemplateRoute, S as surveyorTaskAcceptRoute, T as surveyorTaskStartRoute, U as rtRwVerifyRoute, V as generateRtRwTokenRoute, W as adminUsersRoute, X as verifikatorQueueRoute, Y as verifikatorCaseRoute, Z as acceptRoute, _ as combineRoute, $ as separateRoute, a0 as rejectRoute, a1 as decideRoute, a2 as reviewSanggahanRoute, a3 as verifyCompletionRoute, a4 as auditSearchRoute, a5 as auditExportRoute, a6 as publicSyncKpiRoute, a7 as outboxRoute, a8 as outboxDlqRoute, a9 as outboxProcessRoute, aa as meDataRoute, ab as outboxRetryRoute, ac as notificationsRoute, ad as markReadRoute, ae as unitsRoute, af as adminChecklistTemplatesRoute, ag as priorityConfigRoute, ah as adminOutboxRoute, ai as adminFailedAssessmentsRoute, aj as retryBatchRoute, ak as inboundWebhookRoute, al as adminDaerahDashboardRoute, am as adminDaerahCasesRoute, an as adminDaerahOperatorsRoute, ao as adminDaerahPetugasRoute, ap as adminDaerahStatsRoute, aq as adminDaerahSlaRoute, ar as adminDaerahSlaDetailRoute, as as adminDaerahUnitsRoute, at as adminDaerahUnitsDetailRoute, au as operatorIndexRoute, av as operatorStatsRoute, aw as operatorMergeRoute, ax as operatorSeparateRoute, ay as operatorPriorityRoute, az as operatorAssignRoute, aA as operatorEscalateRoute, aB as operatorSlaRoute, aC as operatorQueueCountsRoute, aD as operatorBacklogRoute, aE as reportImpactRoute, aF as petugasTasksRoute, aG as petugasTaskDetailRoute, aH as petugasAcceptRoute, aI as petugasProgressRoute, aJ as petugasEvidenceRoute, aK as petugasCompleteRoute, aL as petugasClarificationRoute, aM as petugasRejectRoute, aN as auditorAuditSearchRoute, aO as auditorAuditExportRoute, aP as auditorSystemLogsRoute, aQ as auditorStatsRoute, aR as executiveDashboardRoute, aS as executiveRegionalStatsRoute, aT as executiveTrendAnalysisRoute, aU as wargaSanggahanRoute, aV as wargaReopenRoute, aW as wargaEvidenceRoute, aX as geocodeRoute, aY as logger, aZ as processStuckOutbox, a_ as processPendingOutbox, a$ as processFailedAssessments, b0 as cleanupRevokedTokens } from "./assets/reverse-CFpAs7pE.js";
+import { H as Hono, c as cspMiddleware, h as healthRoute, a as clientErrorsRoute, b as categoriesRoute, w as wilayahRoute, d as wilayahBoundaryRoute, e as authLoginRoute, f as authRefreshRoute, g as authLogoutRoute, i as authMeRoute, j as authValidateRoleRoute, r as registerWargaRoute, k as registerVerifikatorRoute, l as reportsIndexRoute, m as reportsStatsRoute, n as reportsHeatmapRoute, s as shareFilterRoute, o as reportsNearbyRoute, p as sharedFilterRoute, q as requireAuth, t as reportTimelineHandler, u as reportByIdRoute, v as priorityRoute, x as photosUploadUrlRoute, y as closeRoute, z as shareRoute, A as escalateRoute, B as resolveRoute, C as assignRoute, D as reportSupportingRoute, E as reportsDuplicatesRoute, F as exportGeojsonRoute, G as exportCsvRoute, I as exportPdfRoute, J as publicGeojsonRoute, K as publicReportsGeojsonRoute, L as publicReportsClusterRoute, M as publicReportsRoute, N as publicCasesRoute, O as publicCategoriesRoute, P as publicStatsRoute, Q as publicHealthRoute, R as anonymousReportsRoute, S as agentAssessRoute, T as agentAssessmentsRoute, U as surveyorTasksRoute, V as surveyorTaskDetailRoute, W as surveyorVisitRoute, X as surveyorChecklistTemplateRoute, Y as surveyorTaskAcceptRoute, Z as surveyorTaskStartRoute, _ as rtRwVerifyRoute, $ as generateRtRwTokenRoute, a0 as adminUsersRoute, a1 as verifikatorQueueRoute, a2 as verifikatorCaseRoute, a3 as acceptRoute, a4 as combineRoute, a5 as separateRoute, a6 as rejectRoute, a7 as decideRoute, a8 as reviewSanggahanRoute, a9 as verifyCompletionRoute, aa as auditSearchRoute, ab as auditExportRoute, ac as publicSyncKpiRoute, ad as outboxRoute, ae as outboxDlqRoute, af as outboxProcessRoute, ag as meDataRoute, ah as outboxRetryRoute, ai as notificationsRoute, aj as markReadRoute, ak as unitsRoute, al as adminChecklistTemplatesRoute, am as priorityConfigRoute, an as adminOutboxRoute, ao as adminFailedAssessmentsRoute, ap as retryBatchRoute, aq as inboundWebhookRoute, ar as adminDaerahDashboardRoute, as as adminDaerahCasesRoute, at as adminDaerahOperatorsRoute, au as adminDaerahPetugasRoute, av as adminDaerahStatsRoute, aw as adminDaerahSlaRoute, ax as adminDaerahSlaDetailRoute, ay as adminDaerahUnitsRoute, az as adminDaerahUnitsDetailRoute, aA as operatorIndexRoute, aB as operatorStatsRoute, aC as operatorMergeRoute, aD as operatorSeparateRoute, aE as operatorPriorityRoute, aF as operatorAssignRoute, aG as operatorEscalateRoute, aH as operatorSlaRoute, aI as operatorQueueCountsRoute, aJ as operatorBacklogRoute, aK as reportImpactRoute, aL as petugasTasksRoute, aM as petugasTaskDetailRoute, aN as petugasAcceptRoute, aO as petugasProgressRoute, aP as petugasEvidenceRoute, aQ as petugasCompleteRoute, aR as petugasClarificationRoute, aS as petugasRejectRoute, aT as auditorAuditSearchRoute, aU as auditorAuditExportRoute, aV as auditorSystemLogsRoute, aW as auditorStatsRoute, aX as executiveDashboardRoute, aY as executiveRegionalStatsRoute, aZ as executiveTrendAnalysisRoute, a_ as wargaSanggahanRoute, a$ as wargaReopenRoute, b0 as wargaEvidenceRoute, b1 as wargaStatsRoute, b2 as geocodeRoute, b3 as testResetRoute, b4 as testSeedRoute, b5 as testQueryRoute, b6 as debugReportRoute, b7 as logger, b8 as processStuckOutbox, b9 as processPendingOutbox, ba as processFailedAssessments, bb as cleanupRevokedTokens } from "./assets/debug-report-Bmh99tUE.js";
 import "events";
 import "crypto";
 import "dns";
@@ -33,6 +33,9 @@ app.route("/api/wilayah/:id/boundary", wilayahBoundaryRoute);
 app.route("/api/auth/login", authLoginRoute);
 app.route("/api/auth/refresh", authRefreshRoute);
 app.route("/api/auth/logout", authLogoutRoute);
+app.route("/api/auth/me", authMeRoute);
+app.route("/api/auth/validate-role", authValidateRoleRoute);
+app.route("/api/auth/register", registerWargaRoute);
 app.route("/api/auth/register-verifikator", registerVerifikatorRoute);
 app.route("/api/reports", reportsIndexRoute);
 app.route("/api/reports/stats", reportsStatsRoute);
@@ -40,6 +43,7 @@ app.route("/api/reports/heatmap", reportsHeatmapRoute);
 app.route("/api/reports/share-filter", shareFilterRoute);
 app.route("/api/reports/nearby", reportsNearbyRoute);
 app.route("/api/shared/:token", sharedFilterRoute);
+app.get("/api/reports/:id/timeline", requireAuth, reportTimelineHandler);
 app.route("/api/reports/:id", reportByIdRoute);
 app.route("/api/reports/:id/priority", priorityRoute);
 app.route("/api/reports/:id/photos/upload-url", photosUploadUrlRoute);
@@ -48,19 +52,20 @@ app.route("/api/reports/:id/share", shareRoute);
 app.route("/api/reports/:id/escalate", escalateRoute);
 app.route("/api/reports/:id/resolve", resolveRoute);
 app.route("/api/reports/:id/assign", assignRoute);
-app.route("/api/reports/:id/timeline", reportTimelineRoute);
 app.route("/api/reports/:id/supporting", reportSupportingRoute);
 app.route("/api/reports/duplicates", reportsDuplicatesRoute);
 app.route("/api/export/geojson", exportGeojsonRoute);
 app.route("/api/export/csv", exportCsvRoute);
+app.route("/api/export/pdf", exportPdfRoute);
 app.route("/api/public/geojson", publicGeojsonRoute);
 app.route("/api/public/reports.geojson", publicReportsGeojsonRoute);
-app.route("/api/public/reports", publicReportsRoute);
 app.route("/api/public/reports/cluster", publicReportsClusterRoute);
+app.route("/api/public/reports", publicReportsRoute);
 app.route("/api/public/cases", publicCasesRoute);
 app.route("/api/public/categories", publicCategoriesRoute);
 app.route("/api/public/stats", publicStatsRoute);
 app.route("/api/public/health", publicHealthRoute);
+app.route("/api/public/anonymous-reports", anonymousReportsRoute);
 app.route("/api/agent/assess", agentAssessRoute);
 app.route("/api/agent/assessments", agentAssessmentsRoute);
 app.route("/api/surveyor/tasks", surveyorTasksRoute);
@@ -136,19 +141,28 @@ app.route("/api/executive/trend-analysis", executiveTrendAnalysisRoute);
 app.route("/api/warga/sanggahan/:id", wargaSanggahanRoute);
 app.route("/api/warga/reopen/:id", wargaReopenRoute);
 app.route("/api/warga/evidence/:id", wargaEvidenceRoute);
+app.route("/api/warga/stats", wargaStatsRoute);
 app.route("/api/geocode", geocodeRoute);
+app.route("/api/test/reset", testResetRoute);
+app.route("/api/test/seed", testSeedRoute);
+app.route("/api/test/query", testQueryRoute);
+app.route("/api/test/debug-report", debugReportRoute);
 app.onError((err, c) => {
+  const errorId = crypto.randomUUID();
   logger.error({
     route: c.req.path,
     method: c.req.method,
     error: err,
+    errorId,
     user_id: c.get("user")?.sub
   });
   return c.json(
     {
       error: {
         code: "INTERNAL_ERROR",
-        message: err.message || String(err)
+        message: err.message || String(err),
+        stack: String(err.stack),
+        errorId
       }
     },
     500
