@@ -71,15 +71,13 @@ kmipn-26-deno/
 │   ├── src/
 │   │   ├── components/     # Layout, Sidebar, Maps, StatusBadges, Tables
 │   │   ├── pages/          # Dashboard and workflow pages
-│   │   │   ├── Dashboard.tsx, Queue.tsx, CaseList.tsx, CaseDetail.tsx
-│   │   │   ├── Audit.tsx, Analytics.tsx, AdminDaerah.tsx
-│   │   │   ├── SubmitReport.tsx, CreateReport.tsx
-│   │   │   └── ...         # Other page components
 │   │   ├── theme/          # Design tokens (Colors, Typography, Radii)
 │   │   └── api/            # API client with token interceptors
-├── schema.sql              # Complete canonical D1/SQLite schema
-├── scripts/                # Database seeders and maintenance utilities
-├── wrangler.toml           # Cloudflare deployment & binding configuration
+├── scripts/
+│   ├── drop_all_tables.sql # Drop all application tables
+│   ├── schema.sql          # Complete canonical D1/SQLite schema
+│   └── seed.sql            # Reference data (users, categories, units, SLA, etc.)
+├── wrangler.json           # Cloudflare deployment & binding configuration
 └── package.json            # Project scripts and dependencies
 ```
 
@@ -97,14 +95,9 @@ kmipn-26-deno/
 ### 2. Installation
 
 ```bash
-# Clone and install dependencies
 cd kmipn-26-deno
 npm install
-
-# Install web SPA dependencies
-cd web
-npm install
-cd ..
+cd web && npm install && cd ..
 ```
 
 ### 3. Environment Configuration
@@ -115,50 +108,50 @@ Copy `.env.example` to `.env` and fill in the required environment parameters:
 cp .env.example .env
 ```
 
-Key environment variables:
-
-```ini
-APP_BASE_URL="https://sigap.live"
-R2_PUBLIC_URL="https://r2.sigap.live"
-ALLOWED_ORIGINS="http://localhost:5173,https://sigap.live"
-```
-
 Cloudflare Worker Secrets (configured via `wrangler secret put <KEY>`):
 
 - `JWT_SECRET`: 256-bit cryptographically secure string (`openssl rand -base64 32`)
 - `LLM_API_KEY`: LLM vision provider API key
-- `LLM_API_URI`: LLM vision endpoint (e.g. Minimax or Gemini endpoint)
+- `LLM_API_URI`: LLM vision endpoint
+- `PHOTO_EVIDENCE_SECRET`: Photo metadata encryption key
 
 ---
 
-## 💾 Database setup
+## 💾 Database Setup
 
-`schema.sql` is the complete canonical D1/SQLite schema. Edit it directly when the data model changes; there is no ordered migration chain. `scripts/seed.sql` supplies the five reference categories, three demo accounts, an active unit, SLA defaults, and the priority formula.
+All SQL files live in `scripts/`:
 
-Use Node.js 22.13 or newer for the isolated SQLite validation:
+| File                    | Purpose                                        |
+| ----------------------- | ---------------------------------------------- |
+| `scripts/drop_all_tables.sql` | Drops all application tables (order-safe) |
+| `scripts/schema.sql`    | Creates all 27 tables and indexes              |
+| `scripts/seed.sql`      | Seeds users, categories, units, SLA rules, priority formula, checklists |
+
+### Rebuild Remote Database
 
 ```bash
+# Drop everything
+npx wrangler d1 execute kmipn-26-deno --remote --file=scripts/drop_all_tables.sql --yes
+
+# Create tables
+npx wrangler d1 execute kmipn-26-deno --remote --file=scripts/schema.sql --yes
+
+# Seed reference data
+npx wrangler d1 execute kmipn-26-deno --remote --file=scripts/seed.sql --yes
+```
+
+### Local Development
+
+```bash
+# Reset local D1 (drops + creates + seeds)
+npm run db:reset:local
+
+# Or seed only missing rows
+npm run db:seed:local
+
+# Validate schema in isolated SQLite
 npm run db:check
 ```
-
-This validates a fresh in-memory database, checks the seeded login passwords, and rebuilds it a second time. It never touches the running local database or Cloudflare.
-
-To create or rebuild the local demo database, stop the development servers first, then run:
-
-```bash
-npm run db:reset:local
-npm run dev
-```
-
-The reset replaces every application table in **local D1** with the canonical schema and seed. Existing local reports, tasks, sessions, and settings are deleted. It preserves local R2 files and does not contact the deployed database. The reset helper only accepts `--local`; it has no remote mode.
-
-To add missing demo seed rows to an existing compatible local schema without resetting it:
-
-```bash
-npm run db:seed:local
-```
-
-Deployment remains separate from database replacement. The ordinary test command does not change any database.
 
 ---
 
@@ -178,89 +171,66 @@ Deployment remains separate from database replacement. The ordinary test command
 
 ## 🌐 Production Deployment
 
-The platform is deployed live on Cloudflare Workers:
+```bash
+npm run deploy
+```
 
 - **Live Worker URL**: [https://sigap.live](https://sigap.live)
 - **Web SPA Entry**: Served at `/` and all web client routes
 - **REST API Entry**: Served under `/api/*`
 
-To deploy the latest changes:
+---
 
-```bash
-npm run deploy
-```
+## 👥 Test Accounts
+
+| Role        | Email                | Password     | Access                                                          |
+| ----------- | -------------------- | ------------ | --------------------------------------------------------------- |
+| **ADMIN**   | `admin@sigap.live`   | `admin123`   | Full system access: users, categories, SLA, audit, exports      |
+| **PETUGAS** | `petugas@sigap.live` | `petugas123` | Field tasks, progress, completion photos, survey checklists     |
+| **WARGA**   | `warga@sigap.live`   | `warga123`   | Create reports, upload evidence, track status, file sanggahan   |
 
 ---
 
-## 👥 Manual QA Test Accounts
-
-For testing, auditing, and grading, 3 role accounts are pre-seeded in the remote database with standard credentials:
-
-| Role        | Email                | Password     | Primary Scope / Access                                                        |
-| ----------- | -------------------- | ------------ | ----------------------------------------------------------------------------- |
-| **ADMIN**   | `admin@sigap.live`   | `admin123`   | Full system access: user management, categories, wilayah, SLA, audit, exports |
-| **PETUGAS** | `petugas@sigap.live` | `petugas123` | Field tasks, progress notes, upload completion photos, survey checklists      |
-| **WARGA**   | `warga@sigap.live`   | `warga123`   | Create public reports, upload evidence, track status, file sanggahan          |
-
----
-
-## 📡 API Endpoints Catalog
+## 📡 API Endpoints
 
 ### Authentication (`/api/auth`)
 
-- `POST /api/auth/login` — Authenticate user and issue JWT access & refresh tokens
+- `POST /api/auth/login` — Authenticate and issue JWT tokens
 - `POST /api/auth/register` — Citizen registration
-- `POST /api/auth/refresh` — Rotate and issue fresh access tokens
-- `GET /api/auth/me` — Return current authenticated session and role details
+- `POST /api/auth/refresh` — Rotate refresh token
+- `GET /api/auth/me` — Current session and role
 
 ### Reports & Geospatial (`/api/reports`)
 
-- `GET /api/reports` — List and filter reports (supports pagination, category, status, search)
-- `POST /api/reports` — Submit new infrastructure report
-- `GET /api/reports/:id` — Get detailed report information with timeline & photos
-- `POST /api/reports/photos/upload-url` — Obtain secure R2 photo upload URL
-- `GET /api/reports/heatmap` — Geospatial coordinates for density heatmaps
-- `GET /api/reports/duplicates` — Potential duplicate detection via spatial proximity
+- `GET /api/reports` — List and filter reports
+- `POST /api/reports` — Submit new report
+- `GET /api/reports/:id` — Report detail with timeline
+- `POST /api/reports/photos/upload-url` — R2 photo upload URL
+- `GET /api/reports/heatmap` — Heatmap coordinates
+- `GET /api/reports/duplicates` — Duplicate detection
 
-### Workflow Roles
+### Workflow
 
-- `/api/cases/*` — Case queue, review, accept/reject, sanggahan handling
-- `/api/tasks/*` — Task lifecycle, acceptance, progress, completion evidence
-- `/api/surveyor/*` — Field assessment tasks, structured checklist completion
-- `/api/petugas/*` — Technical execution, progress updates, completion evidence upload
-- `/api/rt-rw/*` — Neighborhood-level verification and feedback
-- `/api/warga/*` — Citizen complaint timeline, photo attachments, and sanggahan filing
+- `/api/cases/*` — Case queue, review, accept/reject
+- `/api/tasks/*` — Task lifecycle, progress, completion
+- `/api/surveyor/*` — Field assessment, checklists
+- `/api/petugas/*` — Technical execution, evidence upload
+- `/api/rt-rw/*` — Neighborhood verification
+- `/api/warga/*` — Citizen timeline, sanggahan
 
-### Administration & Insights
+### Administration
 
-- `/api/admin/users` — User account management and role assignments
-- `/api/admin/categories` — Nested damage categories and icons
-- `/api/admin/wilayah` — Administrative village, subdistrict, and regional hierarchy
-- `/api/admin/priority-config` — Priority scoring formula and weight weights
-- `/api/admin-daerah/*` — Regional unit management and SLA targets
-- `/api/executive/stats` — High-level KPI aggregations and trend charts
-- `/api/auditor/audit-search` — Paginated audit trail search with filters
-- `/api/auditor/audit-export` — Export audit log as CSV or JSON
-- `/api/auditor/stats` — Audit statistics (counts, top actors, suspicious activity)
-- `/api/auditor/verify-chain` — Verify audit chain integrity
-- `/api/auditor/system-logs` — System logs with level filter
-- `/api/export/*` — Export report data to GeoJSON, CSV, and PDF
+- `/api/admin/users` — User management
+- `/api/admin/categories` — Damage categories
+- `/api/admin/wilayah` — Regional hierarchy
+- `/api/admin/priority-config` — Priority scoring weights
+- `/api/admin-daerah/*` — Unit management and SLA
+- `/api/executive/stats` — KPI aggregations
+- `/api/auditor/*` — Audit trail, export, verification
+- `/api/export/*` — GeoJSON, CSV, PDF export
 
 ---
 
-## 📄 License & Attribution Notice
+## 📄 License
 
-This project is licensed under the **Server Side Public License Version 1.0 (SSPL-1.0)**. See the full license in [`LICENSE`](./LICENSE).
-
-### ⚖️ Historical Versions & Open Source Licensing Notice
-
-Previous releases and earlier repository snapshots that did not contain an explicit `LICENSE` file are legally classified as **unlicensed** under default copyright law (governed by the Berne Convention and GitHub Terms of Service § D.4 — _"All Rights Reserved"_).
-
-**Important clarification on unlicensed open-source code:**
-In software licensing, "unlicensed" or lacking an explicit license file **does not mean** the code is in the public domain, nor does it mean there are "no rules" or that anyone may freely copy, modify, distribute, or sub-license the software. Under international intellectual property law:
-
-- The authors retain exclusive copyright ownership of all code and creative assets.
-- Without an explicit open-source license grant, third parties only possess the default, non-transferable right to view the repository hosted on GitHub.
-- No implied rights of commercial distribution, modification, or derivation existed for those earlier unlicensed commits.
-
-With the formal inclusion of the [`LICENSE`](./LICENSE) file in this release, all rights, permissions, modification allowances, and mandatory public attribution requirements are governed explicitly under **SSPL-1.0**.
+Licensed under **Server Side Public License Version 1.0 (SSPL-1.0)**. See [`LICENSE`](./LICENSE).
