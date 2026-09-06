@@ -1,0 +1,897 @@
+[
+  {
+    "method": "GET",
+    "path": "/api/health",
+    "handler": "src/routes/api/health.ts",
+    "auth": "public"
+  },
+  {
+    "method": "POST",
+    "path": "/api/client-errors",
+    "handler": "src/routes/api/client-errors.ts",
+    "auth": "public"
+  },
+  {
+    "method": "GET",
+    "path": "/api/categories",
+    "handler": "src/routes/api/categories.ts",
+    "auth": "authenticated"
+  },
+  {
+    "method": "POST",
+    "path": "/api/categories",
+    "handler": "src/routes/api/categories.ts",
+    "auth": "authenticated"
+  },
+  {
+    "method": "GET",
+    "path": "/api/wilayah",
+    "handler": "src/routes/api/wilayah.ts",
+    "auth": "authenticated"
+  },
+  {
+    "method": "POST",
+    "path": "/api/wilayah",
+    "handler": "src/routes/api/wilayah.ts",
+    "auth": "authenticated"
+  },
+  {
+    "method": "PATCH",
+    "path": "/api/wilayah/:id",
+    "handler": "src/routes/api/wilayah.ts",
+    "auth": "authenticated"
+  },
+  {
+    "method": "DELETE",
+    "path": "/api/wilayah/:id",
+    "handler": "src/routes/api/wilayah.ts",
+    "auth": "authenticated"
+  },
+  {
+    "method": "GET",
+    "path": "/api/wilayah/:id/boundary",
+    "handler": "src/routes/api/wilayah/[id]/boundary.ts",
+    "auth": "public"
+  },
+  {
+    "method": "GET",
+    "path": "/api/wilayah/:id",
+    "handler": "src/routes/api/wilayah/[id].ts",
+    "auth": "public"
+  },
+  {
+    "method": "PUT",
+    "path": "/api/wilayah/:id",
+    "handler": "src/routes/api/wilayah/[id].ts",
+    "auth": "authenticated"
+  },
+  {
+    "method": "POST",
+    "path": "/api/auth/login",
+    "handler": "src/routes/api/auth/login.ts",
+    "auth": "public"
+  },
+  {
+    "method": "POST",
+    "path": "/api/auth/refresh",
+    "handler": "src/routes/api/auth/refresh.ts",
+    "auth": "public"
+  },
+  {
+    "method": "POST",
+    "path": "/api/auth/logout",
+    "handler": "src/routes/api/auth/logout.ts",
+    "auth": "authenticated"
+  },
+  {
+    "method": "GET",
+    "path": "/api/auth/me",
+    "handler": "src/routes/api/auth/me.ts",
+    "auth": "authenticated"
+  },
+  {
+    "method": "POST",
+    "path": "/api/auth/register",
+    "handler": "src/routes/api/auth/register.ts",
+    "auth": "public"
+  },
+  {
+    "method": "POST",
+    "path": "/api/reports",
+    "handler": "src/routes/api/reports/index.ts",
+    "auth": "authenticated"
+  },
+  {
+    "method": "GET",
+    "path": "/api/reports",
+    "handler": "src/routes/api/reports/index.ts",
+    "auth": "authenticated"
+  },
+  {
+    "method": "GET",
+    "path": "/api/reports/stats",
+    "handler": "src/routes/api/reports/stats.ts",
+    "auth": "authenticated"
+  },
+  {
+    "method": "GET",
+    "path": "/api/reports/heatmap",
+    "handler": "src/routes/api/reports/heatmap.ts",
+    "auth": "authenticated"
+  },
+  {
+    "method": "GET",
+    "path": "/api/reports/nearby",
+    "handler": "src/routes/api/reports/nearby.ts",
+    "auth": "authenticated"
+  },
+  {
+    "method": "GET",
+    "path": "/api/reports/duplicates",
+    "handler": "src/routes/api/reports/duplicates.ts",
+    "auth": "authenticated"
+  },
+  {
+    "method": "GET",
+    "path": "/api/reports/:id/timeline",
+    "handler": "src/routes/api/reports/[id]/timeline.ts",
+    "auth": "authenticated"
+  },
+  {
+    "method": "GET",
+    "path": "/api/reports/:id",
+    "handler": "src/routes/api/reports/[id].ts",
+    "auth": "authenticated"
+  },
+  {
+    "method": "PATCH",
+    "path": "/api/reports/:id",
+    "handler": "src/routes/api/reports/[id].ts",
+    "auth": "authenticated"
+  },
+  {
+    "method": "DELETE",
+    "path": "/api/reports/:id",
+    "handler": "src/routes/api/reports/[id].ts",
+    "auth": "authenticated"
+  },
+  {
+    "method": "GET",
+    "path": "/api/reports/:id/priority",
+    "handler": "src/routes/api/reports/[id]/priority.ts",
+    "auth": "authenticated"
+  },
+  {
+    "method": "PUT",
+    "path": "/api/reports/:id/priority",
+    "handler": "src/routes/api/reports/[id]/priority.ts",
+    "auth": "authenticated"
+  },
+  {
+    "method": "POST",
+    "path": "/api/reports/:id/photos/upload-url",
+    "handler": "src/routes/api/reports/photos/upload-url.ts",
+    "auth": "authenticated"
+  },
+  {
+    "method": "POST",
+    "path": "/api/reports/:id/photos",
+    "handler": "src/routes/api/reports/[id]/photos-presigned.ts",
+    "auth": "public"
+  },
+  {
+    "method": "POST",
+    "path": "/api/reports/:id/close",
+    "handler": "src/routes/api/reports/[id]/close.ts",
+    "auth": "authenticated"
+  },
+  {
+    "method": "POST",
+    "path": "/api/reports/:id/escalate",
+    "handler": "src/routes/api/reports/[id]/escalate.ts",
+    "auth": "authenticated"
+  },
+  {
+    "method": "POST",
+    "path": "/api/reports/:id/assign",
+    "handler": "src/routes/api/reports/[id]/assign.ts",
+    "auth": "role-based",
+    "roles": ["ADMIN", "PETUGAS"]
+  },
+  {
+    "method": "GET",
+    "path": "/api/reports/:id/duplicates",
+    "handler": "src/routes/api/reports/[id]/duplicates.ts",
+    "auth": "authenticated"
+  },
+  {
+    "method": "POST",
+    "path": "/api/reports/:id/merge",
+    "handler": "src/routes/api/reports/[id]/merge.ts",
+    "auth": "authenticated"
+  },
+  {
+    "method": "POST",
+    "path": "/api/reports/:id/sanggahan",
+    "handler": "src/routes/api/reports/[id]/sanggahan.ts",
+    "auth": "authenticated"
+  },
+  {
+    "method": "POST",
+    "path": "/api/reports/:id/reopen",
+    "handler": "src/routes/api/reports/[id]/reopen.ts",
+    "auth": "authenticated"
+  },
+  {
+    "method": "POST",
+    "path": "/api/reports/:id/evidence",
+    "handler": "src/routes/api/reports/[id]/evidence.ts",
+    "auth": "authenticated"
+  },
+  {
+    "method": "POST",
+    "path": "/api/reports/photos/upload-url-anon",
+    "handler": "src/routes/api/reports/photos/upload-url-anon.ts",
+    "auth": "public"
+  },
+  {
+    "method": "GET",
+    "path": "/api/map/heatmap",
+    "handler": "src/routes/api/map.ts",
+    "auth": "public"
+  },
+  {
+    "method": "GET",
+    "path": "/api/map/geojson",
+    "handler": "src/routes/api/map.ts",
+    "auth": "public"
+  },
+  {
+    "method": "GET",
+    "path": "/api/export/geojson",
+    "handler": "src/routes/api/export/geojson.ts",
+    "auth": "authenticated"
+  },
+  {
+    "method": "GET",
+    "path": "/api/export/csv",
+    "handler": "src/routes/api/export/csv.ts",
+    "auth": "authenticated"
+  },
+  {
+    "method": "GET",
+    "path": "/api/export/pdf",
+    "handler": "src/routes/api/export/pdf.ts",
+    "auth": "authenticated"
+  },
+  {
+    "method": "GET",
+    "path": "/api/export/reports",
+    "handler": "src/routes/api/export.ts",
+    "auth": "authenticated"
+  },
+  {
+    "method": "GET",
+    "path": "/api/public/geojson",
+    "handler": "src/routes/api/public/geojson.ts",
+    "auth": "public"
+  },
+  {
+    "method": "GET",
+    "path": "/api/public/reports/cluster",
+    "handler": "src/routes/api/public/reports/cluster.ts",
+    "auth": "public"
+  },
+  {
+    "method": "GET",
+    "path": "/api/public/reports",
+    "handler": "src/routes/api/public/reports.ts",
+    "auth": "public"
+  },
+  {
+    "method": "GET",
+    "path": "/api/public/reports/:id",
+    "handler": "src/routes/api/public/reports.ts",
+    "auth": "public"
+  },
+  {
+    "method": "POST",
+    "path": "/api/public/reports",
+    "handler": "src/routes/api/public/reports.ts",
+    "auth": "public"
+  },
+  {
+    "method": "GET",
+    "path": "/api/public/cases",
+    "handler": "src/routes/api/public/cases/index.ts",
+    "auth": "public"
+  },
+  {
+    "method": "GET",
+    "path": "/api/public/cases/:id",
+    "handler": "src/routes/api/public/cases/[id]/index.ts",
+    "auth": "public"
+  },
+  {
+    "method": "GET",
+    "path": "/api/public/categories",
+    "handler": "src/routes/api/public/categories.ts",
+    "auth": "public"
+  },
+  {
+    "method": "GET",
+    "path": "/api/public/stats",
+    "handler": "src/routes/api/public/stats.ts",
+    "auth": "public"
+  },
+  {
+    "method": "POST",
+    "path": "/api/public/anonymous-reports",
+    "handler": "src/routes/api/public/anonymous-reports.ts",
+    "auth": "public"
+  },
+  {
+    "method": "POST",
+    "path": "/api/agent/assess",
+    "handler": "src/routes/api/agent/assess.ts",
+    "auth": "authenticated"
+  },
+  {
+    "method": "GET",
+    "path": "/api/agent/assessments",
+    "handler": "src/routes/api/agent/assessments.ts",
+    "auth": "authenticated"
+  },
+  {
+    "method": "GET",
+    "path": "/api/cases/queue",
+    "handler": "src/routes/api/cases/queue.ts",
+    "auth": "role-based",
+    "roles": ["ADMIN"]
+  },
+  {
+    "method": "POST",
+    "path": "/api/cases/:id/accept",
+    "handler": "src/routes/api/cases/[id]/accept.ts",
+    "auth": "role-based",
+    "roles": ["ADMIN"]
+  },
+  {
+    "method": "POST",
+    "path": "/api/cases/:id/decide",
+    "handler": "src/routes/api/cases/[id]/decide.ts",
+    "auth": "role-based",
+    "roles": ["ADMIN"]
+  },
+  {
+    "method": "POST",
+    "path": "/api/cases/:id/reject",
+    "handler": "src/routes/api/cases/[id]/reject.ts",
+    "auth": "role-based",
+    "roles": ["ADMIN"]
+  },
+  {
+    "method": "POST",
+    "path": "/api/cases/:id/combine",
+    "handler": "src/routes/api/cases/[id]/combine.ts",
+    "auth": "role-based",
+    "roles": ["ADMIN"]
+  },
+  {
+    "method": "POST",
+    "path": "/api/cases/:id/separate",
+    "handler": "src/routes/api/cases/[id]/separate.ts",
+    "auth": "role-based",
+    "roles": ["ADMIN"]
+  },
+  {
+    "method": "POST",
+    "path": "/api/cases/:id/review-sanggahan",
+    "handler": "src/routes/api/cases/[id]/review-sanggahan.ts",
+    "auth": "role-based",
+    "roles": ["ADMIN"]
+  },
+  {
+    "method": "POST",
+    "path": "/api/cases/:id/verify-completion",
+    "handler": "src/routes/api/cases/[id]/verify-completion.ts",
+    "auth": "role-based",
+    "roles": ["ADMIN"]
+  },
+  {
+    "method": "POST",
+    "path": "/api/cases/:id/override-priority",
+    "handler": "src/routes/api/cases/[id]/override-priority.ts",
+    "auth": "role-based",
+    "roles": ["ADMIN"]
+  },
+  {
+    "method": "GET",
+    "path": "/api/cases/:id",
+    "handler": "src/routes/api/cases/[id].ts",
+    "auth": "role-based",
+    "roles": ["ADMIN"]
+  },
+  {
+    "method": "GET",
+    "path": "/api/tasks",
+    "handler": "src/routes/api/tasks/tasks.ts",
+    "auth": "authenticated"
+  },
+  {
+    "method": "GET",
+    "path": "/api/tasks/:id",
+    "handler": "src/routes/api/tasks/[id]/index.ts",
+    "auth": "authenticated"
+  },
+  {
+    "method": "POST",
+    "path": "/api/tasks/:id/accept",
+    "handler": "src/routes/api/tasks/[id]/accept.ts",
+    "auth": "role-based",
+    "roles": ["ADMIN", "PETUGAS"]
+  },
+  {
+    "method": "POST",
+    "path": "/api/tasks/:id/start",
+    "handler": "src/routes/api/tasks/[id]/start.ts",
+    "auth": "role-based",
+    "roles": ["ADMIN", "PETUGAS"]
+  },
+  {
+    "method": "PATCH",
+    "path": "/api/tasks/:id/progress",
+    "handler": "src/routes/api/tasks/[id]/progress.ts",
+    "auth": "role-based",
+    "roles": ["ADMIN", "PETUGAS"]
+  },
+  {
+    "method": "POST",
+    "path": "/api/tasks/:id/complete",
+    "handler": "src/routes/api/tasks/[id]/complete.ts",
+    "auth": "role-based",
+    "roles": ["ADMIN", "PETUGAS"]
+  },
+  {
+    "method": "POST",
+    "path": "/api/tasks/:id/reject",
+    "handler": "src/routes/api/tasks/[id]/reject.ts",
+    "auth": "role-based",
+    "roles": ["ADMIN", "PETUGAS"]
+  },
+  {
+    "method": "POST",
+    "path": "/api/tasks/:id/clarification",
+    "handler": "src/routes/api/tasks/[id]/clarification.ts",
+    "auth": "role-based",
+    "roles": ["ADMIN", "PETUGAS"]
+  },
+  {
+    "method": "POST",
+    "path": "/api/tasks/:id/evidence",
+    "handler": "src/routes/api/tasks/[id]/evidence.ts",
+    "auth": "role-based",
+    "roles": ["ADMIN", "PETUGAS"]
+  },
+  {
+    "method": "POST",
+    "path": "/api/tasks/:id/visit",
+    "handler": "src/routes/api/tasks/[id]/visit.ts",
+    "auth": "role-based",
+    "roles": ["ADMIN", "PETUGAS"]
+  },
+  {
+    "method": "GET",
+    "path": "/api/tasks/:id/checklist-template",
+    "handler": "src/routes/api/tasks/[id]/checklist-template.ts",
+    "auth": "authenticated"
+  },
+  {
+    "method": "GET",
+    "path": "/api/users",
+    "handler": "src/routes/api/users.ts",
+    "auth": "role-based",
+    "roles": ["ADMIN"]
+  },
+  {
+    "method": "POST",
+    "path": "/api/users",
+    "handler": "src/routes/api/users.ts",
+    "auth": "role-based",
+    "roles": ["ADMIN"]
+  },
+  {
+    "method": "GET",
+    "path": "/api/units",
+    "handler": "src/routes/api/units.ts",
+    "auth": "authenticated"
+  },
+  {
+    "method": "POST",
+    "path": "/api/units",
+    "handler": "src/routes/api/units.ts",
+    "auth": "role-based",
+    "roles": ["ADMIN"]
+  },
+  {
+    "method": "PATCH",
+    "path": "/api/units/:id",
+    "handler": "src/routes/api/units.ts",
+    "auth": "role-based",
+    "roles": ["ADMIN"]
+  },
+  {
+    "method": "DELETE",
+    "path": "/api/units/:id",
+    "handler": "src/routes/api/units.ts",
+    "auth": "role-based",
+    "roles": ["ADMIN"]
+  },
+  {
+    "method": "GET",
+    "path": "/api/priority-config",
+    "handler": "src/routes/api/priority-config.ts",
+    "auth": "authenticated"
+  },
+  {
+    "method": "GET",
+    "path": "/api/priority-config/active",
+    "handler": "src/routes/api/priority-config.ts",
+    "auth": "authenticated"
+  },
+  {
+    "method": "GET",
+    "path": "/api/priority-config/:version",
+    "handler": "src/routes/api/priority-config.ts",
+    "auth": "authenticated"
+  },
+  {
+    "method": "POST",
+    "path": "/api/priority-config",
+    "handler": "src/routes/api/priority-config.ts",
+    "auth": "role-based",
+    "roles": ["ADMIN"]
+  },
+  {
+    "method": "PATCH",
+    "path": "/api/priority-config/:version",
+    "handler": "src/routes/api/priority-config/[id].ts",
+    "auth": "role-based",
+    "roles": ["ADMIN"]
+  },
+  {
+    "method": "POST",
+    "path": "/api/priority-config/:version/activate",
+    "handler": "src/routes/api/priority-config/[id]/activate.ts",
+    "auth": "role-based",
+    "roles": ["ADMIN"]
+  },
+  {
+    "method": "GET",
+    "path": "/api/stats",
+    "handler": "src/routes/api/stats.ts",
+    "auth": "authenticated"
+  },
+  {
+    "method": "GET",
+    "path": "/api/stats/sync-quality",
+    "handler": "src/routes/api/stats/sync-quality.ts",
+    "auth": "role-based",
+    "roles": ["ADMIN"]
+  },
+  {
+    "method": "GET",
+    "path": "/api/config/statuses",
+    "handler": "src/routes/api/config/index.ts",
+    "auth": "authenticated"
+  },
+  {
+    "method": "GET",
+    "path": "/api/config/priorities",
+    "handler": "src/routes/api/config/index.ts",
+    "auth": "authenticated"
+  },
+  {
+    "method": "GET",
+    "path": "/api/config/sla",
+    "handler": "src/routes/api/config/index.ts",
+    "auth": "authenticated"
+  },
+  {
+    "method": "GET",
+    "path": "/api/config/categories",
+    "handler": "src/routes/api/config/index.ts",
+    "auth": "authenticated"
+  },
+  {
+    "method": "GET",
+    "path": "/api/config/wilayah/levels",
+    "handler": "src/routes/api/config/index.ts",
+    "auth": "authenticated"
+  },
+  {
+    "method": "POST",
+    "path": "/api/sync/batch",
+    "handler": "src/routes/api/sync/batch.ts",
+    "auth": "authenticated"
+  },
+  {
+    "method": "GET",
+    "path": "/api/notifications",
+    "handler": "src/routes/api/notifications.ts",
+    "auth": "authenticated"
+  },
+  {
+    "method": "POST",
+    "path": "/api/notifications/:id/read",
+    "handler": "src/routes/api/notifications.ts",
+    "auth": "authenticated"
+  },
+  {
+    "method": "POST",
+    "path": "/api/notifications/mark-read",
+    "handler": "src/routes/api/notifications/mark-read.ts",
+    "auth": "authenticated"
+  },
+  {
+    "method": "GET",
+    "path": "/api/facilities",
+    "handler": "src/routes/api/facilities/index.ts",
+    "auth": "authenticated"
+  },
+  {
+    "method": "GET",
+    "path": "/api/facilities/cluster",
+    "handler": "src/routes/api/facilities/cluster.ts",
+    "auth": "public"
+  },
+  {
+    "method": "GET",
+    "path": "/api/admin/users",
+    "handler": "src/routes/api/admin/users/index.ts",
+    "auth": "role-based",
+    "roles": ["ADMIN"]
+  },
+  {
+    "method": "GET",
+    "path": "/api/admin/users/:id",
+    "handler": "src/routes/api/admin/users/index.ts",
+    "auth": "role-based",
+    "roles": ["ADMIN"]
+  },
+  {
+    "method": "POST",
+    "path": "/api/admin/users",
+    "handler": "src/routes/api/admin/users/index.ts",
+    "auth": "role-based",
+    "roles": ["ADMIN"]
+  },
+  {
+    "method": "PUT",
+    "path": "/api/admin/users/:id",
+    "handler": "src/routes/api/admin/users/index.ts",
+    "auth": "role-based",
+    "roles": ["ADMIN"]
+  },
+  {
+    "method": "PUT",
+    "path": "/api/admin/wilayah/:id",
+    "handler": "src/routes/api/admin/wilayah/[id].ts",
+    "auth": "role-based",
+    "roles": ["ADMIN"]
+  },
+  {
+    "method": "DELETE",
+    "path": "/api/admin/wilayah/:id",
+    "handler": "src/routes/api/admin/wilayah.ts",
+    "auth": "role-based",
+    "roles": ["ADMIN"]
+  },
+  {
+    "method": "PUT",
+    "path": "/api/admin/categories/:id",
+    "handler": "src/routes/api/admin/categories/[id].ts",
+    "auth": "role-based",
+    "roles": ["ADMIN"]
+  },
+  {
+    "method": "GET",
+    "path": "/api/admin/failed-assessments",
+    "handler": "src/routes/api/admin/failed-assessments.ts",
+    "auth": "role-based",
+    "roles": ["ADMIN"]
+  },
+  {
+    "method": "POST",
+    "path": "/api/admin/failed-assessments/:id/retry",
+    "handler": "src/routes/api/admin/failed-assessments.ts",
+    "auth": "role-based",
+    "roles": ["ADMIN"]
+  },
+  {
+    "method": "DELETE",
+    "path": "/api/admin/failed-assessments/:id",
+    "handler": "src/routes/api/admin/failed-assessments.ts",
+    "auth": "role-based",
+    "roles": ["ADMIN"]
+  },
+  {
+    "method": "POST",
+    "path": "/api/admin/failed-assessments/retry-batch",
+    "handler": "src/routes/api/admin/failed-assessments/retry-batch.ts",
+    "auth": "role-based",
+    "roles": ["ADMIN"]
+  },
+  {
+    "method": "GET",
+    "path": "/api/admin-daerah/dashboard",
+    "handler": "src/routes/api/admin-daerah/dashboard.ts",
+    "auth": "role-based",
+    "roles": ["ADMIN"]
+  },
+  {
+    "method": "GET",
+    "path": "/api/admin-daerah/cases",
+    "handler": "src/routes/api/admin-daerah/cases.ts",
+    "auth": "role-based",
+    "roles": ["ADMIN"]
+  },
+  {
+    "method": "GET",
+    "path": "/api/admin-daerah/operators",
+    "handler": "src/routes/api/admin-daerah/operators.ts",
+    "auth": "role-based",
+    "roles": ["ADMIN"]
+  },
+  {
+    "method": "GET",
+    "path": "/api/admin-daerah/petugas",
+    "handler": "src/routes/api/admin-daerah/petugas.ts",
+    "auth": "role-based",
+    "roles": ["ADMIN"]
+  },
+  {
+    "method": "GET",
+    "path": "/api/admin-daerah/sla",
+    "handler": "src/routes/api/admin-daerah/sla/index.ts",
+    "auth": "role-based",
+    "roles": ["ADMIN"]
+  },
+  {
+    "method": "POST",
+    "path": "/api/admin-daerah/sla",
+    "handler": "src/routes/api/admin-daerah/sla/index.ts",
+    "auth": "role-based",
+    "roles": ["ADMIN"]
+  },
+  {
+    "method": "GET",
+    "path": "/api/admin-daerah/sla/:id",
+    "handler": "src/routes/api/admin-daerah/sla/[id].ts",
+    "auth": "role-based",
+    "roles": ["ADMIN"]
+  },
+  {
+    "method": "PUT",
+    "path": "/api/admin-daerah/sla/:id",
+    "handler": "src/routes/api/admin-daerah/sla/[id].ts",
+    "auth": "role-based",
+    "roles": ["ADMIN"]
+  },
+  {
+    "method": "GET",
+    "path": "/api/admin-daerah/units",
+    "handler": "src/routes/api/admin-daerah/units/index.ts",
+    "auth": "role-based",
+    "roles": ["ADMIN"]
+  },
+  {
+    "method": "POST",
+    "path": "/api/admin-daerah/units",
+    "handler": "src/routes/api/admin-daerah/units/index.ts",
+    "auth": "role-based",
+    "roles": ["ADMIN"]
+  },
+  {
+    "method": "GET",
+    "path": "/api/admin-daerah/units/:id",
+    "handler": "src/routes/api/admin-daerah/units/[id].ts",
+    "auth": "role-based",
+    "roles": ["ADMIN"]
+  },
+  {
+    "method": "PUT",
+    "path": "/api/admin-daerah/units/:id",
+    "handler": "src/routes/api/admin-daerah/units/[id].ts",
+    "auth": "role-based",
+    "roles": ["ADMIN"]
+  },
+  {
+    "method": "DELETE",
+    "path": "/api/admin-daerah/units/:id",
+    "handler": "src/routes/api/admin-daerah/units/[id].ts",
+    "auth": "role-based",
+    "roles": ["ADMIN"]
+  },
+  {
+    "method": "GET",
+    "path": "/api/auditor/audit-search",
+    "handler": "src/routes/api/auditor/audit-search.ts",
+    "auth": "role-based",
+    "roles": ["ADMIN"]
+  },
+  {
+    "method": "GET",
+    "path": "/api/auditor/audit-export",
+    "handler": "src/routes/api/auditor/audit-export.ts",
+    "auth": "role-based",
+    "roles": ["ADMIN"]
+  },
+  {
+    "method": "GET",
+    "path": "/api/auditor/stats",
+    "handler": "src/routes/api/auditor/stats.ts",
+    "auth": "role-based",
+    "roles": ["ADMIN"]
+  },
+  {
+    "method": "GET",
+    "path": "/api/auditor/verify-chain",
+    "handler": "src/routes/api/auditor/verify-chain.ts",
+    "auth": "role-based",
+    "roles": ["ADMIN"]
+  },
+  {
+    "method": "GET",
+    "path": "/api/executive/dashboard",
+    "handler": "src/routes/api/executive/dashboard.ts",
+    "auth": "role-based",
+    "roles": ["ADMIN"]
+  },
+  {
+    "method": "GET",
+    "path": "/api/executive/regional-stats",
+    "handler": "src/routes/api/executive/regional-stats.ts",
+    "auth": "role-based",
+    "roles": ["ADMIN"]
+  },
+  {
+    "method": "GET",
+    "path": "/api/executive/trend-analysis",
+    "handler": "src/routes/api/executive/trend-analysis.ts",
+    "auth": "role-based",
+    "roles": ["ADMIN"]
+  },
+  {
+    "method": "GET",
+    "path": "/api/warga/stats",
+    "handler": "src/routes/api/warga/stats.ts",
+    "auth": "authenticated"
+  },
+  {
+    "method": "GET",
+    "path": "/api/geocode/reverse",
+    "handler": "src/routes/api/geocode/reverse.ts",
+    "auth": "public"
+  },
+  {
+    "method": "GET",
+    "path": "/api/public/stats/trend",
+    "handler": "src/routes/api/public/stats-trend.ts",
+    "auth": "public"
+  },
+  {
+    "method": "GET",
+    "path": "/api/cases/:id/priority-breakdown",
+    "handler": "src/routes/api/cases/[id]/priority-breakdown.ts",
+    "auth": "role-based",
+    "roles": ["ADMIN"]
+  },
+  {
+    "method": "GET",
+    "path": "/api/export/history",
+    "handler": "src/routes/api/export/history.ts",
+    "auth": "role-based",
+    "roles": ["ADMIN"]
+  }
+]

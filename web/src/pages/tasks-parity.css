@@ -1,0 +1,134 @@
+.task-tabs {
+  display: flex;
+  gap: 22px;
+  border-bottom: 1px solid var(--border, #e2e8f0);
+  margin: 0 0 22px;
+  width: 100%;
+  overflow-x: auto;
+}
+.task-tabs button {
+  padding: 12px 0;
+  font-size: 12px;
+  font-weight: 600;
+  border-bottom: 2px solid transparent;
+  color: #667085;
+}
+.task-tabs button[aria-selected="true"] {
+  color: #0f7a6b;
+  border-color: #0f7a6b;
+}
+.ref-tasks .ref-table {
+  min-width: 850px;
+}
+.ref-tasks td small {
+  display: block;
+  font-size: 10px;
+  color: #7c8795;
+  margin-top: 4px;
+}
+.ref-tasks td > a {
+  font-size: 10px;
+  color: #7c8795;
+}
+.task-actions {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+  flex-wrap: wrap;
+}
+.task-progress > span {
+  display: block;
+  width: 100%;
+  min-width: 100px;
+  margin: 10px 0;
+  height: 6px;
+  background: #edf2f3;
+  border-radius: 6px;
+  overflow: hidden;
+}
+.task-progress i {
+  display: block;
+  height: 100%;
+  background: #0f7a6b;
+}
+.task-progress em {
+  font-size: 10px;
+  background: #e8f5ed;
+  color: #328455;
+  padding: 3px 7px;
+  border-radius: 12px;
+  font-style: normal;
+}
+.task-dialog {
+  padding: 25px;
+  overflow: auto;
+}
+.task-dialog header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+.task-dialog h2 {
+  font-size: 19px;
+  font-weight: 700;
+}
+.task-dialog p {
+  font-size: 12px;
+  color: #667085;
+  margin: 8px 0 18px;
+}
+.task-dialog header button {
+  font-size: 24px;
+}
+.task-evidence {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+  margin: 18px 0;
+}
+.task-evidence h3 {
+  font-size: 12px;
+  font-weight: 600;
+  margin-bottom: 8px;
+}
+.task-evidence img,
+.task-no-photo {
+  width: 100%;
+  aspect-ratio: 1.8;
+  object-fit: cover;
+  border-radius: 8px;
+}
+.task-no-photo {
+  display: grid;
+  place-items: center;
+  background: #f1f4f6;
+  color: #8792a0;
+  font-size: 12px;
+}
+.task-dialog label {
+  display: flex;
+  flex-direction: column;
+  gap: 7px;
+  font-size: 12px;
+  font-weight: 600;
+  margin: 15px 0;
+}
+.task-dialog input,
+.task-dialog textarea {
+  padding: 10px;
+  border: 1px solid #dce2e7;
+  border-radius: 7px;
+  font-weight: 400;
+}
+.task-dialog textarea {
+  min-height: 85px;
+}
+.task-dialog footer {
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+  margin-top: 20px;
+}
+.task-dialog [role="alert"] {
+  color: #b42318;
+}

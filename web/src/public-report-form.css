@@ -1,0 +1,126 @@
+.public-report-form {
+  background: white;
+  border-radius: 15px;
+  padding: 25px;
+  max-width: 600px;
+  width: 100%;
+  margin: 24px auto;
+  box-sizing: border-box;
+  overflow-y: auto;
+  max-height: 90vh;
+  color: #252d32;
+}
+[role="dialog"] .public-report-form {
+  margin: 0;
+}
+.report-form-heading {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 18px;
+}
+.report-form-heading h2 {
+  font-size: 19px;
+  font-weight: 700;
+  margin: 0;
+}
+.report-form-heading button {
+  font-size: 24px;
+  line-height: 1;
+  background: none;
+  border: 0;
+}
+.public-report-form > p {
+  font-size: 13px;
+  color: #66716c;
+  margin-bottom: 18px;
+}
+.public-report-form form {
+  display: grid;
+  gap: 15px;
+}
+.public-report-form label {
+  display: grid;
+  gap: 6px;
+  font-size: 12px;
+  font-weight: 500;
+}
+.public-report-form input,
+.public-report-form select,
+.public-report-form textarea {
+  width: 100%;
+  min-width: 0;
+  border: 1px solid #dce2de;
+  border-radius: 7px;
+  padding: 10px 11px;
+  font: inherit;
+  background: white;
+}
+.public-report-form small {
+  font-size: 11px;
+  color: #66716c;
+}
+.report-form-columns {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 18px;
+}
+.report-form-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 8px;
+  margin-top: 5px;
+  flex-wrap: wrap;
+}
+.report-photo-previews {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+.report-photo-previews > div {
+  position: relative;
+}
+.report-photo-previews img {
+  width: 90px;
+  height: 65px;
+  object-fit: cover;
+  border-radius: 6px;
+}
+.report-photo-previews button {
+  position: absolute;
+  right: 2px;
+  top: 2px;
+  background: white;
+  border-radius: 50%;
+  width: 20px;
+  height: 20px;
+}
+.report-error,
+.report-success {
+  padding: 12px;
+  border-radius: 8px;
+  font-size: 13px;
+  margin-bottom: 15px;
+}
+.report-error {
+  background: #fff0ed;
+  color: #a33a2e;
+}
+.report-success {
+  background: #e8f5ec;
+  color: #216641;
+}
+.report-form-heading button {
+  width: 36px;
+  height: 35px;
+  border: 1px solid #dce2de;
+  border-radius: 8px;
+  font-size: 14px;
+}
+.public-report-form textarea {
+  min-height: 84px;
+}
+.public-report-form input::placeholder,
+.public-report-form textarea::placeholder {
+  font-weight: 400;
+}

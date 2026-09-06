@@ -1,0 +1,98 @@
+@import url("https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans:wght@400;500;600;700&display=swap");
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  /* ─── Sidebar ──────────────────────────────────────────── */
+  --sidebar-bg: #16302b;
+  --sidebar-text: #cfe4df;
+  --sidebar-divider: #234a43;
+  --sidebar-active-bg: #0f7a6b;
+  --sidebar-text-muted: #7fa8a0;
+
+  /* ─── Primary / Accent ─────────────────────────────────── */
+  --primary: #0f7a6b;
+  --primary-hover: #0a5c50;
+  --primary-light: #e2f1ee;
+  --primary-border: #bfe0d9;
+
+  /* ─── Backgrounds ──────────────────────────────────────── */
+  --bg-outer: #e6e8e3;
+  --bg-page: #f9faf8;
+  --bg-card: #ffffff;
+  --bg-surface: #f4f5f3;
+  --bg-soft: #eef0ec;
+
+  /* ─── Borders ──────────────────────────────────────────── */
+  --border-neutral: #e4e7e2;
+  --border-panel: #d3d7d0;
+  --border-thin: #eef0ec;
+
+  /* ─── Text ─────────────────────────────────────────────── */
+  --text-primary: #17191c;
+  --text-secondary: #3a3f45;
+  --text-label: #616770;
+  --text-muted: #8a9099;
+
+  /* ─── Status ───────────────────────────────────────────── */
+  --status-critical: #c0392b;
+  --status-critical-bg: #f8e2de;
+  --status-critical-text: #a5271a;
+  --status-warning: #b8730a;
+  --status-warning-bg: #f8ecd6;
+  --status-warning-text: #8a5808;
+  --status-processing: #2563eb;
+  --status-processing-bg: #e5edfd;
+  --status-processing-text: #1d4ed8;
+  --status-done: #0f7a6b;
+  --status-done-bg: #e2f1ee;
+  --status-done-text: #0a5c50;
+  --status-neutral: #616770;
+  --status-neutral-bg: #eef0ec;
+}
+
+body {
+  font-family: "IBM Plex Sans", system-ui, sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  background-color: var(--bg-outer);
+  color: var(--text-primary);
+}
+
+code,
+.font-mono,
+[data-mono] {
+  font-family: "IBM Plex Mono", monospace;
+}
+
+.tnum {
+  font-variant-numeric: tabular-nums;
+}
+
+/* ─── Scrollbar styling ─────────────────────────────────── */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #c5ccc8;
+  border-radius: 999px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #a0a8a3;
+}
+
+/* ─── Focus ring ────────────────────────────────────────── */
+*:focus-visible {
+  outline: 2px solid var(--primary);
+  outline-offset: 2px;
+  border-radius: 4px;
+}

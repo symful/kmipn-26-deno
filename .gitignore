@@ -1,0 +1,33 @@
+# dotenv environment variable files
+.env
+.env.development.local
+.env.test.local
+.env.production.local
+.env.local
+.sisyphus
+
+# Wrangler deploy artifacts
+.wrangler/
+
+# Fresh build directory
+# npm + other dependencies
+node_modules/
+vendor/
+dist/
+web/dist/
+
+# Run artefacts — auth harness manifest
+.run/
+
+.dev.vars
+dev-server.log
+dev.err.log
+dev.out.log
+my.err.log
+my.out.log
+deploy.log
+deverr.txt
+devout.txt
+test-results/
+migrations_backup_pre_rebuild/
+
