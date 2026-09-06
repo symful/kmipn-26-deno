@@ -13,8 +13,6 @@ export interface Env {
   LLM_API_KEY: string;
   JWT_SECRET: string;
   PHOTO_EVIDENCE_SECRET?: string;
-  /** Temporary decryption-only binding; remove after all v1 photo metadata is migrated. */
-  LEGACY_PHOTO_EVIDENCE_SECRET?: string;
   R2: R2Bucket;
   D1: D1Database;
   RATE_LIMITER?: KVNamespace;

@@ -65,7 +65,7 @@
     "DUPLICATE_LIMIT": "10",
     "SHARE_TOKEN_EXPIRY_HOURS": "168",
     "FAILED_ASSESSMENTS_BATCH_LIMIT": "50",
-    "R2_PUBLIC_URL": "http://localhost:8787/r2",
+    "R2_PUBLIC_URL": "https://r2.sigap.live",
     "ALLOWED_ORIGINS": "http://localhost:8787,http://localhost:5173"
   },
   "env": {
