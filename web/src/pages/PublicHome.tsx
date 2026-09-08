@@ -300,6 +300,15 @@ export const PublicHome = ({
           ◈ Lokasi publik digeneralisasi · Data pribadi pelapor tidak
           ditampilkan
         </span>
+        <a
+          href="https://drive.google.com/drive/folders/1aMUyQcEapn9TtHLfy9Ds5o8Fiz3CeY8i?usp=sharing"
+          target="_blank"
+          rel="noopener noreferrer"
+          className="ref-button primary"
+          style={{ marginLeft: "auto" }}
+        >
+          ⬇ Download APK
+        </a>
         <span>Data publik · {new Date().toLocaleDateString("id-ID")}</span>
       </div>
       <PublicCaseModal
