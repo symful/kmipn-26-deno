@@ -45,12 +45,22 @@ export const PublicLayout = ({ children }: { children: ReactNode }) => {
           ))}
         </nav>
         <div className="ref-public-actions">
-          <Link to="/login" className="ref-button">
+          <a
+            href="https://drive.google.com/drive/folders/1aMUyQcEapn9TtHLfy9Ds5o8Fiz3CeY8i?usp=sharing"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="ref-button"
+            style={{ fontSize: 11 }}
+          >
+            ⬇ Download APK
+          </a>
+          <Link to="/login" className="ref-button" style={{ fontSize: 11 }}>
             Masuk Admin
           </Link>
           <Link
             to="/submit"
             className="ref-button primary"
+            style={{ fontSize: 11 }}
             onClick={(event) => {
               if (
                 !event.ctrlKey &&

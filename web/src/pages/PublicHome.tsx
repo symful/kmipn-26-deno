@@ -296,21 +296,11 @@ export const PublicHome = ({
         </>
       )}
       <div className="ref-footer">
-        <span style={{ flex: 1 }}>
+        <span>
           ◈ Lokasi publik digeneralisasi · Data pribadi pelapor tidak
           ditampilkan
         </span>
-        <a
-          href="https://drive.google.com/drive/folders/1aMUyQcEapn9TtHLfy9Ds5o8Fiz3CeY8i?usp=sharing"
-          target="_blank"
-          rel="noopener noreferrer"
-          className="ref-button primary"
-        >
-          ⬇ Download APK
-        </a>
-        <span style={{ flex: 1, textAlign: "right" }}>
-          Data publik · {new Date().toLocaleDateString("id-ID")}
-        </span>
+        <span>Data publik · {new Date().toLocaleDateString("id-ID")}</span>
       </div>
       <PublicCaseModal
         report={selected}
