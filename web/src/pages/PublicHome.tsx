@@ -296,7 +296,7 @@ export const PublicHome = ({
         </>
       )}
       <div className="ref-footer">
-        <span>
+        <span style={{ flex: 1 }}>
           ◈ Lokasi publik digeneralisasi · Data pribadi pelapor tidak
           ditampilkan
         </span>
@@ -305,11 +305,12 @@ export const PublicHome = ({
           target="_blank"
           rel="noopener noreferrer"
           className="ref-button primary"
-          style={{ marginLeft: "auto" }}
         >
           ⬇ Download APK
         </a>
-        <span>Data publik · {new Date().toLocaleDateString("id-ID")}</span>
+        <span style={{ flex: 1, textAlign: "right" }}>
+          Data publik · {new Date().toLocaleDateString("id-ID")}
+        </span>
       </div>
       <PublicCaseModal
         report={selected}
