@@ -58,11 +58,10 @@ export async function awardXp(
           : "new_report_accepted";
 
     await env.D1.prepare(
-      `INSERT INTO gamification_profiles (user_id, ${typeCounter}, accepted_adjudicated, xp_reached_at, updated_at)
-       VALUES (?, 1, 1, datetime('now'), datetime('now'))
+      `INSERT INTO gamification_profiles (user_id, ${typeCounter}, xp_reached_at, updated_at)
+       VALUES (?, 1, datetime('now'), datetime('now'))
        ON CONFLICT(user_id) DO UPDATE SET
          ${typeCounter} = ${typeCounter} + 1,
-         accepted_adjudicated = accepted_adjudicated + 1,
          xp_reached_at = COALESCE(xp_reached_at, datetime('now')),
          updated_at = datetime('now')`,
     )
