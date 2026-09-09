@@ -74,17 +74,15 @@ export const PublicLeaderboard = () => {
   const fmtScore = (v: number) => v.toFixed(1);
 
   let denomMonths: number | null = null;
-  let denomSource = "";
   if (tab === "kecamatan" && kecamatan[0]) {
     denomMonths = kecamatan[0].active_months;
-    denomSource = kecamatan[0].denominator_source;
   }
 
   return (
     <div className="ref-content">
       <PageHead
         title="Leaderboard"
-        subtitle="Leaderboard sepanjang waktu, tidak di-reset; pengguna bersifat opt-in."
+        subtitle="Rekap kontribusi sepanjang masa dan tidak direset. Semua hadiah hanya berupa pengakuan — tidak ada uang."
       />
 
       <div className="ref-detail-tabs">
@@ -143,11 +141,11 @@ export const PublicLeaderboard = () => {
                       <th>Peringkat</th>
                       <th>Kecamatan</th>
                       <th>Skor</th>
-                      <th>%ile Aktivitas</th>
-                      <th>%ile Partisipasi</th>
-                      <th>Rate Kualitas</th>
-                      <th>Kontributor</th>
-                      <th>Kontribusi Accepted</th>
+                      <th>Skor Kesungguhan</th>
+                      <th>Skor Keragaman Pelapor</th>
+                      <th>Kualitas Laporan</th>
+                      <th>Jumlah Pelapor</th>
+                      <th>Laporan Diterima</th>
                     </tr>
                   </thead>
                   <tbody>
@@ -167,8 +165,7 @@ export const PublicLeaderboard = () => {
                         <td>{fmtPct(row.participation_percentile)}</td>
                         <td>{fmtPct(row.quality_rate)}</td>
                         <td>{row.unique_contributors}</td>
-                        <td>{row.accepted_contributions}</td>
-                      </tr>
+                        <td>{row.accepted_contributions}</td>                      </tr>
                     ))}
                   </tbody>
                 </table>
@@ -182,10 +179,12 @@ export const PublicLeaderboard = () => {
                   marginTop: 10,
                 }}
               >
-                Dinormalisasi {denomMonths} bulan aktif; denominator:{" "}
-                {denomSource}. Skor = 50×%ile aktivitas + 30×%ile partisipasi +
-                20× kualitas; rate mentah per 1.000 penduduk tidak ditampilkan
-                karena denominator fallback kecil.
+                Skor menghitung kesungguhan tiap kecamatan dibanding kecamatan
+                lain, ditambah rasio laporan yang diterima. Karena data jumlah
+                penduduk belum tersedia, perbandingan memakai jumlah akun
+                warga yang aktif — jadi yang dinilai adalah keunggulan
+                relatif antarkecamatan, bukan jumlah laporan mentah.
+                Periode: {denomMonths} bulan.
               </p>
             )}
           </>
@@ -195,9 +194,10 @@ export const PublicLeaderboard = () => {
       ) : (
         <>
           <div className="ref-notice" style={{ marginBottom: 16 }}>
-            Papan skor pengguna bersifat opt-in. Pengguna memerlukan minimal 5
-            kontribusi yang telah diadjudikasi dan reputasi minimal 70% untuk
-            muncul di papan skor ini.
+            Papan skor ini hanya menampilkan warga yang bersedia menampilkan
+            namanya (bisa diatur lewat profil di aplikasi). Nama baru muncul
+            setelah warga punya sedikitnya 5 laporan yang sudah selesai
+            dinilai, dan minimal 7 dari 10 laporannya dinilai benar.
           </div>
           <section className="ref-card" style={{ marginTop: 0 }}>
             <div className="ref-table-wrap">
