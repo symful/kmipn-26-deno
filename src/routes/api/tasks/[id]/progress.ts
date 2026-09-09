@@ -242,7 +242,7 @@ taskProgressRoute.patch(
     if (statements.length > 0) await c.env.D1.batch(statements);
 
     const afterR = await c.env.D1.prepare(
-      "SELECT id, status, progress_percent, progress_notes, estimated_completion, completion_evidence_urls FROM tasks WHERE id = ?1",
+      "SELECT id, status, progress_percent, progress_notes, estimated_completion, completion_evidence_urls, resolution_evidence_urls FROM tasks WHERE id = ?1",
     )
       .bind(taskId)
       .first<Record<string, unknown>>();
@@ -274,6 +274,9 @@ taskProgressRoute.patch(
       estimated_completion: afterR!.estimated_completion,
       completion_evidence_urls: afterR!.completion_evidence_urls
         ? JSON.parse(afterR!.completion_evidence_urls as string)
+        : null,
+      resolution_evidence_urls: afterR!.resolution_evidence_urls
+        ? JSON.parse(afterR!.resolution_evidence_urls as string)
         : null,
     });
   }),

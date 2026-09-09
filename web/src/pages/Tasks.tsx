@@ -2,6 +2,7 @@ import type { TaskSummary } from "../api/task-types";
 import { useEffect, useState, type FormEvent } from "react";
 import { Link } from "react-router-dom";
 import { api } from "../api/client";
+import { useAuthStore } from "../stores/auth";
 import { PageHead } from "../components/ReferencePage";
 import { Modal } from "../components/design-system/Modal";
 import "./tasks-parity.css";
@@ -18,6 +19,7 @@ function photos(value: unknown): string[] {
   }
 }
 export default function Tasks({ reportId }: { reportId?: string } = {}) {
+  const user = useAuthStore((s) => s.user);
   const [tasks, setTasks] = useState<Task[]>([]),
     [tab, setTab] = useState(0),
     [loading, setLoading] = useState(true),
@@ -70,7 +72,8 @@ export default function Tasks({ reportId }: { reportId?: string } = {}) {
         });
       else {
         if (file) {
-          if (file.size > 1024 * 1024) throw new Error("Foto maksimal 1 MB");
+          if (file.size > 10 * 1024 * 1024)
+            throw new Error("Foto maksimal 10 MB");
           const upload = await api.uploadReportPhoto(
             selected.report_id,
             file,
@@ -79,6 +82,7 @@ export default function Tasks({ reportId }: { reportId?: string } = {}) {
           await api.petugasEvidence(selected.id, {
             photo_urls: [upload.public_url],
             notes: reason,
+            role: user?.role === "ADMIN" ? "resolution" : "field",
           });
         }
         await api.petugasProgress(selected.id, {
@@ -281,8 +285,15 @@ export default function Tasks({ reportId }: { reportId?: string } = {}) {
           )}
           <div className="task-evidence">
             {[
-              ["Sebelum", photos(selected?.photo_urls)],
-              ["Sesudah / progres", photos(selected?.completion_evidence_urls)],
+              ["Bukti laporan warga", photos(selected?.photo_urls)],
+              [
+                "Bukti petugas lapangan",
+                photos(selected?.completion_evidence_urls),
+              ],
+              [
+                "Bukti penanganan admin",
+                photos(selected?.resolution_evidence_urls),
+              ],
             ].map(([label, urls]) => (
               <div key={String(label)}>
                 <h3>{String(label)}</h3>
@@ -326,7 +337,7 @@ export default function Tasks({ reportId }: { reportId?: string } = {}) {
                     />
                   </label>
                   <label>
-                    Foto progres (opsional, maksimal 1 MB)
+                    Foto progres (opsional, maksimal 10 MB)
                     <input
                       type="file"
                       accept="image/jpeg,image/png,image/webp"

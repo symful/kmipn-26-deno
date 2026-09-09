@@ -36,7 +36,7 @@ taskDetailRoute.get(
             st.progress_percent, st.progress_notes, st.estimated_completion,
             st.instructions, st.unit_id,
             st.accepted_at, st.started_at, st.completed_at,
-            st.verification_status, st.verified_by, st.verified_at, st.completion_evidence_urls,
+            st.verification_status, st.verified_by, st.verified_at, st.completion_evidence_urls, st.resolution_evidence_urls,
             st.created_at, st.updated_at,
             r.description AS report_description, r.title AS report_title, r.lng, r.lat, r.photo_urls,
             r.severity, ${REPORT_AREA_SQL} AS report_address, r.category_id,

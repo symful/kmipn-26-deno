@@ -585,7 +585,7 @@ export const api = {
 
   petugasEvidence: async (
     id: string,
-    body: { photo_urls: string[]; notes?: string },
+    body: { photo_urls: string[]; notes?: string; role?: "field" | "resolution" },
   ) => {
     return request<{
       success: boolean;

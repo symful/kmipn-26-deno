@@ -1220,7 +1220,7 @@ export const CaseDetail = () => {
                               low: "ringan",
                               medium: "sedang",
                               high: "berat",
-                              critical: "sangat berat",
+                              critical: "kritis",
                             } as Record<string, string>
                           )[severity]
                         : null;

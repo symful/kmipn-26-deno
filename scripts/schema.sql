@@ -150,7 +150,8 @@ CREATE TABLE IF NOT EXISTS tasks (
   verification_status TEXT DEFAULT 'pending' CHECK (verification_status IN ('pending','verified','rejected')),
   verified_by TEXT,
   verified_at TEXT,
-  completion_evidence_urls TEXT
+  completion_evidence_urls TEXT,
+  resolution_evidence_urls TEXT
 );
 CREATE INDEX IF NOT EXISTS idx_tasks_assigned_to ON tasks(assigned_to, status);
 CREATE INDEX IF NOT EXISTS idx_tasks_worker_id ON tasks(worker_id);
@@ -409,6 +410,7 @@ CREATE TABLE IF NOT EXISTS task_evidence (
   task_id TEXT NOT NULL,
   photo_urls TEXT DEFAULT '[]',
   notes TEXT,
+  role TEXT NOT NULL DEFAULT 'field' CHECK (role IN ('field','resolution')),
   created_at TEXT NOT NULL DEFAULT (datetime('now'))
 );
 CREATE INDEX IF NOT EXISTS idx_task_evidence_task ON task_evidence(task_id);

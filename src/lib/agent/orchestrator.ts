@@ -312,10 +312,10 @@ function deriveSeverityScore(
     };
     if (d.damage_visible) {
       const severityBase: Record<string, number> = {
-        critical: 95,
-        high: 85,
-        medium: 55,
-        low: 30,
+        critical: 90,
+        high: 70,
+        medium: 45,
+        low: 20,
       };
       const assessedScore = severityBase[d.severity ?? "unknown"];
       if (assessedScore == null) return null;

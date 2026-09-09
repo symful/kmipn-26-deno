@@ -65,6 +65,7 @@ taskEvidenceRoute.post(
     }
     const photoUrls: string[] = photoUrlsRaw.map((u) => String(u));
     const notes = body.notes ? String(body.notes) : null;
+    const role = body.role === "resolution" ? "resolution" : "field";
 
     const taskR = await c.env.D1.prepare(
       "SELECT id, status, verification_status FROM tasks WHERE id = ?1 AND (?3 = 'ADMIN' OR worker_id = ?2 OR assigned_to = ?2)",
@@ -104,13 +105,15 @@ taskEvidenceRoute.post(
     const statements: D1PreparedStatement[] = [];
     statements.push(
       c.env.D1.prepare(
-        `INSERT INTO task_evidence (id, task_id, photo_urls, notes, created_at)
-     VALUES (lower(hex(randomblob(16))), ?1, ?2, ?3, datetime('now'))`,
-      ).bind(taskId, JSON.stringify(photoUrls), notes),
+        `INSERT INTO task_evidence (id, task_id, photo_urls, notes, role, created_at)
+     VALUES (lower(hex(randomblob(16))), ?1, ?2, ?3, ?4, datetime('now'))`,
+      ).bind(taskId, JSON.stringify(photoUrls), notes, role),
     );
     statements.push(
       c.env.D1.prepare(
-        "UPDATE tasks SET completion_evidence_urls = ?, updated_at = datetime('now') WHERE id = ?",
+        role === "resolution"
+          ? "UPDATE tasks SET resolution_evidence_urls = ?, updated_at = datetime('now') WHERE id = ?"
+          : "UPDATE tasks SET completion_evidence_urls = ?, updated_at = datetime('now') WHERE id = ?",
       ).bind(JSON.stringify(photoUrls), taskId),
     );
 
@@ -128,7 +131,7 @@ taskEvidenceRoute.post(
         action: "petugas_task_evidence",
         objectType: "task",
         objectId: taskId,
-        after: { evidence_id: evidenceId, photo_count: photoUrls.length },
+        after: { evidence_id: evidenceId, photo_count: photoUrls.length, role },
       }).catch((e) =>
         logger.error({
           route: c.req.path,

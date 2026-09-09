@@ -25,6 +25,7 @@ export interface TaskSummary {
   task_type?: "survei_verifikasi" | "perbaikan_fisik" | null;
   verification_status?: "pending" | "verified" | "rejected" | null;
   completion_evidence_urls?: string[] | string | null;
+  resolution_evidence_urls?: string[] | string | null;
 }
 export interface TaskVisit {
   id: string;
