@@ -69,6 +69,46 @@ caseDetailRoute.get(
       .bind(id)
       .all();
 
+    const appeR = await c.env.D1.prepare(
+      `SELECT p.event_type, p.metadata, p.occurred_at, p.actor_id, u.name AS actor_name
+     FROM case_events p
+     LEFT JOIN users u ON u.id = p.actor_id
+     WHERE p.report_id = ?1 AND p.event_type IN ('sanggahan_filed','sanggahan_accepted','sanggahan_rejected')
+     ORDER BY p.occurred_at DESC LIMIT 1`,
+    )
+      .bind(id)
+      .first<{
+        event_type: string;
+        metadata: string | null;
+        occurred_at: string;
+        actor_id: string | null;
+        actor_name: string | null;
+      }>();
+
+    let sanggahan: Record<string, unknown> | null = null;
+    if (appeR) {
+      let reason: string | null = null;
+      try {
+        const parsedMeta = JSON.parse(String(appeR.metadata ?? "{}"));
+        if (parsedMeta && typeof parsedMeta === "object") {
+          reason = (parsedMeta.reason as string) ?? null;
+        }
+      } catch {
+        reason = null;
+      }
+      const outcome =
+        appeR.event_type === "sanggahan_accepted"
+          ? "accepted"
+          : appeR.event_type === "sanggahan_rejected"
+            ? "rejected"
+            : "pending";
+      sanggahan = {
+        status: outcome,
+        filed_at: appeR.occurred_at,
+        reason,
+      };
+    }
+
     const calcResult = await getPriorityScore(c.env, id);
     const supportingReports = await c.env.D1.prepare(
       "SELECT id, title, description, photo_urls, created_at FROM reports WHERE merged_into = ? ORDER BY created_at",
@@ -170,6 +210,7 @@ caseDetailRoute.get(
         reason: row.reason,
         created_at: row.created_at,
       })),
+      sanggahan,
     };
 
     return c.json(result);

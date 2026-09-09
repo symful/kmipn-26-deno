@@ -63,6 +63,27 @@ sanggahanRoute.post(
       );
     }
 
+    const existingSanggahanR = await c.env.D1.prepare(
+      `SELECT id FROM case_events WHERE report_id = ? AND event_type = 'sanggahan_filed'
+     AND id NOT IN (
+       SELECT id FROM case_events WHERE report_id = ? AND event_type IN ('sanggahan_accepted', 'sanggahan_rejected')
+     )`,
+    )
+      .bind(reportId, reportId)
+      .first<{ id: string }>();
+    if (existingSanggahanR) {
+      return c.json(
+        {
+          error: {
+            code: "ALREADY_EXISTS",
+            message:
+              "Sanggahan sudah pernah diajukan untuk laporan ini. Status terbaru muncul di detail laporan.",
+          },
+        },
+        409,
+      );
+    }
+
     const currentStatus = reportR.status;
     if (
       !APPEALABLE_STATES.includes(
@@ -81,33 +102,13 @@ sanggahanRoute.post(
       );
     }
 
-    const existingSanggahanR = await c.env.D1.prepare(
-      `SELECT id FROM case_events WHERE report_id = ? AND event_type = 'sanggahan_filed'
-     AND id NOT IN (
-       SELECT id FROM case_events WHERE report_id = ? AND event_type IN ('sanggahan_accepted', 'sanggahan_rejected')
-     )`,
-    )
-      .bind(reportId, reportId)
-      .first<{ id: string }>();
-    if (existingSanggahanR) {
-      return c.json(
-        {
-          error: {
-            code: "ALREADY_EXISTS",
-            message: "Sanggahan sudah pernah diajukan untuk laporan ini",
-          },
-        },
-        409,
-      );
-    }
-
     const statements: D1PreparedStatement[] = [];
     const eventId = generateId();
     statements.push(
       c.env.D1.prepare(
-        `INSERT INTO case_events (id, report_id, event_type, actor_id, occurred_at)
-     VALUES (?1, ?2, 'sanggahan_filed', ?3, datetime('now'))`,
-      ).bind(eventId, reportId, user.sub),
+        `INSERT INTO case_events (id, report_id, event_type, actor_id, metadata, occurred_at)
+     VALUES (?1, ?2, 'sanggahan_filed', ?3, ?4, datetime('now'))`,
+      ).bind(eventId, reportId, user.sub, JSON.stringify({ reason: parsed.reason })),
     );
     statements.push(
       c.env.D1.prepare(

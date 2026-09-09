@@ -195,7 +195,7 @@ export const PublicLeaderboard = () => {
             Hanya warga yang ikut serta yang ditampilkan di papan ini.
             Warga bisa bergabung atau keluar kapan saja lewat profil di
             aplikasi. Nama warga baru muncul setelah memiliki minimal 5
-            laporan yang sudah dinilai, dan sekurang-kurangnya 70%
+            laporan yang sudah dinilai, dan sekurang-kurangnya 60%
             laporannya dinilai benar.
           </div>
           <section className="ref-card" style={{ marginTop: 0 }}>

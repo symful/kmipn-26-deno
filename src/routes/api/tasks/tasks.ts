@@ -118,7 +118,9 @@ tasksRoute.get(
       const tasks = tasksR.results ?? [];
       return c.json({
         data: normalizeTasksEvidenceUrls(
-          normalizeReportsPhotoUrls(tasks as { photo_urls?: unknown }[]),
+          normalizeReportsPhotoUrls(
+            tasks as { photo_urls?: unknown; completion_evidence_urls?: unknown; resolution_evidence_urls?: unknown }[],
+          ),
         ),
       });
     }
@@ -205,7 +207,9 @@ tasksRoute.get(
 
     return c.json({
       data: normalizeTasksEvidenceUrls(
-        normalizeReportsPhotoUrls(sanitized as { photo_urls?: unknown }[]),
+        normalizeReportsPhotoUrls(
+          sanitized as { photo_urls?: unknown; completion_evidence_urls?: unknown; resolution_evidence_urls?: unknown }[],
+        ),
       ),
     });
   }),

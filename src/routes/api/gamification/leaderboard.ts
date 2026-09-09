@@ -28,7 +28,7 @@ gamificationLeaderboardRoutes.get(
        WHERE p.leaderboard_opt_in = 1
          AND p.abuse_flag = 0
          AND p.total_adjudicated >= 5
-         AND CAST(p.accepted_adjudicated AS REAL) / p.total_adjudicated >= 0.7
+         AND CAST(p.accepted_adjudicated AS REAL) / p.total_adjudicated >= 0.6
          AND u.disabled = 0
          AND u.deleted_at IS NULL
        ORDER BY xp DESC,

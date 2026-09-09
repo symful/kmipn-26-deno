@@ -38,9 +38,9 @@ type CompletionProof = {
 };
 
 type SanggahanData = {
+  status?: "pending" | "accepted" | "rejected" | null | undefined;
   filed_at: string;
-  filed_by?: string;
-  reason?: string;
+  reason?: string | null;
 };
 
 type WorkerOption = { id: string; name: string };
@@ -55,7 +55,7 @@ const DECISION_LABELS: Record<Decision, string> = {
 };
 
 const DECISION_COLORS: Record<Decision, string> = {
-  valid: "bg-selesai hover:bg-selesai",
+  valid: "bg-sigap-selesai hover:bg-sigap-selesai",
   needs_completion: "bg-warning-500 hover:bg-warning-600",
   needs_survey: "bg-primary-500 hover:bg-primary-600",
   duplicate: "bg-primary-500 hover:bg-primary-600",
@@ -163,14 +163,16 @@ export default function CaseReview() {
 
       const report = caseData.report;
       const status = (report.status as string) ?? "";
+      const appeal = (caseData as { sanggahan?: SanggahanData | null }).sanggahan;
       if (APPEALABLE_STATUSES.includes(status)) {
-        const audit = caseData.audit ?? [];
-        const sanggolEvent = audit.find((e) => e.action === "sanggahan_filed");
-        if (sanggolEvent) {
+        if (appeal?.filed_at) {
           setSanggahan({
-            filed_at: sanggolEvent.created_at,
-            ...(sanggolEvent.actor ? { filed_by: sanggolEvent.actor } : {}),
+            status: appeal.status,
+            filed_at: appeal.filed_at,
+            reason: appeal.reason ?? null,
           });
+        } else {
+          setSanggahan(null);
         }
       }
 
@@ -1146,7 +1148,7 @@ export default function CaseReview() {
                       onClick={() => setVerifyDecision("approved")}
                       className={`flex-1 px-3 py-2 rounded text-sm font-medium transition-colors ${
                         verifyDecision === "approved"
-                          ? "bg-selesai text-white"
+                          ? "bg-sigap-selesai text-white"
                           : "bg-neutral-100 text-neutral-700 hover:bg-neutral-200"
                       }`}
                     >
@@ -1229,13 +1231,27 @@ export default function CaseReview() {
                   <p className="text-sm font-medium text-warning-600 mb-1">
                     Sanggahan telah diajukan
                   </p>
-                  <p className="text-xs text-warning-500">
+                  <p className="text-xs text-warning-500 mb-2">
                     Diajukan:{" "}
                     {sanggahan.filed_at
                       ? new Date(sanggahan.filed_at).toLocaleString("id-ID")
                       : "?"}
-                    {sanggahan.filed_by && ` oleh ${sanggahan.filed_by}`}
                   </p>
+                  {sanggahan.reason ? (
+                    <div>
+                      <p className="text-xs font-semibold text-warning-600 mb-1">
+                        Alasan warga (identitas anonim)
+                      </p>
+                      <p className="text-sm text-warning-500 whitespace-pre-wrap">
+                        {sanggahan.reason}
+                      </p>
+                    </div>
+                  ) : (
+                    <p className="text-xs text-warning-500">
+                      Rincian alasan tidak tersedia untuk sanggahan sebelum
+                      pencatatan alasan dimulai.
+                    </p>
+                  )}
                 </div>
               ) : (
                 <p className="text-sm text-sigap-textMuted">
@@ -1270,7 +1286,7 @@ export default function CaseReview() {
                       onClick={() => setSanggahanDecision("accepted")}
                       className={`flex-1 px-3 py-2 rounded text-sm font-medium transition-colors ${
                         sanggahanDecision === "accepted"
-                          ? "bg-selesai text-white"
+                          ? "bg-sigap-selesai text-white"
                           : "bg-neutral-100 text-neutral-700 hover:bg-neutral-200"
                       }`}
                     >
