@@ -1077,6 +1077,14 @@ export const CaseDetail = () => {
         actions={
           user?.role === "ADMIN" ? (
             <>
+              {report.appeal_status === "pending" && (
+                <Link
+                  className="ref-button primary"
+                  to={`/system/case-review/${report.id}`}
+                >
+                  Tinjau Sanggahan
+                </Link>
+              )}
               <button
                 className="ref-button"
                 onClick={() => openActionModal("combine")}
