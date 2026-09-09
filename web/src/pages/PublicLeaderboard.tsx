@@ -179,10 +179,10 @@ export const PublicLeaderboard = () => {
                   marginTop: 10,
                 }}
               >
-                Skor menunjukkan seberapa aktif suatu kecamatan dibanding
-                kecamatan lain, dihitung dari laporan yang sudah diterima.
-                Dihitung selama {denomMonths} bulan dan terus bertambah
-                seiring waktu.
+                Skor menunjukkan seberapa aktif kecamatan ini dibanding
+                kecamatan lain, berdasarkan laporan yang sudah diterima.
+                Dihitung sepanjang {denomMonths} bulan terakhir dan akan
+                terus bertambah.
               </p>
             )}
           </>
@@ -192,9 +192,10 @@ export const PublicLeaderboard = () => {
       ) : (
         <>
           <div className="ref-notice" style={{ marginBottom: 16 }}>
-            Papan ini hanya menampilkan warga yang memilih tampil — bisa
-            diatur kapan saja di profil aplikasi. Nama muncul setelah punya
-            minimal 5 laporan yang sudah dinilai, dengan paling sedikit 70%
+            Hanya warga yang ikut serta yang ditampilkan di papan ini.
+            Warga bisa bergabung atau keluar kapan saja lewat profil di
+            aplikasi. Nama warga baru muncul setelah memiliki minimal 5
+            laporan yang sudah dinilai, dan sekurang-kurangnya 70%
             laporannya dinilai benar.
           </div>
           <section className="ref-card" style={{ marginTop: 0 }}>
