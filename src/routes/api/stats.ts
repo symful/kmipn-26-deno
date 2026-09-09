@@ -55,7 +55,7 @@ statsRoute.get(
       ).first<{ cnt: number }>();
 
       const needsVerification = await env.D1.prepare(
-        "SELECT COUNT(*) as cnt FROM reports WHERE status = 'under_review'",
+        "SELECT COUNT(*) as cnt FROM reports WHERE status IN ('under_review', 'needs_survey', 'needs_completion')",
       ).first<{ cnt: number }>();
 
       const slaBreached = await env.D1.prepare(
