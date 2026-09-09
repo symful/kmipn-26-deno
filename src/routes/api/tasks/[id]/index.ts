@@ -7,6 +7,7 @@ import { safeHandler } from "@/lib/safeHandler";
 import {
   normalizeReportPhotoUrls,
   normalizeReportsPhotoUrls,
+  normalizeTaskEvidenceUrls,
 } from "@/lib/photo-urls";
 
 export const taskDetailRoute = new Hono<{
@@ -102,7 +103,9 @@ taskDetailRoute.get(
       );
     }
 
-    const normalizedTask = normalizeReportPhotoUrls(task);
+    const normalizedTask = normalizeTaskEvidenceUrls(
+      normalizeReportPhotoUrls(task),
+    );
 
     const clarificationsResult = await c.env.D1.prepare(
       `SELECT id, message, created_at

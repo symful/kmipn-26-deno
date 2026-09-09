@@ -3,7 +3,10 @@ import { Hono } from "hono";
 import type { Env } from "@/types/bindings";
 import { type AuthVariables } from "@/lib/auth";
 import { safeHandler } from "@/lib/safeHandler";
-import { normalizeReportsPhotoUrls } from "@/lib/photo-urls";
+import {
+  normalizeReportsPhotoUrls,
+  normalizeTasksEvidenceUrls,
+} from "@/lib/photo-urls";
 
 export const tasksRoute = new Hono<{
   Bindings: Env;
@@ -114,7 +117,9 @@ tasksRoute.get(
         .all();
       const tasks = tasksR.results ?? [];
       return c.json({
-        data: normalizeReportsPhotoUrls(tasks as { photo_urls?: unknown }[]),
+        data: normalizeTasksEvidenceUrls(
+          normalizeReportsPhotoUrls(tasks as { photo_urls?: unknown }[]),
+        ),
       });
     }
 
@@ -199,7 +204,9 @@ tasksRoute.get(
     }));
 
     return c.json({
-      data: normalizeReportsPhotoUrls(sanitized as { photo_urls?: unknown }[]),
+      data: normalizeTasksEvidenceUrls(
+        normalizeReportsPhotoUrls(sanitized as { photo_urls?: unknown }[]),
+      ),
     });
   }),
 );

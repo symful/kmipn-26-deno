@@ -24,8 +24,8 @@ export interface TaskSummary {
   unit_name: string;
   task_type?: "survei_verifikasi" | "perbaikan_fisik" | null;
   verification_status?: "pending" | "verified" | "rejected" | null;
-  completion_evidence_urls?: string[] | string | null;
-  resolution_evidence_urls?: string[] | string | null;
+  completion_evidence_urls?: string[] | null;
+  resolution_evidence_urls?: string[] | null;
 }
 export interface TaskListResponse {
   data: TaskSummary[];

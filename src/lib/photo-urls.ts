@@ -42,3 +42,31 @@ export function normalizeReportsPhotoUrls<T extends { photo_urls?: unknown }>(
 ): T[] {
   return arr.map((item) => normalizeReportPhotoUrls(item));
 }
+
+export function normalizeTaskEvidenceUrls<
+  T extends {
+    completion_evidence_urls?: unknown;
+    resolution_evidence_urls?: unknown;
+  },
+>(obj: T): T {
+  if (obj.completion_evidence_urls !== undefined) {
+    obj.completion_evidence_urls = normalizePhotoUrls(
+      obj.completion_evidence_urls,
+    );
+  }
+  if (obj.resolution_evidence_urls !== undefined) {
+    obj.resolution_evidence_urls = normalizePhotoUrls(
+      obj.resolution_evidence_urls,
+    );
+  }
+  return obj;
+}
+
+export function normalizeTasksEvidenceUrls<
+  T extends {
+    completion_evidence_urls?: unknown;
+    resolution_evidence_urls?: unknown;
+  },
+>(arr: T[]): T[] {
+  return arr.map((item) => normalizeTaskEvidenceUrls(item));
+}

@@ -11,12 +11,7 @@ type Task = TaskSummary;
 const tabs = ["Semua Tugas", "Survei Verifikasi", "Perbaikan Fisik"];
 const types = ["", "survei_verifikasi", "perbaikan_fisik"];
 function photos(value: unknown): string[] {
-  if (Array.isArray(value)) return value.filter((v) => typeof v === "string");
-  try {
-    return photos(JSON.parse(String(value)));
-  } catch {
-    return [];
-  }
+  return Array.isArray(value) ? value.filter((v) => typeof v === "string") : [];
 }
 export default function Tasks({ reportId }: { reportId?: string } = {}) {
   const user = useAuthStore((s) => s.user);
