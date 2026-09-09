@@ -116,7 +116,7 @@ taskDetailRoute.get(
     const clarifications = clarificationsResult.results ?? [];
 
     const evidenceResult = await c.env.D1.prepare(
-      `SELECT id, photo_urls, notes, created_at
+      `SELECT id, photo_urls, notes, role, created_at
      FROM task_evidence
      WHERE task_id = ?
      ORDER BY created_at DESC`,

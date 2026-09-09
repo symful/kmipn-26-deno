@@ -101,17 +101,6 @@ export interface Report {
 
 export interface AssessmentResult {
   source?: "recorded_database_evidence";
-  tasks?: Array<{
-    id: string;
-    status: string;
-    progress_percent: number;
-    progress_notes: string | null;
-    instructions: string | null;
-    deadline: string | null;
-    verification_status: string | null;
-    completion_evidence_urls: string[] | null;
-    completed_at: string | null;
-  }>;
   visits?: Array<{
     id: string;
     task_id: string;

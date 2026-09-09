@@ -1,4 +1,4 @@
-import type { TaskListResponse, TaskDetailResponse } from "./task-types";
+import type { TaskListResponse } from "./task-types";
 import type {
   GeoJSONFeatureCollection,
   KategoriListResponse,
@@ -522,9 +522,6 @@ export const api = {
     ),
 
   getTasks: () => request<TaskListResponse>(`/tasks`, { token: true }),
-
-  getTask: (id: string) =>
-    request<TaskDetailResponse>(`/tasks/${id}`, { token: true }),
 
   submitVisit: (
     id: string,

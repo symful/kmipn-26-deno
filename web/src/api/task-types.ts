@@ -27,27 +27,6 @@ export interface TaskSummary {
   completion_evidence_urls?: string[] | string | null;
   resolution_evidence_urls?: string[] | string | null;
 }
-export interface TaskVisit {
-  id: string;
-  findings: string;
-  dimensions?: string;
-  recommendation?: string;
-  notes?: string;
-  condition_assessment?: string;
-  photo_urls: string[];
-  created_at: string;
-}
-export interface TaskDetailResponse {
-  task: TaskSummary & { checklist: Array<{ item: string; checked: boolean }> };
-  visits: TaskVisit[];
-  evidence: Array<{
-    id: string;
-    photo_urls: string[];
-    notes: string | null;
-    created_at: string;
-  }>;
-  clarifications: Array<{ id: string; message: string; created_at: string }>;
-}
 export interface TaskListResponse {
   data: TaskSummary[];
 }
