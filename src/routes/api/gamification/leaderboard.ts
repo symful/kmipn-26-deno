@@ -141,20 +141,20 @@ gamificationLeaderboardRoutes.get(
     });
 
     const n = entries.length;
+    const percentileRank = (values: number[], v: number): number => {
+      if (values.length === 0) return 0;
+      const below = values.filter((x) => x < v).length;
+      const equal = values.filter((x) => x === v).length;
+      return (below + (equal - 1) / 2) / values.length;
+    };
+    const activityValues = entries.map((e) => e.activity_rate);
+    const participationValues = entries.map((e) => e.participation_rate);
     for (const entry of entries) {
-      const sortedActivity = [...entries]
-        .map((e) => e.activity_rate)
-        .sort((a, b) => a - b);
-      const activityRank = sortedActivity.indexOf(entry.activity_rate);
-      entry.activity_percentile =
-        n === 1 ? 0 : (activityRank - 1) / (n - 1);
-
-      const sortedParticipation = [...entries]
-        .map((e) => e.participation_rate)
-        .sort((a, b) => a - b);
-      const participationRank = sortedParticipation.indexOf(entry.participation_rate);
-      entry.participation_percentile =
-        n === 1 ? 0 : (participationRank - 1) / (n - 1);
+      entry.activity_percentile = percentileRank(activityValues, entry.activity_rate);
+      entry.participation_percentile = percentileRank(
+        participationValues,
+        entry.participation_rate,
+      );
     }
 
     for (const entry of entries) {

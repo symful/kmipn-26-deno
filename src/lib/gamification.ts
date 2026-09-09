@@ -32,7 +32,14 @@ export async function awardXp(
     const xp = XP_VALUES[params.type];
     if (xp === undefined) return;
 
-    const result = await env.D1.prepare(
+    const existing = await env.D1.prepare(
+      "SELECT 1 FROM xp_ledger WHERE idempotency_key = ?",
+    )
+      .bind(params.idempotencyKey)
+      .first();
+    if (existing) return;
+
+    await env.D1.prepare(
       `INSERT INTO xp_ledger (id, user_id, contribution_id, contribution_type, xp, kind, reason, idempotency_key, created_at)
        VALUES (?, ?, ?, ?, ?, 'credit', ?, ?, datetime('now'))
        ON CONFLICT(idempotency_key) DO NOTHING`,
@@ -48,10 +55,9 @@ export async function awardXp(
       )
       .run();
 
-    if (result.meta?.changes === 0) return;
-
     const typeCounter =
-      params.type === "status_changing_update"
+      params.type === "status_changing_update" ||
+      params.type === "self_status_changing_update"
         ? "status_changing_accepted"
         : params.type === "corroboration"
           ? "corroboration_accepted"
