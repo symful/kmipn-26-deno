@@ -199,11 +199,17 @@ function deriveUrgency(results: Record<string, ToolResult>): number {
     }
   }
 
+  return Math.min(5, urgency);
+}
+
+export function computeReviewRisk(results: Record<string, ToolResult>): number {
+  let risk = 0;
+
   const privacyResult = results.detect_privacy_risk;
   if (privacyResult && privacyResult.status === "fulfilled") {
     const privacy = privacyResult.value as { risk_level?: string } | undefined;
     if (privacy?.risk_level === "high") {
-      urgency += 1;
+      risk += 0.35;
     }
   }
 
@@ -212,7 +218,7 @@ function deriveUrgency(results: Record<string, ToolResult>): number {
     const location = locationResult.value as
       { consistent?: boolean } | undefined;
     if (location?.consistent === false) {
-      urgency += 1;
+      risk += 0.25;
     }
   }
 
@@ -221,11 +227,76 @@ function deriveUrgency(results: Record<string, ToolResult>): number {
     const duplicates = duplicatesResult.value as
       { duplicates_found?: boolean } | undefined;
     if (duplicates?.duplicates_found) {
-      urgency += 1;
+      risk += 0.20;
     }
   }
 
-  return Math.min(5, urgency);
+  const mediaResult = results.assess_media_quality;
+  if (mediaResult && mediaResult.status === "fulfilled") {
+    const media = mediaResult.value as { quality_ok?: boolean } | undefined;
+    if (media?.quality_ok === false) {
+      risk += 0.15;
+    }
+  }
+
+  const confidences: number[] = [];
+  for (const [toolName, result] of Object.entries(results)) {
+    if (
+      toolName === "collect_field_evidence" ||
+      result.status !== "fulfilled"
+    ) {
+      continue;
+    }
+    const val = result.value as { confidence?: number } | undefined;
+    if (typeof val?.confidence === "number") {
+      confidences.push(val.confidence);
+    }
+  }
+  if (confidences.length > 0) {
+    const avg =
+      confidences.reduce((a, b) => a + b, 0) / confidences.length;
+    if (avg < 0.5) {
+      risk += 0.20;
+    }
+  }
+
+  let rejectedCount = 0;
+  for (const result of Object.values(results)) {
+    if (result.status === "rejected") {
+      rejectedCount++;
+    }
+  }
+  if (rejectedCount > 0) {
+    risk += Math.min(rejectedCount * 0.05, 0.25);
+  }
+
+  return Math.round(Math.min(1, risk) * 100) / 100;
+}
+
+export function classifyContribution(
+  results: Record<string, ToolResult>,
+): "new_report" | "corroboration" | "status_changing_update" {
+  const duplicatesResult = results.find_duplicates;
+  const duplicatesFound =
+    duplicatesResult &&
+    duplicatesResult.status === "fulfilled" &&
+    (duplicatesResult.value as { duplicates_found?: boolean } | undefined)
+      ?.duplicates_found === true;
+
+  if (!duplicatesFound) {
+    return "new_report";
+  }
+
+  const damageResult = results.extract_damage_indicators;
+  if (damageResult && damageResult.status === "fulfilled") {
+    const damage = damageResult.value as
+      { damage_visible?: boolean } | undefined;
+    if (damage?.damage_visible === false) {
+      return "status_changing_update";
+    }
+  }
+
+  return "corroboration";
 }
 
 function deriveSeverityScore(
@@ -530,6 +601,8 @@ async function finalizeAssessment(
   }
 
   const recommendedStatus = deriveRecommendedStatus(results);
+  const contributionType = classifyContribution(results);
+  const reviewRisk = computeReviewRisk(results);
 
   const facilityCard = {
     location: { lat: meta.lat, lng: meta.lng },
@@ -538,17 +611,20 @@ async function finalizeAssessment(
     photo_gallery: photoUrls,
     recommended_status: recommendedStatus,
     all_assessments: allAssessments,
+    review_risk: reviewRisk,
+    contribution_type: contributionType,
   };
 
   const severityScore = deriveSeverityScore(results);
 
   batchStatements.push(
     env.D1.prepare(
-      `UPDATE reports SET facility_card = ?, ai_recommended_status = ?, severity = COALESCE(?, severity), updated_at = datetime('now') WHERE id = ?`,
+      `UPDATE reports SET facility_card = ?, ai_recommended_status = ?, severity = COALESCE(?, severity), contribution_type = COALESCE(contribution_type, ?), submission_intent = COALESCE(submission_intent, 'report'), updated_at = datetime('now') WHERE id = ?`,
     ).bind(
       JSON.stringify(facilityCard),
       hasSuccess ? recommendedStatus : "needs_review",
       severityScore,
+      contributionType,
       reportId,
     ),
   );

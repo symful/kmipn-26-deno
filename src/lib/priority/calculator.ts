@@ -1,5 +1,11 @@
 import type { Env } from "@/types/bindings";
 
+/**
+ * Each field stores the component's contribution to the final score (0–100).
+ * `report_count` now holds the corroboration bonus applied post-sum, NOT a
+ * raw merged-report count.  Only independent corroborations from distinct
+ * reporters (excluding the original) count toward this bonus.
+ */
 export interface PriorityBreakdown {
   severity: number;
   impact: number;
@@ -9,14 +15,11 @@ export interface PriorityBreakdown {
 }
 
 /**
- * REPORT_COUNT_CONTRIBUTION_FACTOR — multiplier applied to the raw merged-report
- * count before capping.  Formula: min(reportCount * FACTOR, MAX_CONTRIBUTION).
- * Each supporting (merged) report adds 2 points, capping at 20.  This is
- * intentionally NOT normalised to 0-100 like the other components because its
- * absolute ceiling is 20 and it feeds additively into the weighted total.
- *
- * NOTE: Adding this factor may shift existing priority sort order for reports
- * that already have merged duplicates.
+ * REPORT_COUNT_CONTRIBUTION_FACTOR — bonus per independent corroboration,
+ * applied AFTER the normalised weighted sum.  Each corroborating report
+ * from a distinct reporter (excluding the original) adds 2 points, capped
+ * at 20.  Independent corroborations only: the SQL query filters
+ * contribution_type = 'corroboration' and excludes the original reporter_id.
  */
 const REPORT_COUNT_CONTRIBUTION_FACTOR = 2;
 const REPORT_COUNT_MAX_CONTRIBUTION = 20;
@@ -237,63 +240,57 @@ export async function evaluatePriority(
     severity: severityW,
     impact: impactW,
     vulnerability: vulnerabilityW = 0,
-    report_count: reportCountW,
     sla: slaW,
   } = formula.weights;
 
   const inputs = priorityInputs(report);
   const severityRaw = inputs.severity.value ?? 0;
-  const severityNormalized = Math.min(1, Math.max(0, severityRaw / 100));
-  const severityComponent = Math.round(severityNormalized * severityW * 100);
+  const severityN = Math.min(1, Math.max(0, severityRaw / 100));
 
-  const impactNormalized = Math.min(
+  const impactN = Math.min(
     1,
     Math.max(0, (Number(report.population_affected) || 0) / 100_000),
   );
-  const impactComponent = Math.round(impactNormalized * impactW * 100);
 
-  const vulnerabilityNormalized = Math.min(
+  const vulnerabilityN = Math.min(
     1,
     Math.max(0, Number(report.vulnerability_index) || 0),
-  );
-  const vulnerabilityComponent = Math.round(
-    vulnerabilityNormalized * vulnerabilityW * 100,
   );
 
   let deadline = report.deadline ? new Date(report.deadline) : null;
   if (!deadline) {
     deadline = await getSlaDeadline(env, report.category_id, report.priority);
   }
-  const slaNormalized = computeSlaPressure(deadline);
-  const slaComponent = Math.round(slaNormalized * slaW * 100);
+  const slaN = computeSlaPressure(deadline);
 
-  const reportCountR = await env.D1.prepare(
-    `SELECT COUNT(*) as cnt FROM reports WHERE merged_into = ?`,
+  const weighted =
+    severityN * severityW +
+    impactN * impactW +
+    vulnerabilityN * vulnerabilityW +
+    slaN * slaW;
+  const base = Math.round(weighted * 100);
+
+  const corroborationsR = await env.D1.prepare(
+    `SELECT COUNT(DISTINCT reporter_id) AS cnt FROM reports WHERE merged_into = ? AND contribution_type = 'corroboration' AND reporter_id IS NOT NULL AND reporter_id != (SELECT reporter_id FROM reports WHERE id = ?)`,
   )
-    .bind(reportId)
+    .bind(reportId, reportId)
     .first<{ cnt: number }>();
-  const reportCount = reportCountR?.cnt ?? 0;
-  const reportCountComponent =
-    reportCountW === undefined
-      ? Math.min(
-          reportCount * REPORT_COUNT_CONTRIBUTION_FACTOR,
-          REPORT_COUNT_MAX_CONTRIBUTION,
-        )
-      : Math.round(Math.min(100, reportCount * 10) * reportCountW);
+  const corroborations = corroborationsR?.cnt ?? 0;
+  const bonus = Math.min(
+    corroborations * REPORT_COUNT_CONTRIBUTION_FACTOR,
+    REPORT_COUNT_MAX_CONTRIBUTION,
+  );
 
-  const slaProximity = slaNormalized;
+  const totalScore = Math.min(100, base + bonus);
+
+  const severityComponent = Math.round(severityN * severityW * 100);
+  const impactComponent = Math.round(impactN * impactW * 100);
+  const vulnerabilityComponent = Math.round(vulnerabilityN * vulnerabilityW * 100);
+  const slaComponent = Math.round(slaN * slaW * 100);
+  const slaProximity = slaN;
   const reporterReliability = await computeReporterReliability(
     env,
     report.device_id,
-  );
-
-  const totalScore = Math.min(
-    100,
-    severityComponent +
-      impactComponent +
-      vulnerabilityComponent +
-      slaComponent +
-      reportCountComponent,
   );
 
   const breakdown: PriorityBreakdown = {
@@ -301,7 +298,7 @@ export async function evaluatePriority(
     impact: impactComponent,
     vulnerability: vulnerabilityComponent,
     sla: slaComponent,
-    report_count: reportCountComponent,
+    report_count: bonus,
   };
 
   const otherFactors: PriorityOtherFactors = {
@@ -334,7 +331,7 @@ export async function evaluatePriority(
       impactComponent,
       vulnerabilityComponent,
       slaComponent,
-      reportCountComponent,
+      bonus,
       formula.version,
       now,
     )
@@ -439,14 +436,13 @@ export function computePriority(input: {
   report_count?: number;
 }): number {
   const b = computePriorityBreakdown(input);
-  return (
-    Math.round(
-      (b.severity * 0.35 +
-        b.impact * 0.25 +
-        b.vulnerability * 0.2 +
-        b.sla * 0.2 +
-        b.report_count) *
-        100,
-    ) / 100
-  );
+  const severityN = Math.min(1, Math.max(0, b.severity / 100));
+  const impactN = Math.min(1, Math.max(0, b.impact / 100_000));
+  const vulnerabilityN = Math.min(1, Math.max(0, b.vulnerability));
+  const slaN = Math.min(1, Math.max(0, b.sla));
+  const weighted =
+    severityN * 0.35 + impactN * 0.25 + vulnerabilityN * 0.2 + slaN * 0.2;
+  const base = Math.round(weighted * 100);
+  const bonus = Math.min(b.report_count ?? 0, REPORT_COUNT_MAX_CONTRIBUTION);
+  return Math.min(100, base + bonus);
 }
