@@ -9,6 +9,7 @@ import { getAssessments } from "@/lib/agent/store";
 import { evaluatePriority } from "@/lib/priority/calculator";
 import { VerifikatorAcceptSchema } from "@/lib/schemas";
 import { parseJson } from "@/lib/validation";
+import { recordAdjudication, awardXp } from "@/lib/gamification";
 
 const ALLOWED_STATES = ["submitted", "under_review", "needs_survey"] as const;
 
@@ -147,6 +148,35 @@ casesAcceptRoute.post(
         }),
       ),
     );
+
+    {
+      const rpt = await c.env.D1.prepare(
+        `SELECT reporter_id FROM reports WHERE id = ?`,
+      )
+        .bind(id)
+        .first<{ reporter_id: string }>();
+      if (rpt?.reporter_id) {
+        c.executionCtx.waitUntil(
+          Promise.all([
+            recordAdjudication(c.env, rpt.reporter_id, id, true),
+            awardXp(c.env, {
+              userId: rpt.reporter_id,
+              contributionId: id,
+              type: "new_report",
+              idempotencyKey: `xp:${id}:new_report`,
+              reason: "Report accepted via accept",
+            }),
+          ]).catch((e) =>
+            logger.error({
+              route: c.req.path,
+              method: c.req.method,
+              error: e instanceof Error ? e : new Error(String(e)),
+              context: "gamification_hook_failed",
+            }),
+          ),
+        );
+      }
+    }
 
     let assessments: Awaited<ReturnType<typeof getAssessments>> = [];
     try {

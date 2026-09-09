@@ -8,6 +8,7 @@ import { logger } from "@/lib/logger";
 import { VerifikatorRejectSchema } from "@/lib/schemas";
 import { parseJson } from "@/lib/validation";
 import { evaluatePriority } from "@/lib/priority/calculator";
+import { recordAdjudication } from "@/lib/gamification";
 
 export const casesRejectRoute = new Hono<{
   Bindings: Env;
@@ -117,6 +118,27 @@ casesRejectRoute.post(
         }),
       ),
     );
+
+    {
+      const rpt = await c.env.D1.prepare(
+        `SELECT reporter_id FROM reports WHERE id = ?`,
+      )
+        .bind(id)
+        .first<{ reporter_id: string }>();
+      if (rpt?.reporter_id) {
+        c.executionCtx.waitUntil(
+          recordAdjudication(c.env, rpt.reporter_id, id, false).catch((e) =>
+            logger.error({
+              route: c.req.path,
+              method: c.req.method,
+              error: e instanceof Error ? e : new Error(String(e)),
+              context: "gamification_hook_failed",
+            }),
+          ),
+        );
+      }
+    }
+
     return c.json({ status: "rejected", reason });
   }),
 );

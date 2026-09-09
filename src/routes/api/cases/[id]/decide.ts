@@ -14,6 +14,7 @@ import {
 } from "@/lib/priority/calculator";
 import { getConfig } from "@/config/env";
 import { err } from "@/types/error-codes";
+import { recordAdjudication, awardXp } from "@/lib/gamification";
 
 export const casesDecideRoute = new Hono<{
   Bindings: Env;
@@ -419,6 +420,33 @@ casesDecideRoute.post(
             method: c.req.method,
             error: e,
             context: "priority_calc_failed",
+          }),
+        ),
+      );
+    }
+
+    if (reporterId) {
+      c.executionCtx.waitUntil(
+        (decision === "valid"
+          ? Promise.all([
+              recordAdjudication(c.env, reporterId, id, true),
+              awardXp(c.env, {
+                userId: reporterId,
+                contributionId: id,
+                type: "new_report",
+                idempotencyKey: `xp:${id}:new_report`,
+                reason: "Report accepted via decide",
+              }),
+            ])
+          : decision === "duplicate" || decision === "rejected"
+            ? recordAdjudication(c.env, reporterId, id, false)
+            : Promise.resolve()
+        ).catch((e) =>
+          logger.error({
+            route: c.req.path,
+            method: c.req.method,
+            error: e instanceof Error ? e : new Error(String(e)),
+            context: "gamification_hook_failed",
           }),
         ),
       );

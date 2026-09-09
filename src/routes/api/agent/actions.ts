@@ -11,6 +11,7 @@ import { rateLimit } from "@/lib/ratelimit";
 import { requireRole } from "@/lib/rbac";
 import { appendAudit } from "@/lib/audit";
 import { logger } from "@/lib/logger";
+import { recordAdjudication, awardXp } from "@/lib/gamification";
 
 export const agentActionsRoute = new Hono<{ Bindings: Env }>();
 
@@ -88,6 +89,35 @@ agentActionsRoute.post(
         }),
       ),
     );
+
+    {
+      const rpt = await c.env.D1.prepare(
+        `SELECT reporter_id FROM reports WHERE id = ?`,
+      )
+        .bind(report_id)
+        .first<{ reporter_id: string }>();
+      if (rpt?.reporter_id) {
+        c.executionCtx.waitUntil(
+          Promise.all([
+            recordAdjudication(c.env, rpt.reporter_id, report_id, true),
+            awardXp(c.env, {
+              userId: rpt.reporter_id,
+              contributionId: report_id,
+              type: "new_report",
+              idempotencyKey: `xp:${report_id}:new_report`,
+              reason: "Report approved via agent",
+            }),
+          ]).catch((e) =>
+            logger.error({
+              route: c.req.path,
+              method: c.req.method,
+              error: e instanceof Error ? e : new Error(String(e)),
+              context: "gamification_hook_failed",
+            }),
+          ),
+        );
+      }
+    }
 
     return c.json({ report_id, status: "verified", reason });
   }),
@@ -208,6 +238,26 @@ agentActionsRoute.post(
       ),
     );
 
+    {
+      const rpt = await c.env.D1.prepare(
+        `SELECT reporter_id FROM reports WHERE id = ?`,
+      )
+        .bind(source_report_id)
+        .first<{ reporter_id: string }>();
+      if (rpt?.reporter_id) {
+        c.executionCtx.waitUntil(
+          recordAdjudication(c.env, rpt.reporter_id, source_report_id, false).catch((e) =>
+            logger.error({
+              route: c.req.path,
+              method: c.req.method,
+              error: e instanceof Error ? e : new Error(String(e)),
+              context: "gamification_hook_failed",
+            }),
+          ),
+        );
+      }
+    }
+
     return c.json({
       source_report_id,
       target_report_id,
@@ -291,6 +341,26 @@ agentActionsRoute.post(
         }),
       ),
     );
+
+    {
+      const rpt = await c.env.D1.prepare(
+        `SELECT reporter_id FROM reports WHERE id = ?`,
+      )
+        .bind(report_id)
+        .first<{ reporter_id: string }>();
+      if (rpt?.reporter_id) {
+        c.executionCtx.waitUntil(
+          recordAdjudication(c.env, rpt.reporter_id, report_id, false).catch((e) =>
+            logger.error({
+              route: c.req.path,
+              method: c.req.method,
+              error: e instanceof Error ? e : new Error(String(e)),
+              context: "gamification_hook_failed",
+            }),
+          ),
+        );
+      }
+    }
 
     return c.json({ report_id, status: "rejected", reason });
   }),
