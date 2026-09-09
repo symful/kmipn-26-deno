@@ -82,7 +82,7 @@ export const PublicLeaderboard = () => {
     <div className="ref-content">
       <PageHead
         title="Leaderboard"
-        subtitle="Rekap kontribusi sepanjang masa dan tidak direset. Semua hadiah hanya berupa pengakuan — tidak ada uang."
+        subtitle="Peringkat partisipasi kecamatan dan warga. Dihitung sepanjang masa, tidak direset."
       />
 
       <div className="ref-detail-tabs">
@@ -179,12 +179,10 @@ export const PublicLeaderboard = () => {
                   marginTop: 10,
                 }}
               >
-                Skor menghitung kesungguhan tiap kecamatan dibanding kecamatan
-                lain, ditambah rasio laporan yang diterima. Karena data jumlah
-                penduduk belum tersedia, perbandingan memakai jumlah akun
-                warga yang aktif — jadi yang dinilai adalah keunggulan
-                relatif antarkecamatan, bukan jumlah laporan mentah.
-                Periode: {denomMonths} bulan.
+                Skor menunjukkan seberapa aktif suatu kecamatan dibanding
+                kecamatan lain, dihitung dari laporan yang sudah diterima.
+                Dihitung selama {denomMonths} bulan dan terus bertambah
+                seiring waktu.
               </p>
             )}
           </>
@@ -194,10 +192,10 @@ export const PublicLeaderboard = () => {
       ) : (
         <>
           <div className="ref-notice" style={{ marginBottom: 16 }}>
-            Papan skor ini hanya menampilkan warga yang bersedia menampilkan
-            namanya (bisa diatur lewat profil di aplikasi). Nama baru muncul
-            setelah warga punya sedikitnya 5 laporan yang sudah selesai
-            dinilai, dan minimal 7 dari 10 laporannya dinilai benar.
+            Papan ini hanya menampilkan warga yang memilih tampil — bisa
+            diatur kapan saja di profil aplikasi. Nama muncul setelah punya
+            minimal 5 laporan yang sudah dinilai, dengan paling sedikit 70%
+            laporannya dinilai benar.
           </div>
           <section className="ref-card" style={{ marginTop: 0 }}>
             <div className="ref-table-wrap">
