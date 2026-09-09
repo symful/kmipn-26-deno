@@ -135,21 +135,28 @@ export async function reverseGeocode(
         "Alamat belum tercatat pada peta. Isi alamat secara manual.",
         404,
       );
-    // Only assign Indonesian administrative levels when the source names them explicitly.
-    const district = parts.find((v) => /^Kecamatan\s/i.test(v));
-    const village = ["village", "hamlet"].includes(field("osm_value"))
-      ? field("name")
-      : parts.find((v) => /^(Desa|Kelurahan)\s/i.test(v));
-    const city = parts.find((v) => /^(Kabupaten|Kota)\s/i.test(v));
+    // Photon (Indonesia) returns unprefixed admin levels:
+    // county = kecamatan, district = kelurahan/desa, city = kota/kabupaten,
+    // state = provinsi. Prefixed names ("Kecamatan X") stay accepted as fallback.
+    const kecamatan =
+      field("county") || parts.find((v) => /^Kecamatan\s/i.test(v)) || "";
+    const kelurahan =
+      field("district") ||
+      (["village", "hamlet"].includes(field("osm_value")) ? field("name") : "") ||
+      parts.find((v) => /^(Desa|Kelurahan)\s/i.test(v)) ||
+      "";
+    const kabupaten =
+      field("city") || parts.find((v) => /^(Kabupaten|Kota)\s/i.test(v)) || "";
+    const provinsi = field("state");
     const value: ResolvedAddress = {
       address,
       address_area: address,
       latitude,
       longitude,
-      ...(village ? { kelurahan: village } : {}),
-      ...(district ? { kecamatan: district } : {}),
-      ...(city ? { kabupaten: city } : {}),
-      ...(field("state") ? { provinsi: field("state") } : {}),
+      ...(kelurahan ? { kelurahan } : {}),
+      ...(kecamatan ? { kecamatan } : {}),
+      ...(kabupaten ? { kabupaten } : {}),
+      ...(provinsi ? { provinsi } : {}),
       source: "OpenStreetMap",
       attribution: "© OpenStreetMap contributors",
     };
@@ -162,5 +169,68 @@ export async function reverseGeocode(
     return await request;
   } finally {
     pending.delete(key);
+  }
+}
+
+/**
+ * Fills missing administrative fields on a freshly created report from the
+ * reverse-geocoding API. Only fields the client left null/empty get filled;
+ * provided values are never touched. Swallows all errors so geocoder outages
+ * cannot fail report creation.
+ */
+export async function enrichReportLocation(
+  env: Env,
+  reportId: string,
+  latitude: number,
+  longitude: number,
+  provided: {
+    kecamatan?: string | null | undefined;
+    kelurahan?: string | null | undefined;
+    kabupaten?: string | null | undefined;
+    provinsi?: string | null | undefined;
+    address_area?: string | null | undefined;
+  },
+): Promise<void> {
+  const pick = (v: string | null | undefined) =>
+    typeof v === "string" && v.trim() !== "" ? v.trim() : null;
+  const providedKecamatan = pick(provided.kecamatan);
+  const providedKelurahan = pick(provided.kelurahan);
+  const providedKabupaten = pick(provided.kabupaten);
+  const providedProvinsi = pick(provided.provinsi);
+  const providedAddress = pick(provided.address_area);
+  if (
+    providedKecamatan &&
+    providedKelurahan &&
+    providedKabupaten &&
+    providedProvinsi &&
+    providedAddress
+  ) {
+    return;
+  }
+  try {
+    const resolved = await reverseGeocode(env, latitude, longitude);
+    await env.D1.prepare(
+      `UPDATE reports SET
+         kecamatan = ?,
+         kelurahan = ?,
+         kabupaten = ?,
+         provinsi = ?,
+         address_area = ?
+       WHERE id = ?`,
+    )
+      .bind(
+        providedKecamatan ?? resolved.kecamatan ?? null,
+        providedKelurahan ?? resolved.kelurahan ?? null,
+        providedKabupaten ?? resolved.kabupaten ?? null,
+        providedProvinsi ?? resolved.provinsi ?? null,
+        providedAddress ?? resolved.address_area ?? null,
+        reportId,
+      )
+      .run();
+  } catch (e) {
+    console.error(
+      "[geocoding] location enrichment skipped:",
+      e instanceof Error ? e.message : String(e),
+    );
   }
 }
