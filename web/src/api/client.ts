@@ -456,9 +456,50 @@ export const api = {
     }>(`/public/stats/trend${query ? `?${query}` : ""}`);
   },
 
+  publicGamificationKecamatan: () =>
+    request<{
+      leaderboard: Array<{
+        kecamatan: string;
+        score: number;
+        activity_rate: number;
+        participation_rate: number;
+        quality_rate: number;
+        activity_percentile: number;
+        participation_percentile: number;
+        accepted_contributions: number;
+        unique_contributors: number;
+        adjudicated_total: number;
+        active_months: number;
+        denominator_source: string;
+      }>;
+    }>("/public/gamification/leaderboard/kecamatan"),
+
+  publicGamificationUsers: () =>
+    request<{
+      leaderboard: Array<{
+        rank: number;
+        name: string;
+        xp: number;
+        level: number;
+        reputation: number | null;
+        status_changing_accepted: number;
+      }>;
+    }>("/public/gamification/leaderboard/users"),
+
   reportsClose: (id: string) =>
     request<{ status: string }>(`/reports/${id}/close`, {
       method: "POST",
+      token: true,
+    }),
+
+  selfCloseReport: (id: string, body: { reason: string }) =>
+    request<{
+      success: boolean;
+      status: string;
+      cancelled_tasks: number;
+    }>(`/reports/${id}/self-close`, {
+      method: "POST",
+      body: JSON.stringify(body),
       token: true,
     }),
 

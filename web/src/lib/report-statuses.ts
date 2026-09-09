@@ -1,6 +1,18 @@
 import type { ReportStatus } from "../types";
 
 /**
+ * Statuses from which a WARGA (reporter) may self-close their own report.
+ * Must mirror SELF_CLOSABLE_STATES in the backend (src/types/case-states.ts).
+ */
+export const WARGA_SELF_CLOSABLE_STATUSES = [
+  "verified",
+  "assigned",
+  "in_progress",
+  "needs_survey",
+  "needs_completion",
+] as const;
+
+/**
  * All valid report statuses in the system.
  * These are the canonical status values used throughout the application.
  */
