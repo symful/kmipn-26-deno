@@ -27,5 +27,8 @@ DROP TABLE IF EXISTS sla_rules;
 DROP TABLE IF EXISTS priority_formula_versions;
 DROP TABLE IF EXISTS units;
 DROP TABLE IF EXISTS categories;
+DROP TABLE IF EXISTS gamification_badges;
+DROP TABLE IF EXISTS gamification_profiles;
+DROP TABLE IF EXISTS xp_ledger;
 DROP TABLE IF EXISTS revoked_tokens;
 DROP TABLE IF EXISTS users;

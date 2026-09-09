@@ -102,7 +102,14 @@ CREATE TABLE IF NOT EXISTS reports (
   device_id TEXT,
   assigned_to TEXT,
   geom TEXT,
-  priority INT CHECK (priority IS NULL OR (priority BETWEEN 1 AND 5))
+  priority INT CHECK (priority IS NULL OR (priority BETWEEN 1 AND 5)),
+  contribution_type TEXT CHECK (contribution_type IS NULL OR contribution_type IN ('new_report','corroboration','status_changing_update','duplicate_pure')),
+  submission_intent TEXT,
+  related_case_id TEXT,
+  resolution_source TEXT,
+  verification_method TEXT,
+  resolved_at TEXT,
+  reopened_at TEXT
 );
 CREATE INDEX IF NOT EXISTS idx_reports_status ON reports(status);
 CREATE INDEX IF NOT EXISTS idx_reports_category ON reports(category_id);
@@ -116,6 +123,8 @@ CREATE INDEX IF NOT EXISTS idx_reports_reported_at ON reports(reported_at DESC);
 CREATE INDEX IF NOT EXISTS idx_reports_facility_card_id ON reports(facility_card_id);
 CREATE INDEX IF NOT EXISTS idx_reports_reporter_id ON reports(reporter_id);
 CREATE INDEX IF NOT EXISTS idx_reports_lat_lng ON reports(lat, lng);
+CREATE INDEX IF NOT EXISTS idx_reports_related_case ON reports(related_case_id);
+CREATE INDEX IF NOT EXISTS idx_reports_contribution_type ON reports(contribution_type);
 
 -- ============================================================
 -- PHASE 1: Tasks (field workflow)
@@ -429,6 +438,50 @@ CREATE TABLE IF NOT EXISTS push_outbox (
  attempts INTEGER NOT NULL DEFAULT 0,next_attempt_at TEXT NOT NULL DEFAULT(datetime('now')),
  locked_until TEXT,status TEXT NOT NULL DEFAULT 'pending'
 );
+-- ============================================================
+-- PHASE 2: Gamification
+-- ============================================================
+
+CREATE TABLE IF NOT EXISTS xp_ledger (
+  id TEXT PRIMARY KEY,
+  user_id TEXT NOT NULL,
+  contribution_id TEXT NOT NULL,
+  contribution_type TEXT NOT NULL CHECK (contribution_type IN ('new_report','corroboration','status_changing_update','self_status_changing_update')),
+  xp INTEGER NOT NULL CHECK (xp IN (4, 8, 10, -4, -8, -10)),
+  kind TEXT NOT NULL DEFAULT 'credit' CHECK (kind IN ('credit','reversal')),
+  reason TEXT,
+  idempotency_key TEXT UNIQUE NOT NULL,
+  created_at TEXT NOT NULL DEFAULT (datetime('now'))
+);
+CREATE INDEX IF NOT EXISTS idx_xp_ledger_user ON xp_ledger (user_id, created_at);
+CREATE INDEX IF NOT EXISTS idx_xp_ledger_contribution ON xp_ledger (contribution_id);
+
+CREATE TABLE IF NOT EXISTS gamification_profiles (
+  user_id TEXT PRIMARY KEY,
+  leaderboard_opt_in INTEGER NOT NULL DEFAULT 0,
+  abuse_flag INTEGER NOT NULL DEFAULT 0,
+  accepted_adjudicated INTEGER NOT NULL DEFAULT 0,
+  total_adjudicated INTEGER NOT NULL DEFAULT 0,
+  new_report_accepted INTEGER NOT NULL DEFAULT 0,
+  corroboration_accepted INTEGER NOT NULL DEFAULT 0,
+  status_changing_accepted INTEGER NOT NULL DEFAULT 0,
+  xp_reached_at TEXT,
+  updated_at TEXT NOT NULL DEFAULT (datetime('now'))
+);
+
+CREATE TABLE IF NOT EXISTS gamification_badges (
+  id TEXT PRIMARY KEY,
+  user_id TEXT NOT NULL,
+  badge_key TEXT NOT NULL CHECK (badge_key IN ('first_accepted','active_contributor','evidence_strength','condition_updater','high_reliability')),
+  awarded_at TEXT NOT NULL DEFAULT (datetime('now')),
+  UNIQUE (user_id, badge_key)
+);
+CREATE INDEX IF NOT EXISTS idx_badges_user ON gamification_badges (user_id);
+
+-- ============================================================
+-- PHASE 1: Push Notifications (triggers)
+-- ============================================================
+
 CREATE TRIGGER IF NOT EXISTS notifications_enqueue_push AFTER INSERT ON notifications BEGIN
  INSERT OR IGNORE INTO push_outbox(notification_id,user_id,report_id) VALUES(NEW.id,NEW.user_id,NEW.related_report_id);
 END;
