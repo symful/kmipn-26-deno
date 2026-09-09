@@ -5,6 +5,7 @@ import { PublicCaseList } from "./pages/PublicCaseList";
 import { PublicRingkasan } from "./pages/PublicRingkasan";
 import { PublicStatistics } from "./pages/PublicStatistics";
 import { Methodology } from "./pages/Methodology";
+import { PublicLeaderboard } from "./pages/PublicLeaderboard";
 import { SubmitReport } from "./pages/SubmitReport";
 import { CreateReport } from "./pages/CreateReport";
 import { NotFound } from "./pages/NotFound";
@@ -38,6 +39,7 @@ import { Settings } from "./pages/Settings";
 import { Units } from "./pages/Units";
 import { RegionalDashboard } from "./pages/RegionalDashboard";
 import { Analytics } from "./pages/Analytics";
+import { WargaReportDetail } from "./pages/WargaReportDetail";
 
 const SystemIndexRedirect = () => <Navigate to="/system/dashboard" replace />;
 
@@ -60,6 +62,7 @@ export const App = () => {
             <Route path="/statistics" element={<PublicStatistics />} />
             <Route path="/methodology" element={<Methodology />} />
             <Route path="/metodologi" element={<Methodology />} />
+            <Route path="/leaderboard" element={<PublicLeaderboard />} />
             <Route path="/peta" element={<PublicHome />} />
             <Route path="/cases" element={<PublicHome />} />
             <Route path="/case/:id" element={<PublicCaseDetail />} />
@@ -69,6 +72,14 @@ export const App = () => {
           </Route>
           <Route path="/new" element={<CreateReport />} />
           <Route path="/login" element={<Login />} />
+          <Route
+            path="/laporan/:id"
+            element={
+              <ProtectedRoute roles={["WARGA"]}>
+                <WargaReportDetail />
+              </ProtectedRoute>
+            }
+          />
 
           <Route
             path="/system"

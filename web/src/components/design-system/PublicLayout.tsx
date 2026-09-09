@@ -12,6 +12,7 @@ export const PublicLayout = ({ children }: { children: ReactNode }) => {
     ["/peta", "Peta & Daftar", ["/", "/peta", "/cases"]],
     ["/statistics", "Statistik Publik", ["/statistics", "/statistik"]],
     ["/methodology", "Metodologi", ["/methodology", "/metodologi"]],
+    ["/leaderboard", "Leaderboard", ["/leaderboard"]],
   ] as const;
   return (
     <div className="ref-public">
