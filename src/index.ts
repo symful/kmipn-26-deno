@@ -32,6 +32,7 @@ import { assignRoute } from "@/routes/api/reports/[id]/assign";
 import { mergeRoute } from "@/routes/api/reports/[id]/merge";
 import { sanggahanRoute } from "@/routes/api/reports/[id]/sanggahan";
 import { reopenRoute } from "@/routes/api/reports/[id]/reopen";
+import { selfCloseRoute } from "@/routes/api/reports/[id]/self-close";
 import { evidenceRoute } from "@/routes/api/reports/[id]/evidence";
 import { photosPresignedRoute } from "@/routes/api/reports/[id]/photos-presigned";
 import { reportTimelineHandler } from "@/routes/api/reports/[id]/timeline";
@@ -52,6 +53,9 @@ import { anonymousReportsRoute } from "@/routes/api/public/anonymous-reports";
 import { agentAssessRoute } from "@/routes/api/agent/assess";
 import { agentAssessmentsRoute } from "@/routes/api/agent/assessments";
 import { agentActionsRoute } from "@/routes/api/agent/actions";
+import { gamificationRoute } from "@/routes/api/gamification/index";
+import { gamificationLeaderboardRoutes } from "@/routes/api/gamification/leaderboard";
+import { communityUpdateRoute } from "@/routes/api/reports/[id]/community-update";
 
 import {
   processFailedAssessments,
@@ -157,6 +161,7 @@ app.route("/api/public/categories", publicCategoriesRoute);
 app.route("/api/public/stats", publicStatsRoute);
 app.route("/api/public/stats/trend", publicStatsTrendRoute);
 app.route("/api/public/anonymous-reports", anonymousReportsRoute);
+app.route("/api/public/gamification/leaderboard", gamificationLeaderboardRoutes);
 app.route("/api/reports/photos/upload-url-anon", anonymousPhotosUploadUrlRoute);
 
 // ── Reverse geocoding (public) ────────────────────────────────────
@@ -180,6 +185,7 @@ app.use("/api/map", requireAuth);
 app.use("/api/facilities", requireAuth);
 app.use("/api/auth/me", requireAuth);
 app.use("/api/auth/logout", requireAuth);
+app.use("/api/gamification", requireAuth);
 
 // Hono prefix middleware needs a wildcard for nested endpoints.
 for (const prefix of [
@@ -221,6 +227,8 @@ app.route("/api/reports/:id/duplicates", reportDuplicatesByIdRoute);
 app.route("/api/reports/:id/merge", mergeRoute);
 app.route("/api/reports/:id/sanggahan", sanggahanRoute);
 app.route("/api/reports/:id/reopen", reopenRoute);
+app.route("/api/reports/:id/self-close", selfCloseRoute);
+app.route("/api/reports/:id/community-update", communityUpdateRoute);
 app.route("/api/reports/:id/evidence", evidenceRoute);
 app.route("/api/map", mapRoutes);
 app.route("/api/export/geojson", exportGeojsonRoute);
@@ -242,6 +250,7 @@ app.route("/api/facilities/cluster", facilitiesClusterRoute);
 app.route("/api/stats", statsRoute);
 app.route("/api/config", configRoute);
 app.route("/api/units", unitsRoute);
+app.route("/api/gamification", gamificationRoute);
 
 // ═══════════════════════════════════════════════════════════════════
 // requireRole("ADMIN") — admin-only route groups
