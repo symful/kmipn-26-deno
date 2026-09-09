@@ -143,8 +143,8 @@ export const PublicLeaderboard = () => {
                       <th>Peringkat</th>
                       <th>Kecamatan</th>
                       <th>Skor</th>
-                      <th>Rate Aktivitas</th>
-                      <th>Rate Partisipasi</th>
+                      <th>%ile Aktivitas</th>
+                      <th>%ile Partisipasi</th>
                       <th>Rate Kualitas</th>
                       <th>Kontributor</th>
                       <th>Kontribusi Accepted</th>
@@ -163,8 +163,8 @@ export const PublicLeaderboard = () => {
                         >
                           {fmtScore(row.score)}
                         </td>
-                        <td>{fmtPct(row.activity_rate)}</td>
-                        <td>{fmtPct(row.participation_rate)}</td>
+                        <td>{fmtPct(row.activity_percentile)}</td>
+                        <td>{fmtPct(row.participation_percentile)}</td>
                         <td>{fmtPct(row.quality_rate)}</td>
                         <td>{row.unique_contributors}</td>
                         <td>{row.accepted_contributions}</td>
@@ -183,7 +183,9 @@ export const PublicLeaderboard = () => {
                 }}
               >
                 Dinormalisasi {denomMonths} bulan aktif; denominator:{" "}
-                {denomSource}
+                {denomSource}. Skor = 50×%ile aktivitas + 30×%ile partisipasi +
+                20× kualitas; rate mentah per 1.000 penduduk tidak ditampilkan
+                karena denominator fallback kecil.
               </p>
             )}
           </>
