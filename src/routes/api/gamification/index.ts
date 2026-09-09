@@ -25,12 +25,14 @@ gamificationRoute.get(
     const reputation = await getReputation(c.env, user.sub);
 
     const profile = await c.env.D1.prepare(
-      `SELECT leaderboard_opt_in, new_report_accepted, corroboration_accepted, status_changing_accepted
+      `SELECT leaderboard_opt_in, accepted_adjudicated, total_adjudicated, new_report_accepted, corroboration_accepted, status_changing_accepted
        FROM gamification_profiles WHERE user_id = ?`,
     )
       .bind(user.sub)
       .first<{
         leaderboard_opt_in: number;
+        accepted_adjudicated: number;
+        total_adjudicated: number;
         new_report_accepted: number;
         corroboration_accepted: number;
         status_changing_accepted: number;
@@ -47,8 +49,8 @@ gamificationRoute.get(
       level: computeLevel(xp),
       reputation: reputation !== null
         ? {
-            accepted: profile?.new_report_accepted ?? 0,
-            total: (profile?.new_report_accepted ?? 0) + (profile?.corroboration_accepted ?? 0) + (profile?.status_changing_accepted ?? 0),
+            accepted: profile?.accepted_adjudicated ?? 0,
+            total: profile?.total_adjudicated ?? 0,
             value: reputation,
           }
         : null,
