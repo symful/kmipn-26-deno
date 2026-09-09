@@ -34,6 +34,7 @@ export const CaseList = () => {
   const search = params.get("search") || "";
   const month = params.get("month") || "";
   const priority = params.get("priority") || "";
+  const appeal = params.get("appeal") || "";
   const isNew = params.get("new") || "";
   useEffect(() => {
     let active = true;
@@ -48,6 +49,7 @@ export const CaseList = () => {
       search,
       month,
       priority,
+      appeal,
       limit: 100,
     };
     api
@@ -95,6 +97,7 @@ export const CaseList = () => {
     search,
     month,
     priority,
+    appeal,
     reload,
   ]);
   const shown = reports.filter(
@@ -194,6 +197,15 @@ export const CaseList = () => {
         </select>
         <select
           className="ref-select"
+          aria-label="Filter sanggahan"
+          value={appeal}
+          onChange={(e) => update("appeal", e.target.value)}
+        >
+          <option value="">Semua laporan</option>
+          <option value="pending">Ada sanggahan aktif</option>
+        </select>
+        <select
+          className="ref-select"
           aria-label="Filter SLA"
           value={sla}
           onChange={(e) => update("sla", e.target.value)}
@@ -275,6 +287,13 @@ export const CaseList = () => {
                 </p>
                 <div className="flex gap-2.5 items-center flex-wrap">
                   <StatusBadge status={r.status} size="sm" />
+                  {r.appeal_status === "pending" && (
+                    <StatusBadge
+                      tone="warning"
+                      label="Sanggahan aktif"
+                      size="sm"
+                    />
+                  )}
                   <small className="text-xs text-sigap-textTertiary">
                     {r.report_count ?? 1 + (r.supporting_count ?? 0)} laporan
                   </small>

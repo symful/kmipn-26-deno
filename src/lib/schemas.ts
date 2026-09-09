@@ -680,6 +680,7 @@ export const ReportsListQuerySchema = z.object({
     .optional(),
   period: z.enum(["7d", "30d", "90d", "all"]).optional(),
   status: z.string().optional(),
+  appeal: z.enum(["pending"]).optional(),
   category_id: dbId.optional(),
   creator_id: z.string().optional(),
   page: z.coerce.number().int().min(1).default(1),

@@ -109,9 +109,11 @@ CREATE TABLE IF NOT EXISTS reports (
   resolution_source TEXT,
   verification_method TEXT,
   resolved_at TEXT,
-  reopened_at TEXT
+  reopened_at TEXT,
+  appeal_status TEXT DEFAULT NULL CHECK (appeal_status IS NULL OR appeal_status IN ('pending','accepted','rejected'))
 );
 CREATE INDEX IF NOT EXISTS idx_reports_status ON reports(status);
+CREATE INDEX IF NOT EXISTS idx_reports_appeal ON reports(appeal_status);
 CREATE INDEX IF NOT EXISTS idx_reports_category ON reports(category_id);
 CREATE INDEX IF NOT EXISTS idx_reports_idempotency ON reports(idempotency_key);
 CREATE INDEX IF NOT EXISTS idx_reports_created ON reports(created_at DESC);

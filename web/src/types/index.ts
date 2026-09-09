@@ -94,6 +94,7 @@ export interface Report {
     created_at: string;
   }>;
   merged_into?: string | null;
+  appeal_status?: "pending" | "accepted" | "rejected" | null;
   village_name?: string | null;
   report_count?: number | null;
 }

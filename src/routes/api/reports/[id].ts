@@ -18,7 +18,7 @@ reportByIdRoute.get(
     const isAdminOrAuditor = user.role === "ADMIN";
 
     let query = `SELECT r.id, r.idempotency_key, r.category_id, r.description, r.lng, r.lat,
-                        r.photo_urls, r.status, r.severity, r.assigned_to, r.created_at, r.updated_at, r.title, r.deadline, r.merged_into,
+                        r.photo_urls, r.status, r.severity, r.assigned_to, r.created_at, r.updated_at, r.title, r.deadline, r.merged_into, r.appeal_status,
                         ${REPORT_AREA_SQL} AS address_area, r.kecamatan, r.kelurahan, r.kabupaten, r.provinsi, r.impact_dampak,
                         json_extract(r.impact, '$.reported_severity') AS reported_severity,
                         cat.id AS cat_id, cat.name AS cat_name, cat.icon AS cat_icon,
@@ -99,6 +99,7 @@ reportByIdRoute.get(
       created_at: result.created_at,
       updated_at: result.updated_at,
       merged_into: result.merged_into,
+      appeal_status: result.appeal_status,
     };
 
     return c.json(transformed);

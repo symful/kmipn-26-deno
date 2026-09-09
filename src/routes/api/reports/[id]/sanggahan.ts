@@ -40,10 +40,10 @@ sanggahanRoute.post(
     const parsed = await parseJson(c, SanggahanSchema);
 
     const reportR = await c.env.D1.prepare(
-      "SELECT id, status, reporter_id FROM reports WHERE id = ?1",
+      "SELECT id, status, reporter_id, appeal_status FROM reports WHERE id = ?1",
     )
       .bind(reportId)
-      .first<{ id: string; status: string; reporter_id: string }>();
+      .first<{ id: string; status: string; reporter_id: string; appeal_status: string | null }>();
     if (!reportR) {
       return c.json(
         { error: { code: "NOT_FOUND", message: "Laporan tidak ditemukan" } },
@@ -67,7 +67,8 @@ sanggahanRoute.post(
     if (
       !APPEALABLE_STATES.includes(
         currentStatus as (typeof APPEALABLE_STATES)[number],
-      )
+      ) ||
+      reportR.appeal_status === "pending"
     ) {
       return c.json(
         {
@@ -81,9 +82,9 @@ sanggahanRoute.post(
     }
 
     const existingSanggahanR = await c.env.D1.prepare(
-      `SELECT id FROM case_events WHERE report_id = ?1 AND event_type = 'sanggahan_filed'
+      `SELECT id FROM case_events WHERE report_id = ? AND event_type = 'sanggahan_filed'
      AND id NOT IN (
-       SELECT id FROM case_events WHERE report_id = ?1 AND event_type IN ('sanggahan_accepted', 'sanggahan_rejected')
+       SELECT id FROM case_events WHERE report_id = ? AND event_type IN ('sanggahan_accepted', 'sanggahan_rejected')
      )`,
     )
       .bind(reportId, reportId)
@@ -107,6 +108,11 @@ sanggahanRoute.post(
         `INSERT INTO case_events (id, report_id, event_type, actor_id, occurred_at)
      VALUES (?1, ?2, 'sanggahan_filed', ?3, datetime('now'))`,
       ).bind(eventId, reportId, user.sub),
+    );
+    statements.push(
+      c.env.D1.prepare(
+        "UPDATE reports SET appeal_status = 'pending', updated_at = datetime('now') WHERE id = ?",
+      ).bind(reportId),
     );
 
     if (statements.length > 0) {

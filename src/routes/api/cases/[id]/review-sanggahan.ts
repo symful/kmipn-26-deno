@@ -30,10 +30,10 @@ casesReviewSanggahanRoute.post(
     );
 
     const beforeR = await c.env.D1.prepare(
-      "SELECT id, status, reporter_id FROM reports WHERE id = ?",
+      "SELECT id, status, reporter_id, appeal_status FROM reports WHERE id = ?",
     )
       .bind(id)
-      .first<{ id: string; status: string; reporter_id: string }>();
+      .first<{ id: string; status: string; reporter_id: string; appeal_status: string | null }>();
     if (!beforeR) {
       return c.json(
         { error: { code: "NOT_FOUND", message: "Report not found" } },
@@ -42,6 +42,7 @@ casesReviewSanggahanRoute.post(
     }
     const currentStatus = beforeR.status;
     if (
+      beforeR.appeal_status !== "pending" ||
       !APPEALABLE_STATES.includes(
         currentStatus as (typeof APPEALABLE_STATES)[number],
       )
@@ -78,7 +79,7 @@ casesReviewSanggahanRoute.post(
     if (decision === "accepted") {
       statements.push(
         c.env.D1.prepare(
-          "UPDATE reports SET status = ?1, updated_at = (datetime('now')), rejection_reason = NULL WHERE id = ?2",
+          "UPDATE reports SET status = ?1, appeal_status = 'accepted', updated_at = (datetime('now')), rejection_reason = NULL WHERE id = ?2",
         ).bind("submitted", id),
       );
       statements.push(
@@ -88,6 +89,11 @@ casesReviewSanggahanRoute.post(
         ).bind(id, user.sub),
       );
     } else {
+      statements.push(
+        c.env.D1.prepare(
+          "UPDATE reports SET appeal_status = 'rejected', updated_at = (datetime('now')) WHERE id = ?1",
+        ).bind(id),
+      );
       statements.push(
         c.env.D1.prepare(
           `INSERT INTO case_events (id, report_id, event_type, actor_id, occurred_at)

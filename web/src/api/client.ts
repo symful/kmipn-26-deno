@@ -345,6 +345,7 @@ export const api = {
     assigned_unit_id?: string;
     sla?: string;
     creator_id?: string;
+    appeal?: string;
   }) => {
     const qs = new URLSearchParams();
     if (params?.status) qs.set("status", params.status);
@@ -360,6 +361,7 @@ export const api = {
     if (params?.village_id) qs.set("village_id", params.village_id);
     if (params?.severity) qs.set("severity", params.severity);
     if (params?.month) qs.set("month", params.month);
+    if (params?.appeal) qs.set("appeal", params.appeal);
     const query = qs.toString();
     return request<PaginatedReports>(`/reports${query ? `?${query}` : ""}`, {
       token: true,

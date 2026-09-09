@@ -264,6 +264,7 @@ reportsIndexRoute.get(
       severity,
       period,
       month,
+      appeal,
     } = parseQuery(c, ReportsListQuerySchema);
     const user = c.get("user");
     const offset = (page - 1) * limit;
@@ -311,6 +312,10 @@ reportsIndexRoute.get(
       filters.push(`r.status = ?`);
       params.push(status);
     }
+    if (appeal) {
+      filters.push(`r.appeal_status = ?`);
+      params.push(appeal);
+    }
     if (category_id) {
       filters.push(`r.category_id = ?`);
       params.push(category_id);
@@ -322,7 +327,7 @@ reportsIndexRoute.get(
     }
     const where = filters.length ? `WHERE ${filters.join(" AND ")}` : "";
     const baseSql = `SELECT r.id, r.idempotency_key, r.category_id, r.description, r.lng, r.lat,
-                r.photo_urls, r.status, r.severity, r.assigned_to, r.created_at, r.updated_at, r.reported_at, r.title, r.deadline,
+                r.photo_urls, r.status, r.severity, r.assigned_to, r.created_at, r.updated_at, r.reported_at, r.title, r.deadline, r.appeal_status,
                 r.kecamatan, r.kelurahan, r.kabupaten, r.provinsi, r.impact, r.impact_dampak, r.merged_into,
                 ${REPORT_AREA_SQL} AS address_area,
                 cat.id AS cat_id, cat.name AS cat_name, cat.icon AS cat_icon,
@@ -344,7 +349,6 @@ reportsIndexRoute.get(
 
     const listSql = `${baseSql} ORDER BY r.created_at DESC LIMIT ? OFFSET ?`;
     const countSql = `SELECT COUNT(*) AS total FROM reports r ${where}`;
-
     const r = await c.env.D1.prepare(listSql)
       .bind(...listParams)
       .all<Record<string, unknown>>();
