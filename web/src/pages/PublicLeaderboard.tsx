@@ -69,7 +69,8 @@ export const PublicLeaderboard = () => {
     };
   }, [tab]);
 
-  const fmtPct = (v: number) => `${(v * 100).toFixed(1)}%`;
+  const fmtPct = (v: number) =>
+    v > 10 ? "> 1000%" : `${(v * 100).toFixed(1)}%`;
   const fmtScore = (v: number) => v.toFixed(1);
 
   let denomMonths: number | null = null;
