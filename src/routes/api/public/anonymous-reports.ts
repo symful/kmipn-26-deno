@@ -1,3 +1,4 @@
+import { enrichReportLocation } from "@/lib/geocoding";
 import { recordedAddress } from "@/lib/report-area";
 import { Hono } from "hono";
 import { z } from "zod";
@@ -209,6 +210,16 @@ anonymousReportsRoute.post(
         500,
       );
     }
+
+    c.executionCtx.waitUntil(
+      enrichReportLocation(c.env, reportId, parsed.lat, parsed.lng, {
+        kecamatan: parsed.kecamatan,
+        kelurahan: parsed.kelurahan,
+        kabupaten: parsed.kabupaten,
+        provinsi: parsed.provinsi,
+        address_area: parsed.address_area,
+      }),
+    );
 
     c.executionCtx.waitUntil(
       appendAudit(c.env, {

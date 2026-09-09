@@ -15,7 +15,7 @@ import {
   classifyContribution,
   computeReviewRisk,
 } from "@/lib/agent/orchestrator";
-import { awardXp } from "@/lib/gamification";
+import { awardXp, recordAdjudication } from "@/lib/gamification";
 
 const CommunityUpdateSchema = z.object({
   description: z.string().min(10, "Deskripsi pembaruan minimal 10 karakter"),
@@ -250,6 +250,7 @@ communityUpdateRoute.post(
             before: { status: target.status },
             after: { status: "resolved", contribution_id: contributionId },
           }),
+          recordAdjudication(c.env, user.sub, contributionId, true),
           awardXp(c.env, {
             userId: user.sub,
             contributionId,

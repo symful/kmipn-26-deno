@@ -1,3 +1,4 @@
+import { enrichReportLocation } from "@/lib/geocoding";
 import { recordedAddress, REPORT_AREA_SQL } from "@/lib/report-area";
 import { Hono } from "hono";
 import type { Env } from "@/types/bindings";
@@ -174,6 +175,16 @@ reportsIndexRoute.post(
       );
     }
     const reportId = insertResult.id;
+
+    c.executionCtx.waitUntil(
+      enrichReportLocation(c.env, reportId, parsed.lat, parsed.lng, {
+        kecamatan: parsed.kecamatan,
+        kelurahan: parsed.kelurahan,
+        kabupaten: parsed.kabupaten,
+        provinsi: parsed.provinsi,
+        address_area: parsed.address_area,
+      }),
+    );
 
     // Post-insert: audit, async AI
     c.executionCtx.waitUntil(

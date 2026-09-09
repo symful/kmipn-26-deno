@@ -1,3 +1,4 @@
+import { enrichReportLocation } from "@/lib/geocoding";
 import { recordedAddress } from "@/lib/report-area";
 import { Hono } from "hono";
 import type { Env } from "@/types/bindings";
@@ -337,6 +338,18 @@ publicReportsRoute.post(
       )
         .bind(parsed.idempotency_key)
         .first<{ id: string }>();
+
+      if (newReport?.id) {
+        c.executionCtx.waitUntil(
+          enrichReportLocation(c.env, newReport.id, parsed.lat, parsed.lng, {
+            kecamatan: parsed.kecamatan,
+            kelurahan: parsed.kelurahan,
+            kabupaten: parsed.kabupaten,
+            provinsi: parsed.provinsi,
+            address_area: parsed.address_area,
+          }),
+        );
+      }
 
       return { id: newReport?.id ?? null, duplicate: false };
     };
