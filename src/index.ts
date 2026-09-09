@@ -186,6 +186,7 @@ app.use("/api/facilities", requireAuth);
 app.use("/api/auth/me", requireAuth);
 app.use("/api/auth/logout", requireAuth);
 app.use("/api/gamification", requireAuth);
+app.use("/api/gamification/*", requireAuth);
 
 // Hono prefix middleware needs a wildcard for nested endpoints.
 for (const prefix of [
